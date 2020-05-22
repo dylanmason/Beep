@@ -61,6 +61,7 @@ export class FindBeepScreen extends Component {
                 this.setState({tokenid: tokenid});
                 this.setState({id: id});
 
+                //Once we know things like the user's id, we can now get the status of the rider
                 this.getRiderStatus();
             }
         }
@@ -123,6 +124,7 @@ export class FindBeepScreen extends Component {
                                 this.setState({beepersSinglesRate: data.beepersSinglesRate});
                                 this.setState({beepersGroupRate: data.beepersGroupRate});
 
+                                //TODO: should we actually be enabling our socket listener here?
                                 this.enableGetRiderStatus();
 
                                 //if the rider is accepted, we can get more personal information from beeper
@@ -209,15 +211,27 @@ export class FindBeepScreen extends Component {
     }
 
     useCurrentLocation = async () => {
+        //TODO: find amore elegent solution to tell user we are loading location data
         this.setState({ startLocation: "Loading Current Location..." });
+
         let { status } = await Location.requestPermissionsAsync();
+
         if (status !== 'granted') {
+            //TODO: improve this alert
             alert("You must enable location to use this feature.");
+            //If we don't have location permission, DO NOT continue
             return;
         }
+
+        //get location
         let location = await Location.getCurrentPositionAsync({});
+
         console.log("[FindBeep.js] Setting Origin Location to ", location);
+
+        //Make a string we will use to populate the textbox
         let locationString = location.coords.latitude + "," + location.coords.longitude;
+
+        //Update Origin Location
         this.setState({ startLocation: locationString });
     }
 
