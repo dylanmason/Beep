@@ -125,6 +125,7 @@ export class FindBeepScreen extends Component {
                                 this.setState({beepersGroupRate: data.beepersGroupRate});
 
                                 //TODO: should we actually be enabling our socket listener here?
+                                //what does success mean in this case
                                 this.enableGetRiderStatus();
 
                                 //if the rider is accepted, we can get more personal information from beeper
