@@ -1,0 +1,17 @@
+{
+  "name": "Beep",
+  "displayName": "Beep",
+  "expo": {
+    "name": "Beep",
+    "slug": "Beep",
+    "version": "1.0.0",
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
