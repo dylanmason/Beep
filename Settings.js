@@ -6,7 +6,6 @@ import { ThemeContext } from './theme-context';
 async function logout(navigation) {
 
     var token = await AsyncStorage.getItem('@token');
-    console.log("Token: ", token);
 
     //Data we will POST to our Logout API endpoint
     var data = {
