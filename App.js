@@ -3,18 +3,18 @@ import React, { Component } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { StatusBar, AsyncStorage, Vibration } from 'react-native';
-import { RegisterScreen } from './Register'
-import { LoginScreen } from './Login'
-import { MainScreen } from './MainScreen'
-import { SplashScreen } from './SplashScreen'
+import { RegisterScreen } from './components/Register'
+import { LoginScreen } from './components/Login'
+import { MainScreen } from './components/MainScreen'
+import { SplashScreen } from './components/SplashScreen'
 import { Notifications } from 'expo';
 import * as Permissions from 'expo-permissions';
 import Constants from 'expo-constants';
 import * as eva from '@eva-design/eva';
 import { ApplicationProvider, IconRegistry } from '@ui-kitten/components';
-import { default as beepTheme } from './theme.json';
+import { default as beepTheme } from './utils/theme.json';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
-import { ThemeContext } from './theme-context';
+import { ThemeContext } from './utils/theme-context';
 
 const Stack = createStackNavigator();
 var initialScreen;
