@@ -62,7 +62,7 @@ export class FindBeepScreen extends Component {
                 this.setState({id: id});
 
                 //Once we know things like the user's id, we can now get the status of the rider
-                this.getRiderStatus();
+                this.getInitialRiderStatus();
             }
         }
         catch (error)
@@ -79,6 +79,74 @@ export class FindBeepScreen extends Component {
         socket.on('updateRiderStatus', data => {
             console.log("[FindBeep.js] [Socket.io] Socket.io told us to update rider status.");
             this.getRiderStatus();
+        });
+    }
+
+    getInitialRiderStatus() {
+        //We will need to use user's token to update their status
+        let token = this.state.token;
+
+        //Data we will POST to beeper status enpoint API
+        var data = {
+            "token": token
+        }
+
+        fetch("https://beep.nussman.us/api/rider/status", {
+               method: "POST",
+               headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+               },
+               body:  JSON.stringify(data)
+            })
+            .then(
+                function(response)
+                {
+                    if (response.status !== 200)
+                    {
+                        console.log('[FindBeep.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
+                        return;
+                    }
+                    response.json().then(
+                        function(data)
+                        {
+                            if (data.status === "success")
+                            {
+                                //We sucessfuly gotten riders status from database
+                                this.setState({isAccepted: data.isAccepted});
+                                this.setState({beepersFirstName: data.beepersFirstName});
+                                this.setState({queueID: data.queueID});
+                                this.setState({beepersLastName: data.beepersLastName});
+                                this.setState({isAccepted: data.isAccepted});
+                                this.setState({beepersID: data.beepersID});
+                                this.setState({foundBeep: true});
+                                this.setState({beepersQueueSize: data.beepersQueueSize});
+                                this.setState({beepersSinglesRate: data.beepersSinglesRate});
+                                this.setState({beepersGroupRate: data.beepersGroupRate});
+
+
+                                this.enableGetRiderStatus();
+
+                                //if the rider is accepted, we can get more personal information from beeper
+                                if (data.isAccepted)
+                                {
+                                    this.setState({beepersPhone: data.beepersPhone});
+                                    this.setState({beepersVenmo: data.beepersVenmo});
+                                    this.setState({ridersQueuePosition: data.ridersQueuePosition});
+                                }
+                            }
+                            else
+                            {
+                                console.log("[FindBeep.js] [API] " , data.message);
+                                this.setState({foundBeep: false});
+                                this.setState({isAccepted: false});
+                            }
+                        }.bind(this)
+                    );
+                }.bind(this)
+            )
+        .catch((error) => {
+             console.log("[FindBeep.js] [API] Error fetching from the Beep API: ", error);
         });
     }
 
@@ -123,10 +191,6 @@ export class FindBeepScreen extends Component {
                                 this.setState({beepersQueueSize: data.beepersQueueSize});
                                 this.setState({beepersSinglesRate: data.beepersSinglesRate});
                                 this.setState({beepersGroupRate: data.beepersGroupRate});
-
-                                //TODO: should we actually be enabling our socket listener here?
-                                //what does success mean in this case
-                                this.enableGetRiderStatus();
 
                                 //if the rider is accepted, we can get more personal information from beeper
                                 if (data.isAccepted)
