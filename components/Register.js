@@ -145,11 +145,16 @@ export class RegisterScreen extends Component {
                                 const tokenidData = ["@tokenid", data.tokenid];
                                 const singlesRate = ["@singlesRate", "" + data.singlesRate];
                                 const groupRate = ["@groupRate", "" + data.groupRate];
+                                const first = ["@first", data.first];
+                                const last = ["@last", data.last];
+                                const email = ["@email", data.email];
+                                const phone = ["@phone", data.phone];
+                                const venmo = ["@venmo", data.venmo];
 
                                 try
                                 {
                                     //Store data in AsyncStorage
-                                    AsyncStorage.multiSet([idData, usernameData, tokenData, tokenidData, singlesRate, groupRate])
+                                    AsyncStorage.multiSet([idData, usernameData, tokenData, tokenidData, singlesRate, groupRate, first, last, email, phone, venmo]);
                                 }
                                 catch (e)
                                 {

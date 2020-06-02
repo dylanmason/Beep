@@ -383,7 +383,7 @@ export class StartBeepingScreen extends Component {
                                         </Layout>
                                         <Layout style={styles.layout}>
                                             <Text category='h6'>Entered Queue</Text>
-                                            <Text>{new Date(item.timeEnteredQueue * 1000).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</Text>
+                                            <Text>{new Date(item.timeEnteredQueue).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</Text>
                                         </Layout>
                                         <Layout style={styles.layout}>
                                             <Text category='h6'>Group Size</Text>

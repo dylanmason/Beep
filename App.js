@@ -34,7 +34,7 @@ async function registerForPushNotificationsAsync()
         }
         if (finalStatus !== 'granted')
         {
-            alert('Failed to get push token for push notification!');
+            console.log('[App.js] [Push Notifications] Failed to get push token for push notification!');
             return;
         }
 
@@ -46,10 +46,6 @@ async function registerForPushNotificationsAsync()
         AsyncStorage.setItem('@expoPushToken', pushToken);
         //Log that we saved a notification token in storage
         console.log("[Notifications] Wrote Expo Push Token to AsyncStorage: ", pushToken);
-    }
-    else
-    {
-        alert('Must use physical device for Push Notifications');
     }
 
     if (Platform.OS === 'android')

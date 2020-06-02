@@ -2,113 +2,69 @@ import React, { Component } from 'react';
 import { StyleSheet, AsyncStorage } from 'react-native';
 import { Icon, Layout, Text, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 
-
 export class EditProfileScreen extends Component {
 
-    constructor(props)
-    {
+    constructor(props) {
         super(props);
         this.state = {
+            username: '',
             first: '',
             last: '',
             email: '',
             phone: '',
-            venmo: '',
-            username: '',
-            password: '',
+            venmo: ''
         }
     }
 
-
-    retrieveData = async () => {
-        try
-        {
-            //When we load Register.js this will happen
-            //Get tokenid and expoPushToken from AsyncStorage
-            //We get tokenid on login page because if it is set, that means
-            //someone logged out while offline.
-            let tokenid = await AsyncStorage.getItem('@tokenid');
-            //Load expoPushToken
-            let expoPushToken = await AsyncStorage.getItem('@expoPushToken');
-            //Store the Expo Notification token in a state
-            this.setState({expoPushToken: expoPushToken});
-            //Log the Expo Token to console
-            console.log("[Register.js] [Notifications] Got Expo Push Token on Sign Up Page Initialization: " , expoPushToken);
-
-            if (tokenid !== null)
-            {
-                //Token is NOT null, this means a previous user on this device logged out while offline.
-                //We must safely revoke their token.
-                console.log("There was a tokenid stored in memory, this means user logged out while offline. We need to deactivate their token by tokenid.");
-
-                //Post tokenid so we can safely remove the token server-side
-                var data = {
-                    "tokenid": tokenid
-                }
-
-                //POST to our token API
-                fetch("https://beep.nussman.us/api/auth/token", {
-                       method: "POST",
-                       headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                       },
-                       body:  JSON.stringify(data)
-                    })
-                    .then(
-                        function(response)
-                        {
-                            if (response.status !== 200)
-                            {
-                                console.log('[Register.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
-                                return;
-                            }
-                            response.json().then(
-                                function(data)
-                                {
-                                    //Hopefully the token was revoked server-side
-                                    //This API's ouput is not important, just log it
-                                    //so we know that this function is still working when needed
-                                    console.log("[Register.js] [API] Token Revoker API Responce: ", data);
-                                }
-                            );
-                        }
-                    )
-                .catch((error) => {
-                     console.log("[Register.js] [API] Error fetching from the Beep (Token) API: ", error);
-                });
-            }
-        }
-        catch (error)
-        {
-            //If we reach this, we could not pull nessisary data from AsyncStorage
-            console.log("[Register.js] [AsyncStorage] ", error);
-        }
-    };
-
-    handleRegister()
-    {
-        //Before we login, call retrieveData
-        //retrieveData should handle an offline login by tokenid
-        //It also gets the Expo push token and stores it in a state so we can use it here
+    componentDidMount () {
+        //Run retrieveData to get user's data and save it in states
         this.retrieveData();
+    }
 
+    /**
+     * Get User's Data from AsyncStorage
+     */
+    retrieveData = async () => {
+        try {
+            //TODO: improve the perfomance of loading this data, in the future, find a way
+            //to not even use AsyncStorage on every single new screen
+            let username = await AsyncStorage.getItem('@username');
+            let token = await AsyncStorage.getItem('@token');
+            let first = await AsyncStorage.getItem('@first');
+            let last = await AsyncStorage.getItem('@last');
+            let email = await AsyncStorage.getItem('@email');
+            let phone = await AsyncStorage.getItem('@phone');
+            let venmo = await AsyncStorage.getItem('@venmo');
+
+            this.setState({token: token});
+            this.setState({username: username});
+            this.setState({first: first});
+            this.setState({last: last});
+            this.setState({email: email});
+            this.setState({phone: phone});
+            this.setState({venmo: venmo});
+        }
+        catch (error) {
+          console.log("[FindBeep.js] [AsyncStorage] ", error);
+        }
+    }
+
+    handleUpdate() {
         //Define our Main Navigation, use this so send user to Main upon login
         const navigationStuff = this.props.navigation;
 
         //We will POST this data from our states
         var data = {
+            "token": this.state.token,
             "first": this.state.first,
             "last": this.state.last,
             "email": this.state.email,
             "phone": this.state.phone,
-            "venmo": this.state.venmo,
-            "username": this.state.username,
-            "password": this.state.password
+            "venmo": this.state.venmo
         }
 
         //POST to our signup API
-        fetch("https://beep.nussman.us/api/auth/signup", {
+        fetch("https://beep.nussman.us/api/account/edit", {
                method: "POST",
                headers: {
                 Accept: 'application/json',
@@ -116,107 +72,48 @@ export class EditProfileScreen extends Component {
                },
                body:  JSON.stringify(data)
             })
-            .then(
-                function(response)
-                {
+        .then(
+            function(response) {
+                if (response.status !== 200) {
+                    console.log('[EditProfile.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
+                    return;
+                }
 
-                    if (response.status !== 200)
+                response.json().then(
+                    function(data)
                     {
-                        console.log('[Register.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
-                        return;
-                    }
+                        console.log("[EditProfile.js] [API] Update Profile API Responce: ", data);
 
-                    response.json().then(
-                        function(data)
-                        {
-                            //Log what our Signup API returns for debugging
-                            console.log("[Register.js] [API] Signup API Responce: ", data);
+                        if (data.status === "success") {
 
-                            if (data.status === "success")
-                            {
-                                //Upon login, we will store these four items:
-                                //id: the user's id in our db
-                                //username: the user's username in our db
-                                //token: user's auth token in our token db
-                                //tokenid: the token for the token, used for offline logout
-                                const idData = ["@id", data.id];
-                                const usernameData = ["@username", data.username];
-                                const tokenData = ["@token", data.token];
-                                const tokenidData = ["@tokenid", data.tokenid];
+                            const first = ["@first", this.state.first];
+                            const last = ["@last", this.state.last];
+                            const email = ["@email", this.state.email];
+                            const phone = ["@phone", this.state.phone];
+                            const venmo = ["@venmo", this.state.venmo];
 
-                                try
-                                {
-                                    //Store data in AsyncStorage
-                                    AsyncStorage.multiSet([idData, usernameData, tokenData, tokenidData])
-                                }
-                                catch (e)
-                                {
-                                    console.log("[Register.js] [AsyncStorage] Could not store signup data: ", e);
-                                }
-
-                                //Now that the user IS successfully logged in, we need to send their expo push token to our DB
-                                var data = {
-                                    "token": data.token,
-                                    "pushToken": this.state.expoPushToken
-                                }
-
-                                //POST to our push token API
-                                fetch("https://beep.nussman.us/api/auth/push", {
-                                       method: "POST",
-                                       headers: {
-                                        Accept: 'application/json',
-                                        'Content-Type': 'application/json',
-                                       },
-                                       body:  JSON.stringify(data)
-                                    })
-                                    .then(
-                                        function(response)
-                                        {
-                                            if (response.status !== 200)
-                                            {
-                                                console.log('[Register.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
-                                                return;
-                                            }
-                                            response.json().then(
-                                                function(data)
-                                                {
-                                                    //This process of sending our push token to the API should be done silently
-                                                    //Therefore, just log the responce.
-                                                    console.log("[Register.js] [API] Expo Push Token API Responce: ", data);
-                                                }
-                                            );
-                                        }
-                                    )
-                                .catch((error) => {
-                                     console.log("[Register.js] [API] Error updating push token with Beep API: ", error);
-                                });
-
-                                //Signup has been completed. We are ready to send user into main app.
-                                //Use our Navigation we defined earlier to RESET the navigation stack where Main is the root
-                                navigationStuff.reset({
-                                    index: 0,
-                                    routes: [
-                                      { name: 'Main' },
-                                    ],
-                                })
+                            try {
+                                AsyncStorage.multiSet([first, last, email, phone, venmo]);
                             }
-                            else
-                            {
-                                //@TODO: Provide our user's with better sign up errors Ex. 'Password too short!' or 'You must enter a username!'
-                                alert("Error creating new account.");
+                            catch (e) {
+                                console.log("[EditProfile.js] [AsyncStorage] Could not store signup data: ", e);
                             }
-                        }.bind(this)
-                    );
-                }.bind(this)
-            )
+                            console.log("Successfully updated account info");
+                            navigationStuff.goBack();
+                        }
+                        else {
+                            alert("Error updating acount info");
+                        }
+                    }.bind(this)
+                );
+            }.bind(this)
+        )
         .catch((error) => {
-             console.log("[Register.js] [API] Error fetching from the Beep (Signup) API: ", error);
+             console.log("[EditProfile.js] [API] Error fetching from the Beep (Edit Profile) API: ", error);
         });
     }
 
-    render ()
-    {
-
+    render () {
         const BackIcon = (props) => (
              <Icon {...props} name='arrow-back'/>
         );
@@ -232,12 +129,19 @@ export class EditProfileScreen extends Component {
                     <Text style={styles.title} category='h6'>Edit Profile</Text>
                     <Layout style={styles.form}>
                         <Input
+                            value={this.state.username}
+                            textContentType="username"
+                            placeholder="Username"
+                            disabled={true} />
+                        <Input
+                            value={this.state.first}
                             textContentType="givenName"
                             placeholder="First Name"
                             returnKeyType="next"
                             onChangeText={(text) => this.setState({first:text})}
                             onSubmitEditing={()=>this.secondTextInput.focus()} />
                         <Input
+                            value={this.state.last}
                             textContentType="familyName"
                             placeholder="Last Name"
                             returnKeyType="next"
@@ -245,6 +149,7 @@ export class EditProfileScreen extends Component {
                             ref={(input)=>this.secondTextInput = input}
                             onSubmitEditing={()=>this.thirdTextInput.focus()} />
                         <Input
+                            value={this.state.email}
                             textContentType="emailAddress"
                             placeholder="Email"
                             returnKeyType="next"
@@ -252,41 +157,26 @@ export class EditProfileScreen extends Component {
                             ref={(input)=>this.thirdTextInput = input}
                             onSubmitEditing={()=>this.fourthTextInput.focus()} />
                         <Input
+                            value={this.state.phone}
                             textContentType="telephoneNumber"
                             placeholder="Phone Number"
                             returnKeyType="next"
                             onChangeText={(text) => this.setState({phone:text})}
                             ref={(input)=>this.fourthTextInput = input}
                             onSubmitEditing={()=>this.fifthTextInput.focus()} />
-
                         <Input
+                            value={this.state.venmo}
                             textContentType="username"
                             placeholder="Venmo Username"
-                            returnKeyType="next"
+                            returnKeyType="go"
                             onChangeText={(text) => this.setState({venmo:text})}
                             ref={(input)=>this.fifthTextInput = input}
-                            onSubmitEditing={()=>this.sixthTextInput.focus()} />
-
-                        <Input
-                            textContentType="username"
-                            placeholder="Username"
-                            returnKeyType="next"
-                            onChangeText={(text) => this.setState({username:text})}
-                            ref={(input)=>this.sixthTextInput = input}
-                            onSubmitEditing={()=>this.seventhTextInput.focus()} />
-                        <Input
-                            textContentType="password"
-                            placeholder="Password"
-                            returnKeyType="go"
-                            secureTextEntry={true}
-                            ref={(input)=>this.seventhTextInput = input}
-                            onChangeText={(text) => this.setState({password:text})}
-                            onSubmitEditing={() => this.handleRegister()} />
+                            onSubmitEditing={() => this.handleUpdate()} />
                         <Button
                           buttonStyle={styles.button}
-                          onPress={() => this.handleRegister()}
+                            onPress={() => this.handleUpdate()}
                         >
-                        Sign Up
+                        Update Profile
                         </Button>
                     </Layout>
                 </Layout>

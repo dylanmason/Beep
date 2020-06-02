@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { StyleSheet, AsyncStorage } from 'react-native';
 import { Layout, Text, Button, Input, Modal, Card } from '@ui-kitten/components';
 
-
 export class LoginScreen extends Component {
 
     constructor(props)
@@ -131,18 +130,19 @@ export class LoginScreen extends Component {
                                 const usernameData = ["@username", data.username];
                                 const tokenData = ["@token", data.token];
                                 const tokenidData = ["@tokenid", data.tokenid];
-                                //React native does not like it we AsyncStorage store a numerica value, make numbers strings before we store
                                 const singlesRate = ["@singlesRate", "" + data.singlesRate];
                                 const groupRate = ["@groupRate", "" + data.groupRate];
-
-                                try
-                                {
+                                const first = ["@first", data.first];
+                                const last = ["@last", data.last];
+                                const email = ["@email", data.email];
+                                const phone = ["@phone", data.phone];
+                                const venmo = ["@venmo", data.venmo];
+                                
+                                try {
                                     //Store data in AsyncStorage
-                                    AsyncStorage.multiSet([idData, usernameData, tokenData, tokenidData, singlesRate, groupRate])
-                                    //AsyncStorage.multiSet([idData, usernameData, tokenData, tokenidData])
+                                    AsyncStorage.multiSet([idData, usernameData, tokenData, tokenidData, singlesRate, groupRate, first, last, email, phone, venmo]);
                                 }
-                                catch (e)
-                                {
+                                catch (e) {
                                     console.log("[Login.js] [AsyncStorage] Could not store login data: ", e);
                                 }
 
