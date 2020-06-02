@@ -4,8 +4,7 @@ import { Layout, Text, Button, Input, Modal, Card } from '@ui-kitten/components'
 
 export class LoginScreen extends Component {
 
-    constructor(props)
-    {
+    constructor(props) {
         super(props);
         this.state = {
             showLoginError: false,
