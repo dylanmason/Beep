@@ -195,8 +195,7 @@ export class LoginScreen extends Component {
                                 //Use Native Alert to tell user a login error.
                                 //This is where we tell user "Incorrect Password" and such
                                 //alert(data.message);
-                                this.setState({loginError: data.message});
-                                this.setState({showLoginError: true});
+                                this.setState({loginError: data.message, showLoginError: true});
                             }
                         }.bind(this)
                     );

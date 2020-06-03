@@ -36,13 +36,15 @@ export class EditProfileScreen extends Component {
             let phone = await AsyncStorage.getItem('@phone');
             let venmo = await AsyncStorage.getItem('@venmo');
 
-            this.setState({token: token});
-            this.setState({username: username});
-            this.setState({first: first});
-            this.setState({last: last});
-            this.setState({email: email});
-            this.setState({phone: phone});
-            this.setState({venmo: venmo});
+            this.setState({
+                token: token,
+                username: username,
+                first: first,
+                last: last,
+                email: email,
+                phone: phone,
+                venmo: venmo
+            });
         }
         catch (error) {
           console.log("[FindBeep.js] [AsyncStorage] ", error);

@@ -51,12 +51,14 @@ export class StartBeepingScreen extends Component {
 
             if (id !== null)
             {
-                this.setState({username: username});
-                this.setState({token: token});
-                this.setState({tokenid: tokenid});
-                this.setState({id: id});
-                this.setState({singlesRate: singlesRate});
-                this.setState({groupRate: groupRate});
+                this.setState({
+                    username: username,
+                    token: token,
+                    tokenid: tokenid,
+                    id: id,
+                    singlesRate: singlesRate,
+                    groupRate: groupRate
+                });
 
                 console.log("[StartBeeping.js] Fetch beeper status for user id: ", id);
 
@@ -109,50 +111,49 @@ export class StartBeepingScreen extends Component {
     }
 
     getQueue() {
+        //We will need to use user's token to update their status
+        let token = this.state.token;
 
-            //We will need to use user's token to update their status
-            let token = this.state.token;
+        //Data we will POST to beeper status enpoint API
+        var data = {
+            "token": token
+        }
 
-            //Data we will POST to beeper status enpoint API
-            var data = {
-                "token": token
-            }
-
-            fetch("https://beep.nussman.us/api/beeper/queue", {
-                   method: "POST",
-                   headers: {
-                    Accept: 'application/json',
-                    'Content-Type': 'application/json',
-                   },
-                   body:  JSON.stringify(data)
-                })
-                .then(
-                    function(response)
+        fetch("https://beep.nussman.us/api/beeper/queue", {
+               method: "POST",
+               headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+               },
+               body:  JSON.stringify(data)
+            })
+            .then(
+                function(response)
+                {
+                    if (response.status !== 200)
                     {
-                        if (response.status !== 200)
+                        console.log('[StartBeeping.js] [API]  Looks like our API is not responding correctly. Status Code: ' + response.status);
+                        return;
+                    }
+                    response.json().then(
+                        function(data)
                         {
-                            console.log('[StartBeeping.js] [API]  Looks like our API is not responding correctly. Status Code: ' + response.status);
-                            return;
-                        }
-                        response.json().then(
-                            function(data)
+                            if (data.status === "success")
                             {
-                                if (data.status === "success")
-                                {
-                                    //We sucessfuly updated beeper status in database
-                                    this.setState({queue: data.queue});
-                                }
-                                else
-                                {
-                                    alert(data.message);
-                                }
-                            }.bind(this)
-                        );
-                    }.bind(this)
-                )
-            .catch((error) => {
-                 console.log("[StartBeeping.js] [API] Error fetching from the Beep API: ", error);
-            });
+                                //We sucessfuly updated beeper status in database
+                                this.setState({queue: data.queue});
+                            }
+                            else
+                            {
+                                alert(data.message);
+                            }
+                        }.bind(this)
+                    );
+                }.bind(this)
+            )
+        .catch((error) => {
+             console.log("[StartBeeping.js] [API] Error fetching from the Beep API: ", error);
+        });
     }
 
     toggleSwitch = async (value) => {
@@ -214,16 +215,14 @@ export class StartBeepingScreen extends Component {
                             }
                             else
                             {
+                                //Use native popup to tell user why they could not change their status
                                 //Unupdate the toggle switch because something failed
                                 //We redo our actions so the client does not have to wait on server to update the switch
-                                this.setState({isBeeping: !this.state.isBeeping});
+                                this.setState({startBeepingError: data.message, showStartBeepingError: true, isBeeping: !this.state.isBeeping});
                                 //we also need to resubscribe to the socket
                                 if (this.state.isBeeping) {
                                     this.enableGetQueue(); 
                                 }
-                                //Use native popup to tell user why they could not change their status
-                                this.setState({startBeepingError: data.message});
-                                this.setState({showStartBeepingError: true});
                             }
                         }.bind(this)
                     );
@@ -276,10 +275,8 @@ export class StartBeepingScreen extends Component {
                         {
                             console.log("[StartBeeping.js] [API] Accept or Deny API Responce: ", data);
 
-                            if (data.status === "error")
-                            {
-                                this.setState({startBeepingError: data.message});
-                                this.setState({showStartBeepingError: true});
+                            if (data.status === "error") {
+                                this.setState({startBeepingError: data.message, showStartBeepingError: true});
                             }
                         }.bind(this)
                     );
@@ -312,8 +309,8 @@ export class StartBeepingScreen extends Component {
         }
     }
 
-    render ()
-    {
+    render () {
+        console.log("[StartBeeping.js] Rendering Start Beeping Screen");
         if(!this.state.isBeeping)
         {
             return (
