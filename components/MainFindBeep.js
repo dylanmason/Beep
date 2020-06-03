@@ -26,7 +26,6 @@ const CurrentLocationIcon = (props) => (
 );
 
 export class MainFindBeepScreen extends Component {
-
     /*
      * ~~~~~~
      * States
@@ -72,8 +71,7 @@ export class MainFindBeepScreen extends Component {
         }
     };
 
-    componentDidMount ()
-    {
+    componentDidMount () {
         //Run retrieveData to get user's data and save it in states
         this.retrieveData();
 

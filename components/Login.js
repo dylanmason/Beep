@@ -78,8 +78,7 @@ export class LoginScreen extends Component {
         }
     };
 
-    handleLogin()
-    {
+    handleLogin() {
         //Before we login, call retrieveData
         //retrieveData should handle an offline login by tokenid
         //It also gets the Expo push token and stores it in a state so we can use it here

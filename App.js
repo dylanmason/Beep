@@ -70,7 +70,6 @@ function _handleNotification(notification) {
 };
 
 export default function App() {
-
     const [isLoading, setIsLoading] = React.useState(true);
     const [expoPushToken, setExpoPushToken] = React.useState('');
     const [notification, setNotification] = React.useState({});
@@ -79,7 +78,7 @@ export default function App() {
 
     const toggleTheme = () => {
         const nextTheme = theme === 'light' ? 'dark' : 'light';
-        //TODO: Push theme to API to store in DB
+        //TODO: Push theme to AsyncStorage
         setTheme(nextTheme);
     };
 
