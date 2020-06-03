@@ -124,16 +124,17 @@ export class EditProfileScreen extends Component {
 
         return (
             <>
-                <TopNavigation title=' ' alignment='center' leftControl={BackAction()}/>
+                <TopNavigation title='Edit Profile' alignment='center' leftControl={BackAction()}/>
                 <Layout style={styles.container}>
-                    <Text style={styles.title} category='h6'>Edit Profile</Text>
                     <Layout style={styles.form}>
                         <Input
+                            label="Username"
                             value={this.state.username}
                             textContentType="username"
                             placeholder="Username"
                             disabled={true} />
                         <Input
+                            label="First Name"
                             value={this.state.first}
                             textContentType="givenName"
                             placeholder="First Name"
@@ -141,6 +142,7 @@ export class EditProfileScreen extends Component {
                             onChangeText={(text) => this.setState({first:text})}
                             onSubmitEditing={()=>this.secondTextInput.focus()} />
                         <Input
+                            label="Last Name"
                             value={this.state.last}
                             textContentType="familyName"
                             placeholder="Last Name"
@@ -149,6 +151,7 @@ export class EditProfileScreen extends Component {
                             ref={(input)=>this.secondTextInput = input}
                             onSubmitEditing={()=>this.thirdTextInput.focus()} />
                         <Input
+                            label="Email"
                             value={this.state.email}
                             textContentType="emailAddress"
                             placeholder="Email"
@@ -157,6 +160,7 @@ export class EditProfileScreen extends Component {
                             ref={(input)=>this.thirdTextInput = input}
                             onSubmitEditing={()=>this.fourthTextInput.focus()} />
                         <Input
+                            label="Phone Number"
                             value={this.state.phone}
                             textContentType="telephoneNumber"
                             placeholder="Phone Number"
@@ -165,6 +169,7 @@ export class EditProfileScreen extends Component {
                             ref={(input)=>this.fourthTextInput = input}
                             onSubmitEditing={()=>this.fifthTextInput.focus()} />
                         <Input
+                            label="Venmo Username"
                             value={this.state.venmo}
                             textContentType="username"
                             placeholder="Venmo Username"
@@ -194,9 +199,5 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         width: "83%",
         marginTop: 20,
-    },
-    title: {
-        fontSize: 40,
-        padding: 15,
     }
 });

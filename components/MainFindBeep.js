@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, AsyncStorage, Linking } from 'react-native';
-import { Icon, Layout, Text, Button, Input, Toggle, Modal, Card } from '@ui-kitten/components';
+import { Icon, Layout, Text, Button, Input, CheckBox, Modal, Card } from '@ui-kitten/components';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import socket from '../utils/Socket'
@@ -292,7 +292,6 @@ export class MainFindBeepScreen extends Component {
             "destination": this.state.destination,
             "groupSize": this.state.groupSize
         }
-
         fetch("https://beep.nussman.us/api/rider/find", {
                method: "POST",
                headers: {
@@ -459,9 +458,8 @@ export class MainFindBeepScreen extends Component {
                         value={this.state.destination}
                         onChangeText={value => this.setState({destination: value})}
                     />
-                    <Toggle checked={this.state.pickBeeper} onChange={(value) => this.setState({pickBeeper: value})}>
-                    </Toggle>
-                    <Text>Pick your own beeper</Text>
+                    <CheckBox text='Pick your own beeper' checked={this.state.pickBeeper} onChange={(value) => this.setState({pickBeeper: value})}>
+                    </CheckBox>
                     <Button
                         onPress={this.findBeep}
                     >
