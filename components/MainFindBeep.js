@@ -56,10 +56,12 @@ export class MainFindBeepScreen extends Component {
 
             if (id !== null)
             {
-                this.setState({username: username});
-                this.setState({token: token});
-                this.setState({tokenid: tokenid});
-                this.setState({id: id});
+                this.setState({
+                    username: username,
+                    token: token,
+                    tokenid: tokenid,
+                    id: id
+                });
 
                 //Once we know things like the user's id, we can now get the status of the rider
                 this.getInitialRiderStatus();
@@ -112,33 +114,33 @@ export class MainFindBeepScreen extends Component {
                             if (data.status === "success")
                             {
                                 //We sucessfuly gotten riders status from database
-                                this.setState({isAccepted: data.isAccepted});
-                                this.setState({beepersFirstName: data.beepersFirstName});
-                                this.setState({queueID: data.queueID});
-                                this.setState({beepersLastName: data.beepersLastName});
-                                this.setState({isAccepted: data.isAccepted});
-                                this.setState({beepersID: data.beepersID});
-                                this.setState({foundBeep: true});
-                                this.setState({beepersQueueSize: data.beepersQueueSize});
-                                this.setState({beepersSinglesRate: data.beepersSinglesRate});
-                                this.setState({beepersGroupRate: data.beepersGroupRate});
-
+                                this.setState({
+                                    isAccepted: data.isAccepted,
+                                    beepersFirstName: data.beepersFirstName,
+                                    beepersLastName: data.beepersLastName,
+                                    queueID: data.queueID,
+                                    beepersID: data.beepersID,
+                                    foundBeep: true,
+                                    beepersQueueSize: data.beepersQueueSize,
+                                    beepersSinglesRate: data.beepersSinglesRate,
+                                    beepersGroupRate: data.beepersGroupRate
+                                });
 
                                 this.enableGetRiderStatus();
 
                                 //if the rider is accepted, we can get more personal information from beeper
-                                if (data.isAccepted)
-                                {
-                                    this.setState({beepersPhone: data.beepersPhone});
-                                    this.setState({beepersVenmo: data.beepersVenmo});
-                                    this.setState({ridersQueuePosition: data.ridersQueuePosition});
+                                if (data.isAccepted) {
+                                    this.setState({
+                                        beepersPhone: data.beepersPhone,
+                                        beepersVenmo: data.beepersVenmo,
+                                        ridersQueuePosition: data.ridersQueuePosition
+                                    });
                                 }
                             }
                             else
                             {
                                 console.log("[FindBeep.js] [API] " , data.message);
-                                this.setState({foundBeep: false});
-                                this.setState({isAccepted: false});
+                                this.setState({foundBeep: false, isAccepted: false});
                             }
                         }.bind(this)
                     );
@@ -180,30 +182,31 @@ export class MainFindBeepScreen extends Component {
                             if (data.status === "success")
                             {
                                 //We sucessfuly gotten riders status from database
-                                this.setState({isAccepted: data.isAccepted});
-                                this.setState({beepersFirstName: data.beepersFirstName});
-                                this.setState({queueID: data.queueID});
-                                this.setState({beepersLastName: data.beepersLastName});
-                                this.setState({isAccepted: data.isAccepted});
-                                this.setState({beepersID: data.beepersID});
-                                this.setState({foundBeep: true});
-                                this.setState({beepersQueueSize: data.beepersQueueSize});
-                                this.setState({beepersSinglesRate: data.beepersSinglesRate});
-                                this.setState({beepersGroupRate: data.beepersGroupRate});
+                                this.setState({
+                                    isAccepted: data.isAccepted,
+                                    beepersFirstName: data.beepersFirstName,
+                                    beepersLastName: data.beepersLastName,
+                                    queueID: data.queueID,
+                                    beepersID: data.beepersID,
+                                    foundBeep: true,
+                                    beepersQueueSize: data.beepersQueueSize,
+                                    beepersSinglesRate: data.beepersSinglesRate,
+                                    beepersGroupRate: data.beepersGroupRate
+                                });
 
                                 //if the rider is accepted, we can get more personal information from beeper
-                                if (data.isAccepted)
-                                {
-                                    this.setState({beepersPhone: data.beepersPhone});
-                                    this.setState({beepersVenmo: data.beepersVenmo});
-                                    this.setState({ridersQueuePosition: data.ridersQueuePosition});
+                                if (data.isAccepted) {
+                                    this.setState({
+                                        beepersPhone: data.beepersPhone,
+                                        beepersVenmo: data.beepersVenmo,
+                                        ridersQueuePosition: data.ridersQueuePosition
+                                    });
                                 }
                             }
                             else
                             {
                                 console.log("[FindBeep.js] [API] " , data.message);
-                                this.setState({foundBeep: false});
-                                this.setState({isAccepted: false});
+                                this.setState({foundBeep: false, isAccepted: false});
                                 this.disableGetRiderStatus();
                             }
                         }.bind(this)
@@ -247,14 +250,16 @@ export class MainFindBeepScreen extends Component {
 
                             if (data.status === "success")
                             {
-                                this.setState({beepersID: data.beepersID});
-                                this.setState({beepersFirstName: data.beepersFirstName});
-                                this.setState({beepersLastName: data.beepersLastName});
-                                this.setState({beepersQueueSize: data.beepersQueueSize + 1});
-                                this.setState({beepersSinglesRate: data.beepersSinglesRate});
-                                this.setState({beepersGroupRate: data.beepersGroupRate});
-                                this.setState({queueID: data.queueID});
-                                this.setState({foundBeep: true});
+                                this.setState({
+                                    beepersID: data.beepersID,
+                                    beepersFirstName: data.beepersFirstName,
+                                    beepersLastName: data.beepersLastName,
+                                    beepersQueueSize: data.beepersQueueSize + 1,
+                                    beepersSinglesRate: data.beepersSinglesRate,
+                                    beepersGroupRate: data.beepersGroupRate,
+                                    queueID: data.queueID,
+                                    foundBeep: true
+                                });
 
                                 //tell socket server to listen for updates
                                 this.enableGetRiderStatus();
@@ -262,8 +267,7 @@ export class MainFindBeepScreen extends Component {
                             else
                             {
                                 //alert(data.message);
-                                this.setState({findBeepError: data.message});
-                                this.setState({showFindBeepError: true});
+                                this.setState({findBeepError: data.message, showFindBeepError: true});
                             }
                         }.bind(this)
                     );
@@ -290,6 +294,7 @@ export class MainFindBeepScreen extends Component {
             "destination": this.state.destination,
             "groupSize": this.state.groupSize
         }
+
         fetch("https://beep.nussman.us/api/rider/find", {
                method: "POST",
                headers: {
@@ -313,23 +318,23 @@ export class MainFindBeepScreen extends Component {
 
                             if (data.status === "success")
                             {
-                                this.setState({beepersID: data.beepersID});
-                                this.setState({beepersFirstName: data.beepersFirstName});
-                                this.setState({beepersLastName: data.beepersLastName});
-                                this.setState({beepersQueueSize: data.beepersQueueSize + 1});
-                                this.setState({beepersSinglesRate: data.beepersSinglesRate});
-                                this.setState({beepersGroupRate: data.beepersGroupRate});
-                                this.setState({queueID: data.queueID});
-                                this.setState({foundBeep: true});
-
+                                this.setState({
+                                    beepersID: data.beepersID,
+                                    beepersFirstName: data.beepersFirstName,
+                                    beepersLastName: data.beepersLastName,
+                                    beepersQueueSize: data.beepersQueueSize + 1,
+                                    beepersSinglesRate: data.beepersSinglesRate,
+                                    beepersGroupRate: data.beepersGroupRate,
+                                    queueID: data.queueID,
+                                    foundBeep: true
+                                });
                                 //tell socket server to listen for updates
                                 this.enableGetRiderStatus();
                             }
                             else
                             {
                                 //alert(data.message);
-                                this.setState({findBeepError: data.message});
-                                this.setState({showFindBeepError: true});
+                                this.setState({findBeepError: data.message, showFindBeepError: true});
                             }
                         }.bind(this)
                     );
@@ -418,8 +423,8 @@ export class MainFindBeepScreen extends Component {
         socket.emit('stopGetRiderStatus');
     }
 
-    render ()
-    {
+    render () {
+        console.log("[MainFindBeep.js] Rendering Main Find Beep");
         if (!this.state.foundBeep)
         {
             return (
