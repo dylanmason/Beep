@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { StyleSheet, AsyncStorage } from 'react-native';
 import { Icon, Layout, Text, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 
-
 export class RegisterScreen extends Component {
 
     constructor(props)
