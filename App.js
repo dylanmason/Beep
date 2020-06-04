@@ -19,21 +19,18 @@ import * as SplashScreen from 'expo-splash-screen';
 const Stack = createStackNavigator();
 var initialScreen;
 
-async function registerForPushNotificationsAsync()
-{
-    if (Constants.isDevice)
-    {
+async function registerForPushNotificationsAsync() {
+    if (Constants.isDevice) {
         const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
 
         let finalStatus = existingStatus;
 
-        if (existingStatus !== 'granted')
-        {
+        if (existingStatus !== 'granted') {
             const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
             finalStatus = status;
         }
-        if (finalStatus !== 'granted')
-        {
+
+        if (finalStatus !== 'granted') {
             console.log('[App.js] [Push Notifications] Failed to get push token for push notification!');
             return;
         }
@@ -48,8 +45,7 @@ async function registerForPushNotificationsAsync()
         console.log("[Notifications] Wrote Expo Push Token to AsyncStorage: ", pushToken);
     }
 
-    if (Platform.OS === 'android')
-    {
+    if (Platform.OS === 'android') {
         Notifications.createChannelAndroidAsync('default', {
             name: 'default',
             sound: true,
@@ -78,7 +74,6 @@ async function startSplash() {
 }
 
 export default function App() {
-    console.log("starting app");
     startSplash();
 
     const [expoPushToken, setExpoPushToken] = React.useState('');

@@ -75,11 +75,11 @@ export class MainFindBeepScreen extends Component {
         {
           console.log("[FindBeep.js] [AsyncStorage] ", error);
         }
-    };
+    }
 
     async componentDidMount () {
         //Run retrieveData to get user's data and save it in states
-        this.retrieveData();
+        await this.retrieveData();
 
         await SplashScreen.hideAsync();
 
@@ -209,9 +209,8 @@ export class MainFindBeepScreen extends Component {
                                     });
                                 }
                             }
-                            else
-                            {
-                                console.log("[FindBeep.js] [API] " , data.message);
+                            else {
+                                console.log("[FindBeep.js] [API] " , data.message, "Thread:", this.state.username);
                                 this.setState({foundBeep: false, isAccepted: false});
                                 this.disableGetRiderStatus();
                             }

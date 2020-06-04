@@ -33,10 +33,8 @@ const BottomTabBar = ({ navigation, state }) => (
   </BottomNavigation>
 );
 
-export class MainScreen extends Component
-{
-    render()
-    {
+export class MainScreen extends Component {
+    render() {
        return (
             <Navigator tabBar={props => <BottomTabBar {...props} />}>
                 <Screen name='Get a Beep' component={FindBeepScreen}/>

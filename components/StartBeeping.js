@@ -48,7 +48,7 @@ export class StartBeepingScreen extends Component {
             let tokenid = await AsyncStorage.getItem('@tokenid');
             let singlesRate = await AsyncStorage.getItem('@singlesRate');
             let groupRate = await AsyncStorage.getItem('@groupRate');
-
+            console.log(token);
             if (id !== null)
             {
                 this.setState({
@@ -101,10 +101,10 @@ export class StartBeepingScreen extends Component {
         }
     };
 
-    componentDidMount ()
+    async componentDidMount ()
     {
         //get user information and set toggle switch to correct status on mount
-        this.retrieveData();
+        await this.retrieveData();
         socket.on("updateQueue", queue => {
             console.log("[StartBeeping.js] [Socket.io] Socktio.io told us to update queue!");
             this.getQueue();
@@ -146,7 +146,7 @@ export class StartBeepingScreen extends Component {
                             }
                             else
                             {
-                                alert(data.message);
+                                console.warn(data.message, " Thread: ", this.state.username);
                             }
                         }.bind(this)
                     );

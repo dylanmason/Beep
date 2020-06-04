@@ -2,8 +2,11 @@ import React, { Component } from 'react';
 import { StyleSheet, TouchableOpacity, AsyncStorage } from 'react-native';
 import { Toggle, Layout, Text, Button, Input } from '@ui-kitten/components';
 import { ThemeContext } from '../utils/theme-context';
+import socket from '../utils/Socket'
+import { CommonActions } from '@react-navigation/native';
 
-async function logout(navigation) {
+
+async function logout({navigation}) {
 
     var token = await AsyncStorage.getItem('@token');
 
@@ -48,6 +51,9 @@ async function logout(navigation) {
                             AsyncStorage.multiRemove(keys, (err) => {
                                 console.log("[Settings.js] [Logout] Removed all from storage except our push token.");
                             });
+                            //unsub from sockio 
+                            socket.emit('stopGetQueue');
+                            socket.emit('stopGetRiderStatus');
                         }
                         else
                         {
@@ -83,11 +89,12 @@ async function logout(navigation) {
 }
 
 export function MainSettingsScreen({ navigation }) {
+    console.log(navigation);
     const themeContext = React.useContext(ThemeContext);
     return (
         <Layout style={styles.container}>
             <Button onPress={themeContext.toggleTheme}>Toggle Theme</Button>
-            <Button onPress={() => logout(navigation)}>Logout</Button>
+            <Button onPress={() => logout({ navigation })}>Logout</Button>
             <Button onPress={() => navigation.navigate("EditProfileScreen")}>Edit Profile</Button>
         </Layout>
     );
