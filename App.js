@@ -6,7 +6,6 @@ import { Platform, StyleSheet, StatusBar, AsyncStorage, Vibration } from 'react-
 import { RegisterScreen } from './components/Register'
 import { LoginScreen } from './components/Login'
 import { MainScreen } from './components/MainScreen'
-import { SplashScreen } from './components/SplashScreen'
 import { Notifications } from 'expo';
 import * as Permissions from 'expo-permissions';
 import Constants from 'expo-constants';
@@ -15,6 +14,7 @@ import { ApplicationProvider, IconRegistry, Layout } from '@ui-kitten/components
 import { default as beepTheme } from './utils/theme.json';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
 import { ThemeContext } from './utils/theme-context';
+import * as SplashScreen from 'expo-splash-screen';
 
 const Stack = createStackNavigator();
 var initialScreen;
@@ -59,7 +59,6 @@ async function registerForPushNotificationsAsync()
     }
 }
 
-
 function _handleNotification(notification) {
     //Vibrate when we recieve a notification
     Vibration.vibrate();
@@ -67,10 +66,21 @@ function _handleNotification(notification) {
     console.log("[App.js] [Notifications] Notification Recieved: ", notification);
     //Store the most recent notification in a state
     //setNotification(notification);
-};
+}
+
+async function startSplash() {
+    // Prevent native splash screen from autohiding
+    try {
+      await SplashScreen.preventAutoHideAsync();
+    } catch (e) {
+      console.warn(e);
+    }
+}
 
 export default function App() {
-    const [isLoading, setIsLoading] = React.useState(true);
+    console.log("starting app");
+    startSplash();
+
     const [expoPushToken, setExpoPushToken] = React.useState('');
     const [notification, setNotification] = React.useState({});
     const [token, setToken] = React.useState('');
@@ -87,7 +97,6 @@ export default function App() {
     if (initialScreen == null) {
         //When App loads initially, get token from AsyncStorage
         AsyncStorage.getItem('@token').then((token) => {
-
             if(token) {
                 //Register for Expo Push Notifications
                 registerForPushNotificationsAsync();
@@ -109,7 +118,7 @@ export default function App() {
                 initialScreen = "Login";
                 //Log this to console
                 console.log("[App.js] [Auth] No token found, send user to Login");
-                setIsLoading(false);
+                setToken(null);
             }
           }, (error) => {
             //AsyncStorage could not get data from storage
@@ -118,16 +127,12 @@ export default function App() {
 
         //We are checking if a token exists in AsyncStorage
         console.log("[App.js] Rendering Loading Screen");
-        return(
-            <>
-                <SplashScreen/>
-            </>
-        );
+        return(null);
     }
 
     //Loading is done! Render our main app
     console.log("[App.js] Rendering App with Intial Screen: ", initialScreen);
-
+    
     return (
         <>
         <IconRegistry icons={EvaIconsPack} />

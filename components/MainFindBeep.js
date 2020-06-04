@@ -4,6 +4,12 @@ import { Icon, Layout, Text, Button, Input, CheckBox, Modal, Card } from '@ui-ki
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import socket from '../utils/Socket'
+import * as SplashScreen from 'expo-splash-screen';
+import { YellowBox } from 'react-native';
+
+YellowBox.ignoreWarnings([
+  'Non-serializable values were found in the navigation state',
+]);
 
 const PhoneIcon = (props) => (
   <Icon {...props} name='phone-call-outline'/>
@@ -47,15 +53,13 @@ export class MainFindBeepScreen extends Component {
      * Get User's Data from AsyncStorage
      */
     retrieveData = async () => {
-        try
-        {
+        try {
             let username = await AsyncStorage.getItem('@username');
             let token = await AsyncStorage.getItem('@token');
             let id = await AsyncStorage.getItem('@id');
             let tokenid = await AsyncStorage.getItem('@tokenid');
 
-            if (id !== null)
-            {
+            if (id !== null) {
                 this.setState({
                     username: username,
                     token: token,
@@ -73,9 +77,11 @@ export class MainFindBeepScreen extends Component {
         }
     };
 
-    componentDidMount () {
+    async componentDidMount () {
         //Run retrieveData to get user's data and save it in states
         this.retrieveData();
+
+        await SplashScreen.hideAsync();
 
         socket.on('updateRiderStatus', data => {
             console.log("[FindBeep.js] [Socket.io] Socket.io told us to update rider status.");

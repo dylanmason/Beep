@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, AsyncStorage } from 'react-native';
 import { Layout, Text, Button, Input, Modal, Card } from '@ui-kitten/components';
+import * as SplashScreen from 'expo-splash-screen';
 
 export class LoginScreen extends Component {
 
@@ -77,6 +78,10 @@ export class LoginScreen extends Component {
             console.log("[Login.js] [AsyncStorage] ", error);
         }
     };
+
+    async componentDidMount() {
+        await SplashScreen.hideAsync();
+    }
 
     handleLogin() {
         //Before we login, call retrieveData

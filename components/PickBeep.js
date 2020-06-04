@@ -1,5 +1,10 @@
 import React, { Component } from 'react';
 import { Layout, Text, Divider, List, ListItem, Icon, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
+import { YellowBox } from 'react-native';
+
+YellowBox.ignoreWarnings([
+  'Non-serializable values were found in the navigation state',
+]);
 
 export class PickBeepScreen extends Component {
 
