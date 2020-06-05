@@ -54,6 +54,8 @@ async function logout({navigation}) {
                             //unsub from sockio 
                             socket.emit('stopGetQueue');
                             socket.emit('stopGetRiderStatus');
+                            socket.off('updateRiderStatus');
+                            socket.off('updateQueue');
                         }
                         else
                         {
@@ -85,11 +87,11 @@ async function logout({navigation}) {
         routes: [
             { name: 'Login' },
         ],
-    })
+        key: null
+    });
 }
 
 export function MainSettingsScreen({ navigation }) {
-    console.log(navigation);
     const themeContext = React.useContext(ThemeContext);
     return (
         <Layout style={styles.container}>

@@ -40,17 +40,15 @@ export class StartBeepingScreen extends Component {
      * Get User's Data from AsyncStorage
      */
     retrieveData = async () => {
-        try
-        {
+        try {
             let username = await AsyncStorage.getItem('@username');
             let token = await AsyncStorage.getItem('@token');
             let id = await AsyncStorage.getItem('@id');
             let tokenid = await AsyncStorage.getItem('@tokenid');
             let singlesRate = await AsyncStorage.getItem('@singlesRate');
             let groupRate = await AsyncStorage.getItem('@groupRate');
-            console.log(token);
-            if (id !== null)
-            {
+            
+            if (id !== null) {
                 this.setState({
                     username: username,
                     token: token,
@@ -95,16 +93,15 @@ export class StartBeepingScreen extends Component {
                 });
             }
         }
-        catch (error)
-        {
+        catch (error) {
           console.log("[StartBeeping.js] [AsyncStorage] ", error);
         }
-    };
+    }
 
-    async componentDidMount ()
-    {
+    componentDidMount () {
         //get user information and set toggle switch to correct status on mount
-        await this.retrieveData();
+        this.retrieveData();
+
         socket.on("updateQueue", queue => {
             console.log("[StartBeeping.js] [Socket.io] Socktio.io told us to update queue!");
             this.getQueue();

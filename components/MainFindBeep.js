@@ -77,12 +77,15 @@ export class MainFindBeepScreen extends Component {
         }
     }
 
-    async componentDidMount () {
-        //Run retrieveData to get user's data and save it in states
-        await this.retrieveData();
-
+    async doneSplash() {
         await SplashScreen.hideAsync();
+    }
 
+    componentDidMount () {
+        //Run retrieveData to get user's data and save it in states
+        this.retrieveData();
+        this.doneSplash();
+        
         socket.on('updateRiderStatus', data => {
             console.log("[FindBeep.js] [Socket.io] Socket.io told us to update rider status.");
             this.getRiderStatus();
