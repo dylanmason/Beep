@@ -4,8 +4,7 @@ import { Icon, Layout, Text, Button, Input, TopNavigation, TopNavigationAction }
 
 export class RegisterScreen extends Component {
 
-    constructor(props)
-    {
+    constructor(props) {
         super(props);
         this.state = {
             first: '',
@@ -18,10 +17,8 @@ export class RegisterScreen extends Component {
         }
     }
 
-
-    retrieveData = async () => {
-        try
-        {
+    async retrieveData () {
+        try {
             //When we load Register.js this will happen
             //Get tokenid and expoPushToken from AsyncStorage
             //We get tokenid on login page because if it is set, that means
@@ -34,59 +31,48 @@ export class RegisterScreen extends Component {
             //Log the Expo Token to console
             console.log("[Register.js] [Notifications] Got Expo Push Token on Sign Up Page Initialization: " , expoPushToken);
 
-            if (tokenid !== null)
-            {
+            if (tokenid !== null) {
                 //Token is NOT null, this means a previous user on this device logged out while offline.
                 //We must safely revoke their token.
                 console.log("There was a tokenid stored in memory, this means user logged out while offline. We need to deactivate their token by tokenid.");
 
-                //Post tokenid so we can safely remove the token server-side
-                var data = {
-                    "tokenid": tokenid
-                }
-
                 //POST to our token API
                 fetch("https://beep.nussman.us/api/auth/token", {
-                       method: "POST",
-                       headers: {
+                    method: "POST",
+                    headers: {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
-                       },
-                       body:  JSON.stringify(data)
-                    })
-                    .then(
-                        function(response)
-                        {
-                            if (response.status !== 200)
-                            {
-                                console.log('[Register.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
-                                return;
-                            }
-                            response.json().then(
-                                function(data)
-                                {
-                                    //Hopefully the token was revoked server-side
-                                    //This API's ouput is not important, just log it
-                                    //so we know that this function is still working when needed
-                                    console.log("[Register.js] [API] Token Revoker API Responce: ", data);
-                                }
-                            );
+                    },
+                    body: JSON.stringify({ "tokenid": tokenid })
+                })
+                .then(
+                    function(response) {
+                        if (response.status !== 200) {
+                            console.log('[Register.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
+                            return;
                         }
-                    )
+                        response.json().then(
+                            function(data) {
+                                //Hopefully the token was revoked server-side
+                                //This API's ouput is not important, just log it
+                                //so we know that this function is still working when needed
+                                console.log("[Register.js] [API] Token Revoker API Responce: ", data);
+                            }
+                        )
+                    }
+                )
                 .catch((error) => {
                      console.log("[Register.js] [API] Error fetching from the Beep (Token) API: ", error);
                 });
             }
         }
-        catch (error)
-        {
+        catch (error) {
             //If we reach this, we could not pull nessisary data from AsyncStorage
             console.log("[Register.js] [AsyncStorage] ", error);
         }
-    };
+    }
 
-    handleRegister()
-    {
+    handleRegister () {
         //Before we login, call retrieveData
         //retrieveData should handle an offline login by tokenid
         //It also gets the Expo push token and stores it in a state so we can use it here
@@ -108,121 +94,114 @@ export class RegisterScreen extends Component {
 
         //POST to our signup API
         fetch("https://beep.nussman.us/api/auth/signup", {
-               method: "POST",
-               headers: {
+            method: "POST",
+            headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-               },
-               body:  JSON.stringify(data)
-            })
-            .then(
-                function(response)
-                {
+            },
+            body: JSON.stringify(data)
+        })
+        .then(
+            function(response) {
+                if (response.status !== 200) {
+                    console.log('[Register.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
+                    return;
+                }
 
-                    if (response.status !== 200)
-                    {
-                        console.log('[Register.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
-                        return;
-                    }
+                response.json().then(
+                    function(data) {
+                        //Log what our Signup API returns for debugging
+                        console.log("[Register.js] [API] Signup API Responce: ", data);
 
-                    response.json().then(
-                        function(data)
-                        {
-                            //Log what our Signup API returns for debugging
-                            console.log("[Register.js] [API] Signup API Responce: ", data);
+                        if (data.status === "success") {
+                            //Upon login, we will store these four items:
+                            //id: the user's id in our db
+                            //username: the user's username in our db
+                            //token: user's auth token in our token db
+                            //tokenid: the token for the token, used for offline logout
+                            const idData = ["@id", data.id];
+                            const usernameData = ["@username", data.username];
+                            const tokenData = ["@token", data.token];
+                            const tokenidData = ["@tokenid", data.tokenid];
+                            const singlesRate = ["@singlesRate", "" + data.singlesRate];
+                            const groupRate = ["@groupRate", "" + data.groupRate];
+                            const first = ["@first", data.first];
+                            const last = ["@last", data.last];
+                            const email = ["@email", data.email];
+                            const phone = ["@phone", data.phone];
+                            const venmo = ["@venmo", data.venmo];
 
-                            if (data.status === "success")
-                            {
-                                //Upon login, we will store these four items:
-                                //id: the user's id in our db
-                                //username: the user's username in our db
-                                //token: user's auth token in our token db
-                                //tokenid: the token for the token, used for offline logout
-                                const idData = ["@id", data.id];
-                                const usernameData = ["@username", data.username];
-                                const tokenData = ["@token", data.token];
-                                const tokenidData = ["@tokenid", data.tokenid];
-                                const singlesRate = ["@singlesRate", "" + data.singlesRate];
-                                const groupRate = ["@groupRate", "" + data.groupRate];
-                                const first = ["@first", data.first];
-                                const last = ["@last", data.last];
-                                const email = ["@email", data.email];
-                                const phone = ["@phone", data.phone];
-                                const venmo = ["@venmo", data.venmo];
-
-                                try
-                                {
-                                    //Store data in AsyncStorage
-                                    AsyncStorage.multiSet([idData, usernameData, tokenData, tokenidData, singlesRate, groupRate, first, last, email, phone, venmo]);
-                                }
-                                catch (e)
-                                {
-                                    console.log("[Register.js] [AsyncStorage] Could not store signup data: ", e);
-                                }
-
-                                //Now that the user IS successfully logged in, we need to send their expo push token to our DB
-                                var data = {
-                                    "token": data.token,
-                                    "pushToken": this.state.expoPushToken
-                                }
-
-                                //POST to our push token API
-                                fetch("https://beep.nussman.us/api/auth/push", {
-                                       method: "POST",
-                                       headers: {
-                                        Accept: 'application/json',
-                                        'Content-Type': 'application/json',
-                                       },
-                                       body:  JSON.stringify(data)
-                                    })
-                                    .then(
-                                        function(response)
-                                        {
-                                            if (response.status !== 200)
-                                            {
-                                                console.log('[Register.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
-                                                return;
-                                            }
-                                            response.json().then(
-                                                function(data)
-                                                {
-                                                    //This process of sending our push token to the API should be done silently
-                                                    //Therefore, just log the responce.
-                                                    console.log("[Register.js] [API] Expo Push Token API Responce: ", data);
-                                                }
-                                            );
-                                        }
-                                    )
-                                .catch((error) => {
-                                     console.log("[Register.js] [API] Error updating push token with Beep API: ", error);
-                                });
-
-                                //Signup has been completed. We are ready to send user into main app.
-                                //Use our Navigation we defined earlier to RESET the navigation stack where Main is the root
-                                navigationStuff.reset({
-                                    index: 0,
-                                    routes: [
-                                      { name: 'Main' },
-                                    ],
-                                })
+                            try {
+                                //Store data in AsyncStorage
+                                AsyncStorage.multiSet([idData, usernameData, tokenData, tokenidData, singlesRate, groupRate, first, last, email, phone, venmo]);
                             }
-                            else
-                            {
-                                //@TODO: Provide our user's with better sign up errors Ex. 'Password too short!' or 'You must enter a username!'
-                                alert("Error creating new account.");
+                            catch (e) {
+                                console.log("[Register.js] [AsyncStorage] Could not store signup data: ", e);
                             }
-                        }.bind(this)
-                    );
-                }.bind(this)
-            )
+                            
+                            //async function that will send Expo Push Token to db
+                            if (this.state.expoPushToken) {
+                                //send push token to server it is exists (not null)
+                                this.uploadToken(data.token);
+                            }
+
+                            //Signup has been completed. We are ready to send user into main app.
+                            //Use our Navigation we defined earlier to RESET the navigation stack where Main is the root
+                            navigationStuff.reset({
+                                index: 0,
+                                routes: [
+                                  { name: 'Main' },
+                                ],
+                            })
+                        }
+                        else {
+                            //TODO: Provide our user's with better sign up errors Ex. 'Password too short!' or 'You must enter a username!'
+                            alert("Error creating new account.");
+                        }
+                    }.bind(this)
+                )
+            }.bind(this)
+        )
         .catch((error) => {
              console.log("[Register.js] [API] Error fetching from the Beep (Signup) API: ", error);
         });
     }
 
-    render ()
-    {
+    async uploadToken (userToken) {
+        //Now that the user IS successfully logged in, we need to send their expo push token to our DB
+        //POST to our push token API
+        fetch("https://beep.nussman.us/api/auth/push", {
+            method: "POST",
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "token": data.token,
+                "pushToken": this.state.expoPushToken
+            })
+        })
+        .then(
+            function(response) {
+                if (response.status !== 200) {
+                    console.log('[Register.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
+                    return;
+                }
+                response.json().then(
+                    function(data) {
+                        //This process of sending our push token to the API should be done silently
+                        //Therefore, just log the responce.
+                        console.log("[Register.js] [API] Expo Push Token API Responce: ", data);
+                    }
+                )
+            }
+        )
+        .catch((error) => {
+             console.log("[Register.js] [API] Error updating push token with Beep API: ", error);
+        });
+    }
 
+    render () {
         const BackIcon = (props) => (
              <Icon {...props} name='arrow-back'/>
         );

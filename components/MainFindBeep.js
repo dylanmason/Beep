@@ -71,8 +71,7 @@ export class MainFindBeepScreen extends Component {
                 this.getInitialRiderStatus();
             }
         }
-        catch (error)
-        {
+        catch (error) {
           console.log("[FindBeep.js] [AsyncStorage] ", error);
         }
     }
@@ -82,6 +81,7 @@ export class MainFindBeepScreen extends Component {
     }
 
     componentDidMount () {
+        console.log("mounted MainFindBeep");
         //Run retrieveData to get user's data and save it in states
         this.retrieveData();
         this.doneSplash();

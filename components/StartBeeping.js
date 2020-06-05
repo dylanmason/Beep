@@ -99,6 +99,7 @@ export class StartBeepingScreen extends Component {
     }
 
     componentDidMount () {
+        console.log("mounded StartBeeping");
         //get user information and set toggle switch to correct status on mount
         this.retrieveData();
 
