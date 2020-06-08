@@ -6,67 +6,61 @@ import socket from '../utils/Socket'
 import { CommonActions } from '@react-navigation/native';
 
 
-async function logout({navigation}) {
-
+async function logout({ navigation }) {
+    
+    //get token from AsyncStorage to authenticate with the api
     var token = await AsyncStorage.getItem('@token');
-
-    //Data we will POST to our Logout API endpoint
-    var data = {
-        "token": token
-    }
 
     //POST to our Logout API
     fetch("https://beep.nussman.us/api/auth/logout", {
-           method: "POST",
-           headers: {
+        method: "POST",
+        headers: {
             Accept: 'application/json',
             'Content-Type': 'application/json',
-           },
-           body:  JSON.stringify(data)
+        },
+        body: JSON.stringify({
+            "token": token
         })
-        .then(
-            function(response)
-            {
-                if (response.status !== 200)
-                {
-                    console.log('[Settings.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
-                    return;
-                }
-
-                response.json().then(
-                    function(data)
-                    {
-                        //Log the result from the Logout API to debug
-                        console.log("[Settings.js] [API] Logout API Responce: ", data);
-
-                        if (data.status == "success")
-                        {
-                            //Logout was successfull
-                            console.log("[Settings.js] [Logout] We have internet connection.");
-                            //Define the keys we want to unset
-                            let keys = ['@username', '@id', '@token', '@tokenid', '@singlesRate' , '@groupRate', '@first', '@last', '@email', '@phone', '@venmo'];
-                            //Using AsyncStorage, remove keys on logout.
-                            //IMPORTANT: we do NOT remove the expo push token beause we need that for any other user that may login
-                            //We can't remove it because it is only set on App.js when we initialize notifications, we may not re-run that code
-                            AsyncStorage.multiRemove(keys, (err) => {
-                                console.log("[Settings.js] [Logout] Removed all from storage except our push token.");
-                            });
-                            //unsub from sockio 
-                            socket.emit('stopGetQueue');
-                            socket.emit('stopGetRiderStatus');
-                            socket.off('updateRiderStatus');
-                            socket.off('updateQueue');
-                        }
-                        else
-                        {
-                            //Our API returned an error, we didn't logout.
-                            //Use Native Alert to tell user they were not logged out
-                            alert("Could not logout!");
-                        }
-                    }
-                );
+    })
+    .then(
+        function(response) {
+            if (response.status !== 200) {
+                console.log('[Settings.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
+                return;
             }
-        )
+
+            response.json().then(
+                function(data) {
+                    //Log the result from the Logout API to debug
+                    console.log("[Settings.js] [API] Logout API Responce: ", data);
+
+                    if (data.status == "success") {
+                        //Logout was successfull
+                        console.log("[Settings.js] [Logout] We have internet connection.");
+                        //Define the keys we want to unset
+                        let keys = ['@username', '@id', '@token', '@tokenid', '@singlesRate' , '@groupRate', '@first', '@last', '@email', '@phone', '@venmo'];
+                        //Using AsyncStorage, remove keys on logout.
+                        //IMPORTANT: we do NOT remove the expo push token beause we need that for any other user that may login
+                        //We can't remove it because it is only set on App.js when we initialize notifications, we may not re-run that code
+                        AsyncStorage.multiRemove(keys, (err) => {
+                            console.log("[Settings.js] [Logout] Removed all from storage except our push token.");
+                        });
+                        //these two emits tell our socket server that we no longer want the rethinkdb watcher open
+                        socket.emit('stopGetQueue');
+                        socket.emit('stopGetRiderStatus');
+                        //this tells our client to stop listening to updates
+                        socket.off('updateRiderStatus');
+                        socket.off('updateQueue');
+                    }
+                    else {
+                        //Our API returned an error, we didn't logout.
+                        //Use Native Alert to tell user they were not logged out
+                        alert("Could not logout!");
+                    }
+                }
+            );
+        }
+    )
     .catch((error) => {
         //The fetch encountered an error.
         console.log("[Settings.js] [Logout] We have no internet!");

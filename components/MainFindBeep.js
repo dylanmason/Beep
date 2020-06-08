@@ -32,51 +32,44 @@ const CurrentLocationIcon = (props) => (
 );
 
 export class MainFindBeepScreen extends Component {
-    /*
-     * ~~~~~~
-     * States
-     * ~~~~~~
-     * foundBeep - If the rider has found a beeper (Default: False)
-     * isAccepted - If the driver has accepted this rider (Default: False)
-    */
-    state = {
-        showFindBeepError: false,
-        foundBeep: false,
-        isAccepted: false,
-        groupSize: '1',
-        startLocation: '',
-        destination: '',
-        pickBeeper: false
-    };
-
-    /**
-     * Get User's Data from AsyncStorage
-     */
-    retrieveData = async () => {
+    
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLoading: true,
+            showFindBeepError: false,
+            foundBeep: false,
+            isAccepted: false,
+            groupSize: '1',
+            startLocation: '',
+            destination: '',
+            pickBeeper: false
+        }
+    }
+    
+    async retrieveData () {
         try {
             let username = await AsyncStorage.getItem('@username');
             let token = await AsyncStorage.getItem('@token');
             let id = await AsyncStorage.getItem('@id');
             let tokenid = await AsyncStorage.getItem('@tokenid');
 
-            if (id !== null) {
-                this.setState({
-                    username: username,
-                    token: token,
-                    tokenid: tokenid,
-                    id: id
-                });
+            this.setState({
+                username: username,
+                token: token,
+                tokenid: tokenid,
+                id: id
+            });
 
-                //Once we know things like the user's id, we can now get the status of the rider
-                this.getInitialRiderStatus();
-            }
+            //Once we know things like the user's id, we can now get the status of the rider
+            this.getInitialRiderStatus();
         }
         catch (error) {
           console.log("[FindBeep.js] [AsyncStorage] ", error);
         }
     }
 
-    async doneSplash() {
+    async doneSplash () {
         await SplashScreen.hideAsync();
     }
 
@@ -102,27 +95,26 @@ export class MainFindBeepScreen extends Component {
         }
 
         fetch("https://beep.nussman.us/api/rider/status", {
-               method: "POST",
-               headers: {
+            method: "POST",
+            headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-               },
-               body:  JSON.stringify(data)
-            })
-            .then(
-                function(response)
+            },
+            body:  JSON.stringify(data)
+        })
+        .then(
+            function(response)
+            {
+                if (response.status !== 200)
                 {
-                    if (response.status !== 200)
-                    {
-                        console.log('[FindBeep.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
-                        return;
-                    }
-                    response.json().then(
-                        function(data)
-                        {
-                            if (data.status === "success")
-                            {
-                                //We sucessfuly gotten riders status from database
+                    console.log('[FindBeep.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
+                    return;
+                }
+                response.json().then(
+                    function(data) {
+                        if (data.status === "success") {
+                            //if the rider is accepted, we can have more personal info about the beeper
+                            if (data.isAccepted) {
                                 this.setState({
                                     isAccepted: data.isAccepted,
                                     beepersFirstName: data.beepersFirstName,
@@ -132,29 +124,38 @@ export class MainFindBeepScreen extends Component {
                                     foundBeep: true,
                                     beepersQueueSize: data.beepersQueueSize,
                                     beepersSinglesRate: data.beepersSinglesRate,
-                                    beepersGroupRate: data.beepersGroupRate
+                                    beepersGroupRate: data.beepersGroupRate,
+                                    beepersPhone: data.beepersPhone,
+                                    beepersVenmo: data.beepersVenmo,
+                                    ridersQueuePosition: data.ridersQueuePosition,
+                                    isLoading: false
                                 });
-
-                                this.enableGetRiderStatus();
-
-                                //if the rider is accepted, we can get more personal information from beeper
-                                if (data.isAccepted) {
-                                    this.setState({
-                                        beepersPhone: data.beepersPhone,
-                                        beepersVenmo: data.beepersVenmo,
-                                        ridersQueuePosition: data.ridersQueuePosition
-                                    });
-                                }
                             }
-                            else
-                            {
-                                console.log("[FindBeep.js] [API] " , data.message);
-                                this.setState({foundBeep: false, isAccepted: false});
+                            else {
+                                this.setState({
+                                    isAccepted: data.isAccepted,
+                                    beepersFirstName: data.beepersFirstName,
+                                    beepersLastName: data.beepersLastName,
+                                    queueID: data.queueID,
+                                    beepersID: data.beepersID,
+                                    foundBeep: true,
+                                    beepersQueueSize: data.beepersQueueSize,
+                                    beepersSinglesRate: data.beepersSinglesRate,
+                                    beepersGroupRate: data.beepersGroupRate,
+                                    isLoading: false
+                                });
                             }
-                        }.bind(this)
-                    );
-                }.bind(this)
-            )
+
+                            this.enableGetRiderStatus();
+                        }
+                        else {
+                            console.log("[FindBeep.js] [API] " , data.message);
+                            this.setState({isLoading: false, foundBeep: false, isAccepted: false});
+                        }
+                    }.bind(this)
+                );
+            }.bind(this)
+        )
         .catch((error) => {
              console.log("[FindBeep.js] [API] Error fetching from the Beep API: ", error);
         });
@@ -170,27 +171,39 @@ export class MainFindBeepScreen extends Component {
         }
 
         fetch("https://beep.nussman.us/api/rider/status", {
-               method: "POST",
-               headers: {
+            method: "POST",
+            headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-               },
-               body:  JSON.stringify(data)
-            })
-            .then(
-                function(response)
-                {
-                    if (response.status !== 200)
-                    {
-                        console.log('[FindBeep.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
-                        return;
-                    }
-                    response.json().then(
-                        function(data)
-                        {
-                            if (data.status === "success")
-                            {
-                                //We sucessfuly gotten riders status from database
+            },
+            body:  JSON.stringify(data)
+        })
+        .then(
+            function(response) {
+                if (response.status !== 200) {
+                    console.log('[FindBeep.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
+                    return;
+                }
+                response.json().then(
+                    function(data) {
+                        if (data.status === "success") {
+                            if (data.isAccepted) {
+                                this.setState({
+                                    isAccepted: data.isAccepted,
+                                    beepersFirstName: data.beepersFirstName,
+                                    beepersLastName: data.beepersLastName,
+                                    queueID: data.queueID,
+                                    beepersID: data.beepersID,
+                                    foundBeep: true,
+                                    beepersQueueSize: data.beepersQueueSize,
+                                    beepersSinglesRate: data.beepersSinglesRate,
+                                    beepersGroupRate: data.beepersGroupRate,
+                                    beepersPhone: data.beepersPhone,
+                                    beepersVenmo: data.beepersVenmo,
+                                    ridersQueuePosition: data.ridersQueuePosition
+                                });
+                            }
+                            else {
                                 this.setState({
                                     isAccepted: data.isAccepted,
                                     beepersFirstName: data.beepersFirstName,
@@ -202,25 +215,17 @@ export class MainFindBeepScreen extends Component {
                                     beepersSinglesRate: data.beepersSinglesRate,
                                     beepersGroupRate: data.beepersGroupRate
                                 });
-
-                                //if the rider is accepted, we can get more personal information from beeper
-                                if (data.isAccepted) {
-                                    this.setState({
-                                        beepersPhone: data.beepersPhone,
-                                        beepersVenmo: data.beepersVenmo,
-                                        ridersQueuePosition: data.ridersQueuePosition
-                                    });
-                                }
                             }
-                            else {
-                                console.log("[FindBeep.js] [API] " , data.message, "Thread:", this.state.username);
-                                this.setState({foundBeep: false, isAccepted: false});
-                                this.disableGetRiderStatus();
-                            }
-                        }.bind(this)
-                    );
-                }.bind(this)
-            )
+                        }
+                        else {
+                            console.log("[FindBeep.js] [API] " , data.message);
+                            this.setState({isLoading: false, foundBeep: false, isAccepted: false});
+                            this.disableGetRiderStatus();
+                        }
+                    }.bind(this)
+                );
+            }.bind(this)
+        )
         .catch((error) => {
              console.log("[FindBeep.js] [API] Error fetching from the Beep API: ", error);
         });
@@ -236,51 +241,47 @@ export class MainFindBeepScreen extends Component {
         }
 
         fetch("https://beep.nussman.us/api/rider/choose", {
-               method: "POST",
-               headers: {
+            method: "POST",
+            headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-               },
-               body:  JSON.stringify(data)
-            })
-            .then(
-                function(response)
-                {
-                    if (response.status !== 200)
-                    {
-                        console.log('Looks like our API is not responding correctly. Status Code: ' + response.status);
-                        return;
-                    }
-                    response.json().then(
-                        function(data)
-                        {
-                            console.log("[FindBeep.js] Rider API Responce: ", data);
+            },
+            body:  JSON.stringify(data)
+        })
+        .then(
+            function(response) {
+                if (response.status !== 200) {
+                    console.log('Looks like our API is not responding correctly. Status Code: ' + response.status);
+                    return;
+                }
+                response.json().then(
+                    function(data) {
+                        console.log("[FindBeep.js] Rider API Responce: ", data);
 
-                            if (data.status === "success")
-                            {
-                                this.setState({
-                                    beepersID: data.beepersID,
-                                    beepersFirstName: data.beepersFirstName,
-                                    beepersLastName: data.beepersLastName,
-                                    beepersQueueSize: data.beepersQueueSize + 1,
-                                    beepersSinglesRate: data.beepersSinglesRate,
-                                    beepersGroupRate: data.beepersGroupRate,
-                                    queueID: data.queueID,
-                                    foundBeep: true
-                                });
+                        if (data.status === "success") {
+                            this.setState({
+                                beepersID: data.beepersID,
+                                beepersFirstName: data.beepersFirstName,
+                                beepersLastName: data.beepersLastName,
+                                beepersQueueSize: data.beepersQueueSize + 1,
+                                beepersSinglesRate: data.beepersSinglesRate,
+                                beepersGroupRate: data.beepersGroupRate,
+                                queueID: data.queueID,
+                                foundBeep: true,
+                                isLoading: false
+                            });
 
-                                //tell socket server to listen for updates
-                                this.enableGetRiderStatus();
-                            }
-                            else
-                            {
-                                //alert(data.message);
-                                this.setState({findBeepError: data.message, showFindBeepError: true});
-                            }
-                        }.bind(this)
-                    );
-                }.bind(this)
-            )
+                            //tell socket server to listen for updates
+                            this.enableGetRiderStatus();
+                        }
+                        else {
+                            //alert(data.message);
+                            this.setState({isLoading: false, findBeepError: data.message, showFindBeepError: true});
+                        }
+                    }.bind(this)
+                );
+            }.bind(this)
+        )
         .catch((error) => {
              console.log("Error fetching from the Beep (Rider) API: ", error);
         });
@@ -295,6 +296,7 @@ export class MainFindBeepScreen extends Component {
             });
             return;
         }
+        this.setState({isLoading: true});
 
         var data = {
             "token": this.state.token,
@@ -304,50 +306,46 @@ export class MainFindBeepScreen extends Component {
         }
 
         fetch("https://beep.nussman.us/api/rider/find", {
-               method: "POST",
-               headers: {
+            method: "POST",
+            headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-               },
-               body:  JSON.stringify(data)
-            })
-            .then(
-                function(response)
-                {
-                    if (response.status !== 200)
-                    {
-                        console.log('Looks like our API is not responding correctly. Status Code: ' + response.status);
-                        return;
-                    }
-                    response.json().then(
-                        function(data)
-                        {
-                            console.log("[FindBeep.js] Rider API Responce: ", data);
+            },
+            body:  JSON.stringify(data)
+        })
+        .then(
+            function(response) {
+                if (response.status !== 200) {
+                    console.log('Looks like our API is not responding correctly. Status Code: ' + response.status);
+                    return;
+                }
+                response.json().then(
+                    function(data) {
+                        console.log("[FindBeep.js] Rider API Responce: ", data);
 
-                            if (data.status === "success")
-                            {
-                                this.setState({
-                                    beepersID: data.beepersID,
-                                    beepersFirstName: data.beepersFirstName,
-                                    beepersLastName: data.beepersLastName,
-                                    beepersQueueSize: data.beepersQueueSize + 1,
-                                    beepersSinglesRate: data.beepersSinglesRate,
-                                    beepersGroupRate: data.beepersGroupRate,
-                                    queueID: data.queueID,
-                                    foundBeep: true
-                                });
-                                //tell socket server to listen for updates
-                                this.enableGetRiderStatus();
-                            }
-                            else
-                            {
-                                //alert(data.message);
-                                this.setState({findBeepError: data.message, showFindBeepError: true});
-                            }
-                        }.bind(this)
-                    );
-                }.bind(this)
-            )
+                        if (data.status === "success") {
+                            this.setState({
+                                beepersID: data.beepersID,
+                                beepersFirstName: data.beepersFirstName,
+                                beepersLastName: data.beepersLastName,
+                                beepersQueueSize: data.beepersQueueSize + 1,
+                                beepersSinglesRate: data.beepersSinglesRate,
+                                beepersGroupRate: data.beepersGroupRate,
+                                queueID: data.queueID,
+                                foundBeep: true,
+                                isLoading: false
+                            });
+                            //tell socket server to listen for updates
+                            this.enableGetRiderStatus();
+                        }
+                        else {
+                            //alert(data.message);
+                            this.setState({isLoading: false, findBeepError: data.message, showFindBeepError: true});
+                        }
+                    }.bind(this)
+                );
+            }.bind(this)
+        )
         .catch((error) => {
              console.log("Error fetching from the Beep (Rider) API: ", error);
         });
@@ -379,7 +377,7 @@ export class MainFindBeepScreen extends Component {
     }
 
     leaveQueue = () => {
-
+        this.setState({isLoading: true});
         let token = this.state.token;
 
         var data = {
@@ -388,34 +386,29 @@ export class MainFindBeepScreen extends Component {
         }
 
         fetch("https://beep.nussman.us/api/rider/leave", {
-               method: "POST",
-               headers: {
+            method: "POST",
+            headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-               },
-               body:  JSON.stringify(data)
-            })
-            .then(
-                function(response)
-                {
-                    if (response.status !== 200)
-                    {
-                        console.log('[StartBeeping.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
-                        return;
-                    }
-                    response.json().then(
-                        function(data)
-                        {
-                            console.log("[StartBeeping.js] [API] Leave Queue Responce: ", data);
-
-                            if (data.status === "error")
-                            {
-                                alert(data.message);
-                            }
-                        }
-                    );
+            },
+            body:  JSON.stringify(data)
+        })
+        .then(
+            function(response) {
+                if (response.status !== 200) {
+                    console.log('[StartBeeping.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
+                    return;
                 }
-            )
+                response.json().then(
+                    function(data) {
+                        console.log("[StartBeeping.js] [API] Leave Queue Responce: ", data);
+                        if (data.status === "error") {
+                            alert(data.message);
+                        }
+                    }
+                );
+            }
+        )
         .catch((error) => {
              console.log("[StartBeeping.js] [API] Error fetching from the Beep API: ", error);
         });
@@ -433,8 +426,7 @@ export class MainFindBeepScreen extends Component {
 
     render () {
         console.log("[MainFindBeep.js] Rendering Main Find Beep");
-        if (!this.state.foundBeep)
-        {
+        if (!this.state.foundBeep) {
             return (
                 <Layout style={styles.container}>
                     <Input
@@ -471,12 +463,17 @@ export class MainFindBeepScreen extends Component {
                     />
                     <CheckBox text='Pick your own beeper' checked={this.state.pickBeeper} onChange={(value) => this.setState({pickBeeper: value})}>
                     </CheckBox>
-                    <Button
-                        onPress={this.findBeep}
-                    >
-                    Find a Beep
-                    </Button>
-
+                    {!this.state.isLoading ?
+                        <Button
+                            onPress={this.findBeep}
+                        >
+                        Find a Beep
+                        </Button>
+                        :
+                        <Button appearance='outline'>
+                            Loading
+                        </Button>
+                    }
                     <Modal visible={this.state.showFindBeepError}>
                         <Card disabled={true}>
                         <Text>
@@ -502,8 +499,18 @@ export class MainFindBeepScreen extends Component {
                         </Layout>
 
                         <Layout style={styles.group}>
-                            <Text category='h6'>{this.state.ridersQueuePosition}</Text>
-                            <Text appearance='hint'>is your potition in {this.state.beepersFirstName}'s queue.</Text>
+                            {(this.state.ridersQueuePosition == 0) ? 
+                                <>
+                                <Text>You are at the top of {this.state.beepersFirstName}'s queue.</Text>
+                                <Text appearance='hint'>{this.state.beepersFirstName} is currently serving you.</Text>
+                                </>
+
+                                :
+                                <>
+                                <Text category='h6'>{this.state.ridersQueuePosition}</Text>
+                                <Text appearance='hint'>is your potition in {this.state.beepersFirstName}'s queue.</Text>
+                                </>
+                            }
                         </Layout>
 
                         <Button
@@ -564,13 +571,19 @@ export class MainFindBeepScreen extends Component {
                         <Text appearance='hint'>{this.state.beepersFirstName}'s total queue size is</Text>
                         <Text category='h6'>{this.state.beepersQueueSize}</Text>
                         </Layout>
-
-                        <Button
-                            icon={LeaveIcon}
-                            onPress={() => this.leaveQueue()}
-                        >
-                        Leave Queue
-                        </Button>
+                        
+                        {!this.state.isLoading ?
+                            <Button
+                                icon={LeaveIcon}
+                                onPress={() => this.leaveQueue()}
+                            >
+                            Leave Queue
+                            </Button>
+                            :
+                            <Button appearance='outline'>
+                                Loading
+                            </Button>
+                        }
                     </Layout>
                 );
             }
@@ -594,7 +607,8 @@ const styles = StyleSheet.create({
     },
     group: {
         alignItems: "center",
-        marginBottom: 16
+        marginBottom: 16,
+        width: '100%'
     },
     groupConatiner: {
         flexDirection: 'row',
@@ -604,7 +618,7 @@ const styles = StyleSheet.create({
     },
     rateGroup: {
         flexDirection: 'row',
-        width: "80%"
+        width: 120
     },
     layout: {
         flex: 1,

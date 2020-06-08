@@ -7,6 +7,7 @@ export class RegisterScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            isLoading: false,
             first: '',
             last: '',
             email: '',
@@ -73,6 +74,7 @@ export class RegisterScreen extends Component {
     }
 
     handleRegister () {
+        this.setState({isLoading: true});
         //Before we login, call retrieveData
         //retrieveData should handle an offline login by tokenid
         //It also gets the Expo push token and stores it in a state so we can use it here
@@ -156,6 +158,7 @@ export class RegisterScreen extends Component {
                         }
                         else {
                             //TODO: Provide our user's with better sign up errors Ex. 'Password too short!' or 'You must enter a username!'
+                            this.setState({isLoading: false});
                             alert("Error creating new account.");
                         }
                     }.bind(this)
@@ -267,12 +270,18 @@ export class RegisterScreen extends Component {
                             ref={(input)=>this.seventhTextInput = input}
                             onChangeText={(text) => this.setState({password:text})}
                             onSubmitEditing={() => this.handleRegister()} />
+                    {!this.state.isLoading ? 
                         <Button
                           buttonStyle={styles.button}
                           onPress={() => this.handleRegister()}
                         >
                         Sign Up
                         </Button>
+                        :
+                        <Button appearance='outline'>
+                            Loading
+                        </Button>
+                    }
                     </Layout>
                 </Layout>
             </>

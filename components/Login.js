@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, AsyncStorage } from 'react-native';
+import { StyleSheet, AsyncStorage, View } from 'react-native';
 import { Layout, Text, Button, Input, Modal, Card } from '@ui-kitten/components';
 import * as SplashScreen from 'expo-splash-screen';
 
@@ -8,6 +8,7 @@ export class LoginScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            isLoading: false,
             showLoginError: false,
             username: '',
             password: '',
@@ -78,6 +79,7 @@ export class LoginScreen extends Component {
     }
 
     handleLogin() {
+        this.setState({isLoading: true});
         //Before we login, call retrieveData
         //retrieveData should handle an offline login by tokenid
         //It also gets the Expo push token and stores it in a state so we can use it here
@@ -100,6 +102,7 @@ export class LoginScreen extends Component {
         })
         .then(
             function(response) {
+
                 if (response.status !== 200) {
                     console.log('[Login.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
                     return;
@@ -154,7 +157,7 @@ export class LoginScreen extends Component {
                         else {
                             //Use Native Alert to tell user a login error.
                             //This is where we tell user "Incorrect Password" and such
-                            this.setState({loginError: data.message, showLoginError: true});
+                            this.setState({isLoading: false, loginError: data.message, showLoginError: true});
                         }
                     }.bind(this)
                 );
@@ -218,11 +221,17 @@ export class LoginScreen extends Component {
                         ref={(input)=>this.secondTextInput = input}
                         onChangeText={(text) => this.setState({password:text})}
                         onSubmitEditing={() => this.handleLogin()} />
-                    <Button
-                      onPress={() => this.handleLogin()}
-                    >
-                    Login
-                    </Button>
+                    {!this.state.isLoading ? 
+                        <Button
+                          onPress={() => this.handleLogin()}
+                        >
+                        Login
+                        </Button>
+                        :
+                        <Button appearance='outline'>
+                            Loading
+                        </Button>
+                    }
                 </Layout>
                 <Text style={{marginTop: 50, marginBottom: 20}}> Don't have an account? </Text>
                 <Button
@@ -230,7 +239,6 @@ export class LoginScreen extends Component {
                 >
                 Sign Up
                 </Button>
-
                 <Modal visible={this.state.showLoginError}>
                     <Card disabled={true}>
                     <Text>
@@ -260,5 +268,8 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 40,
         padding: 15,
-    }
+    },
+    indicator: {
+        marginTop: 10
+    },
 });

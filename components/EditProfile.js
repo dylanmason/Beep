@@ -24,7 +24,7 @@ export class EditProfileScreen extends Component {
     /**
      * Get User's Data from AsyncStorage
      */
-    retrieveData = async () => {
+    async retrieveData () {
         try {
             //TODO: improve the perfomance of loading this data, in the future, find a way
             //to not even use AsyncStorage on every single new screen
@@ -51,29 +51,26 @@ export class EditProfileScreen extends Component {
         }
     }
 
-    handleUpdate() {
-        //Define our Main Navigation, use this so send user to Main upon login
+    handleUpdate () {
+        //Define our Main Navigation, use this so send user back a page
         const navigationStuff = this.props.navigation;
 
-        //We will POST this data from our states
-        var data = {
-            "token": this.state.token,
-            "first": this.state.first,
-            "last": this.state.last,
-            "email": this.state.email,
-            "phone": this.state.phone,
-            "venmo": this.state.venmo
-        }
-
-        //POST to our signup API
+        //POST to our edit profile API
         fetch("https://beep.nussman.us/api/account/edit", {
-               method: "POST",
-               headers: {
+            method: "POST",
+            headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-               },
-               body:  JSON.stringify(data)
+            },
+            body: JSON.stringify({
+                "token": this.state.token,
+                "first": this.state.first,
+                "last": this.state.last,
+                "email": this.state.email,
+                "phone": this.state.phone,
+                "venmo": this.state.venmo
             })
+        })
         .then(
             function(response) {
                 if (response.status !== 200) {
@@ -82,12 +79,8 @@ export class EditProfileScreen extends Component {
                 }
 
                 response.json().then(
-                    function(data)
-                    {
-                        console.log("[EditProfile.js] [API] Update Profile API Responce: ", data);
-
+                    function(data) {
                         if (data.status === "success") {
-
                             const first = ["@first", this.state.first];
                             const last = ["@last", this.state.last];
                             const email = ["@email", this.state.email];
@@ -100,10 +93,11 @@ export class EditProfileScreen extends Component {
                             catch (e) {
                                 console.log("[EditProfile.js] [AsyncStorage] Could not store signup data: ", e);
                             }
-                            console.log("Successfully updated account info");
+
                             navigationStuff.goBack();
                         }
                         else {
+                            //TODO: modal popup or something better
                             alert("Error updating acount info");
                         }
                     }.bind(this)

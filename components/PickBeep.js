@@ -74,7 +74,7 @@ export class PickBeepScreen extends Component {
             <ListItem
             onPress={() => this.goBack(item.id)}
             title={`${item.first} ${item.last}`}
-            description={`${item.queueSize} in ${item.first}'s queue`}
+            description={`${item.queueSize} in ${item.first}'s queue\nSingles: $${item.singlesRate}\nGroups: $${item.groupRate}`}
             />
         );
 

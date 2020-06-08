@@ -140,7 +140,15 @@ export class StartBeepingScreen extends Component {
                             if (data.status === "success")
                             {
                                 //We sucessfuly updated beeper status in database
-                                this.setState({queue: data.queue});
+                                let currentIndex;
+                                for(let i = 0;  i < data.queue.length; i++) {
+                                    if (data.queue[i].isAccepted) {
+                                        currentIndex = i;
+                                        console.log(i);
+                                        break;
+                                    }
+                                }
+                                this.setState({queue: data.queue, currentIndex: currentIndex});
                             }
                             else
                             {
@@ -405,7 +413,11 @@ export class StartBeepingScreen extends Component {
 
                            :
                             
-                            <Card>
+                            <Card status={(this.state.currentIndex == index) ? "primary" : "basic"} >
+                                {(this.state.currentIndex == index) ? 
+                                <Text category='h2'>Current Beep</Text> :
+                                null
+                                }
                                 <Layout style={styles.groupConatiner}>
                                     <Layout style={styles.layout}>
                                         <Text category='h6'>Rider</Text>
@@ -415,37 +427,27 @@ export class StartBeepingScreen extends Component {
                                         <Text category='h6'>Group Size</Text>
                                         <Text>{item.groupSize}</Text>
                                     </Layout>
-                                    <Layout style={styles.layout}>
-                                        <Text category='h6'>Pick Up </Text>
-                                        <Text>{item.origin} </Text>
-                                    </Layout>
-                                    <Layout style={styles.layout}>
-                                        <Text category='h6'>Drop Off </Text>
-                                        <Text>{item.destination} </Text>
-                                    </Layout>
                                 </Layout>
-                                <Layout style={styles.groupConatiner}>
-                                    <Layout style={styles.layout}>
-                                    <Button
-                                        status='basic'
-                                        style={styles.buttons}
-                                        icon={PhoneIcon}
-                                        onPress={() =>{ Linking.openURL('tel:' + item.personalInfo.phone); } }
-                                    >
-                                    Call Rider
-                                    </Button>
-                                    </Layout>
-                                    <Layout style={styles.layout}>
-                                    <Button
-                                        status='basic'
-                                        style={styles.buttons}
-                                        icon={TextIcon}
-                                        onPress={() =>{ Linking.openURL('sms:' + item.personalInfo.phone); } }
-                                    >
-                                    Text Rider
-                                    </Button>
-                                    </Layout>
-                                </Layout>
+                                <Text category='h6'>Pick Up </Text>
+                                <Text>{item.origin}</Text>
+                                <Text category='h6'>Drop Off </Text>
+                                <Text>{item.destination}</Text>
+                                <Button
+                                    status='basic'
+                                    style={styles.buttons}
+                                    icon={PhoneIcon}
+                                    onPress={() =>{ Linking.openURL('tel:' + item.personalInfo.phone); } }
+                                >
+                                Call Rider
+                                </Button>
+                                <Button
+                                    status='basic'
+                                    style={styles.buttons}
+                                    icon={TextIcon}
+                                    onPress={() =>{ Linking.openURL('sms:' + item.personalInfo.phone); } }
+                                >
+                                Text Rider
+                                </Button>
                                 <Button
                                     status='info'
                                     style={styles.buttons}
@@ -508,8 +510,6 @@ const styles = StyleSheet.create({
     },
     layout: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
         backgroundColor: 'transparent'
     },
     adbutton: {
