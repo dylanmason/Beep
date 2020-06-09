@@ -326,11 +326,11 @@ export class StartBeepingScreen extends Component {
             return (
                 <Layout style={styles.container}>
                     <Toggle
+                        text="Toggle Beeping Status"
                         style={styles.toggle}
                         onChange = {this.toggleSwitch}
                         checked = {this.state.isBeeping}
                     >
-                    Beeping Toggle
                     </Toggle>
                     <Input
                         label='Singles Rate'
@@ -365,126 +365,146 @@ export class StartBeepingScreen extends Component {
         }
         else
         {
-            return (
-                <Layout style={styles.container}>
-                    <Toggle
-                        style={styles.toggle}
-                        onChange = {this.toggleSwitch}
-                        checked = {this.state.isBeeping}
-                    >
-                    Beeping Toggle
-                    </Toggle>
-                    <List
-                        style={styles.list}
-                        data={this.state.queue}
-                        keyExtractor={item => item.id.toString()}
-                        renderItem={({item, index}) =>
+            if (this.state.queue && this.state.queue.length != 0) {
+                return (
+                    <Layout style={styles.container}>
+                        <Toggle
+                            text="Toggle Beeping Status"
+                            style={styles.toggle}
+                            onChange = {this.toggleSwitch}
+                            checked = {this.state.isBeeping}
+                        >
+                        </Toggle>
+                        <List
+                            style={styles.list}
+                            data={this.state.queue}
+                            keyExtractor={item => item.id.toString()}
+                            renderItem={({item, index}) =>
 
-                        item.isAccepted == false ?
+                            item.isAccepted == false ?
 
-                            <Card>
-                                <Layout style={styles.groupConatiner}>
-                                    <Layout style={styles.layout}>
-                                        <Text category='h6'>Rider</Text>
-                                        <Text>{item.personalInfo.first} {item.personalInfo.last}</Text>
+                                <Card>
+                                    <Layout style={styles.groupConatiner}>
+                                        <Layout style={styles.layout}>
+                                            <Text category='h6'>Rider</Text>
+                                            <Text>{item.personalInfo.first} {item.personalInfo.last}</Text>
+                                        </Layout>
+                                        <Layout style={styles.layout}>
+                                            <Text category='h6'>Entered Queue</Text>
+                                            <Text>{new Date(item.timeEnteredQueue).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</Text>
+                                        </Layout>
+                                        <Layout style={styles.layout}>
+                                            <Text category='h6'>Group Size</Text>
+                                            <Text>{item.groupSize}</Text>
+                                        </Layout>
                                     </Layout>
-                                    <Layout style={styles.layout}>
-                                        <Text category='h6'>Entered Queue</Text>
-                                        <Text>{new Date(item.timeEnteredQueue).toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })}</Text>
+                                    <Layout style={styles.groupConatiner}>
+                                        <Layout style={styles.layout}>
+                                            <Button style={styles.adbutton} title="Accept" status='success' icon={AcceptIcon} onPress={()=> this.AcceptDeny(item.id, item.riderid, "accept")} >
+                                                Accept
+                                            </Button>
+                                        </Layout>
+                                        <Layout style={styles.layout}>
+                                            <Button style={styles.adbutton} title="Deny" status='danger' icon={DenyIcon} onPress={()=> this.AcceptDeny(item.id, item.riderid, "deny")}  >
+                                                Deny
+                                            </Button>
+                                        </Layout>
                                     </Layout>
-                                    <Layout style={styles.layout}>
-                                        <Text category='h6'>Group Size</Text>
-                                        <Text>{item.groupSize}</Text>
+                                </Card>
+
+                               :
+                                
+                                <Card status={(this.state.currentIndex == index) ? "primary" : "basic"} >
+                                    {(this.state.currentIndex == index) ? 
+                                    <Text category='h2'>Current Beep</Text> :
+                                    null
+                                    }
+                                    <Layout style={styles.groupConatiner}>
+                                        <Layout style={styles.layout}>
+                                            <Text category='h6'>Rider</Text>
+                                            <Text>{item.personalInfo.first} {item.personalInfo.last}</Text>
+                                        </Layout>
+                                        <Layout style={styles.layout}>
+                                            <Text category='h6'>Group Size</Text>
+                                            <Text>{item.groupSize}</Text>
+                                        </Layout>
                                     </Layout>
-                                </Layout>
-                                <Layout style={styles.groupConatiner}>
-                                    <Layout style={styles.layout}>
-                                        <Button style={styles.adbutton} title="Accept" status='success' icon={AcceptIcon} onPress={()=> this.AcceptDeny(item.id, item.riderid, "accept")} >
-                                            Accept
-                                        </Button>
-                                    </Layout>
-                                    <Layout style={styles.layout}>
-                                        <Button style={styles.adbutton} title="Deny" status='danger' icon={DenyIcon} onPress={()=> this.AcceptDeny(item.id, item.riderid, "deny")}  >
-                                            Deny
-                                        </Button>
-                                    </Layout>
-                                </Layout>
+                                    <Text category='h6'>Pick Up </Text>
+                                    <Text>{item.origin}</Text>
+                                    <Text category='h6'>Drop Off </Text>
+                                    <Text>{item.destination}</Text>
+                                    <Button
+                                        status='basic'
+                                        style={styles.buttons}
+                                        icon={PhoneIcon}
+                                        onPress={() =>{ Linking.openURL('tel:' + item.personalInfo.phone); } }
+                                    >
+                                    Call Rider
+                                    </Button>
+                                    <Button
+                                        status='basic'
+                                        style={styles.buttons}
+                                        icon={TextIcon}
+                                        onPress={() =>{ Linking.openURL('sms:' + item.personalInfo.phone); } }
+                                    >
+                                    Text Rider
+                                    </Button>
+                                    <Button
+                                        status='info'
+                                        style={styles.buttons}
+                                        icon={VenmoIcon}
+                                        onPress={() =>{ Linking.openURL('venmo://paycharge?txn=pay&recipients='+ item.personalInfo.venmo + '&amount= + this.state.beepersGroupRate + &note=Beep'); } }
+                                    >
+                                    Request Money from Rider with Venmo
+                                    </Button>
+                                    <Button
+                                        status='success'
+                                        style={styles.buttons}
+                                        icon={MapsIcon}
+                                        onPress={() => this.handleDirections(item.origin, item.destination) }
+                                    >
+                                    Get Directions for Beep
+                                    </Button>
+                                    <Button onPress={()=> this.AcceptDeny(item.id, item.riderid,"complete")} >
+                                    Done Beeping Rider
+                                    </Button>
+                                </Card>
+                            }
+                        />
+                        <Modal visible={this.state.showStartBeepingError}>
+                            <Card disabled={true}>
+                            <Text>
+                                {this.state.startBeepingError}
+                            </Text>
+                                <Button onPress={() => this.setState({showStartBeepingError: false})}>
+                                Close
+                                </Button>
                             </Card>
-
-                           :
-                            
-                            <Card status={(this.state.currentIndex == index) ? "primary" : "basic"} >
-                                {(this.state.currentIndex == index) ? 
-                                <Text category='h2'>Current Beep</Text> :
-                                null
-                                }
-                                <Layout style={styles.groupConatiner}>
-                                    <Layout style={styles.layout}>
-                                        <Text category='h6'>Rider</Text>
-                                        <Text>{item.personalInfo.first} {item.personalInfo.last}</Text>
-                                    </Layout>
-                                    <Layout style={styles.layout}>
-                                        <Text category='h6'>Group Size</Text>
-                                        <Text>{item.groupSize}</Text>
-                                    </Layout>
-                                </Layout>
-                                <Text category='h6'>Pick Up </Text>
-                                <Text>{item.origin}</Text>
-                                <Text category='h6'>Drop Off </Text>
-                                <Text>{item.destination}</Text>
-                                <Button
-                                    status='basic'
-                                    style={styles.buttons}
-                                    icon={PhoneIcon}
-                                    onPress={() =>{ Linking.openURL('tel:' + item.personalInfo.phone); } }
-                                >
-                                Call Rider
-                                </Button>
-                                <Button
-                                    status='basic'
-                                    style={styles.buttons}
-                                    icon={TextIcon}
-                                    onPress={() =>{ Linking.openURL('sms:' + item.personalInfo.phone); } }
-                                >
-                                Text Rider
-                                </Button>
-                                <Button
-                                    status='info'
-                                    style={styles.buttons}
-                                    icon={VenmoIcon}
-                                    onPress={() =>{ Linking.openURL('venmo://paycharge?txn=pay&recipients='+ item.personalInfo.venmo + '&amount= + this.state.beepersGroupRate + &note=Beep'); } }
-                                >
-                                Request Money from Rider with Venmo
-                                </Button>
-                                <Button
-                                    status='success'
-                                    style={styles.buttons}
-                                    icon={MapsIcon}
-                                    onPress={() => this.handleDirections(item.origin, item.destination) }
-                                >
-                                Get Directions for Beep
-                                </Button>
-                                <Button onPress={()=> this.AcceptDeny(item.id, item.riderid,"complete")} >
-                                Done Beeping Rider
-                                </Button>
-                            </Card>
-                        }
-                    />
-                    <Modal visible={this.state.showStartBeepingError}>
-                        <Card disabled={true}>
-                        <Text>
-                            {this.state.startBeepingError}
-                        </Text>
-                            <Button onPress={() => this.setState({showStartBeepingError: false})}>
-                            Close
-                            </Button>
-                        </Card>
-                    </Modal>
-                </Layout>
-            );
+                        </Modal>
+                    </Layout>
+                );
+            }
+            else {
+                return (
+                    <Layout style={styles.container}>
+                        <Toggle
+                            text="Toggle Beeping Status"
+                            style={styles.toggle}
+                            onChange = {this.toggleSwitch}
+                            checked = {this.state.isBeeping}
+                        >
+                        </Toggle>
+                        <Layout style={styles.empty}>
+                            <Text category='h5'>Your queue is empty</Text>
+                            <Text appearance='hint'>If someone wants you to beep them, it will appear here. If your app is closed, you will recieve a push notification.</Text>
+                        </Layout>
+                    </Layout>
+                );
+            }
         }
     }
 }
+
 
 const styles = StyleSheet.create({
     container: {
@@ -520,5 +540,14 @@ const styles = StyleSheet.create({
     },
     inputs: {
         width: "80%"
+    },
+    empty : {
+        height: '80%',
+        width: '80%',
+        alignItems: "center",
+        justifyContent: 'center',
+    },
+    emptyConatiner: {
+        width: '85%'
     }
 });

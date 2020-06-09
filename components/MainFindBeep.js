@@ -36,7 +36,7 @@ export class MainFindBeepScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isLoading: true,
+            isLoading: false,
             showFindBeepError: false,
             foundBeep: false,
             isAccepted: false,
@@ -77,7 +77,6 @@ export class MainFindBeepScreen extends Component {
         console.log("mounted MainFindBeep");
         //Run retrieveData to get user's data and save it in states
         this.retrieveData();
-        this.doneSplash();
         
         socket.on('updateRiderStatus', data => {
             console.log("[FindBeep.js] [Socket.io] Socket.io told us to update rider status.");
@@ -159,6 +158,7 @@ export class MainFindBeepScreen extends Component {
         .catch((error) => {
              console.log("[FindBeep.js] [API] Error fetching from the Beep API: ", error);
         });
+        this.doneSplash();
     }
 
     getRiderStatus() {

@@ -89,9 +89,9 @@ export function MainSettingsScreen({ navigation }) {
     const themeContext = React.useContext(ThemeContext);
     return (
         <Layout style={styles.container}>
-            <Button onPress={themeContext.toggleTheme}>Toggle Theme</Button>
-            <Button onPress={() => logout({ navigation })}>Logout</Button>
-            <Button onPress={() => navigation.navigate("EditProfileScreen")}>Edit Profile</Button>
+            <Button style={styles.buttons} onPress={themeContext.toggleTheme}>Toggle Theme</Button>
+            <Button style={styles.buttons} onPress={() => logout({ navigation })}>Logout</Button>
+            <Button style={styles.buttons} onPress={() => navigation.navigate("EditProfileScreen")}>Edit Profile</Button>
         </Layout>
     );
 }
@@ -101,5 +101,8 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    buttons : {
+        margin: 2
     }
 });

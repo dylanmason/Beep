@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Layout, Text, Divider, List, ListItem, Icon, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
-import { YellowBox } from 'react-native';
+import { Layout, Text, Divider, List, ListItem, Icon, TopNavigation, TopNavigationAction, Spinner } from '@ui-kitten/components';
+import { YellowBox, StyleSheet } from 'react-native';
 
 YellowBox.ignoreWarnings([
   'Non-serializable values were found in the navigation state',
@@ -11,6 +11,7 @@ export class PickBeepScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            isLoading: true,
             beeperList: []
         }
     }
@@ -37,7 +38,7 @@ export class PickBeepScreen extends Component {
                         console.log("[PickBeep.js] Rider API Responce: ", data);
 
                         if (data.status === "success") {
-                            this.setState({beeperList: data.beeperList});
+                            this.setState({isLoading: false, beeperList: data.beeperList});
                         }
                         else {
                             alert(data.message);
@@ -57,8 +58,8 @@ export class PickBeepScreen extends Component {
 
     goBack (id) {
         const { navigation, route } = this.props;
-        navigation.goBack();
         route.params.handlePick(id);
+        navigation.goBack();
     }
 
     render() {
@@ -77,16 +78,36 @@ export class PickBeepScreen extends Component {
             description={`${item.queueSize} in ${item.first}'s queue\nSingles: $${item.singlesRate}\nGroups: $${item.groupRate}`}
             />
         );
-
-        return (
-            <>
+        
+        if (!this.state.isLoading) {
+            return (
+                <>
+                    <TopNavigation title='Beeper List' alignment='center' leftControl={BackAction()}/>
+                    <List
+                        data={this.state.beeperList}
+                        ItemSeparatorComponent={Divider}
+                        renderItem={renderItem}
+                    />
+                </>
+            );
+        }
+        else {
+            return (
+                <>
                 <TopNavigation title='Beeper List' alignment='center' leftControl={BackAction()}/>
-                <List
-                    data={this.state.beeperList}
-                    ItemSeparatorComponent={Divider}
-                    renderItem={renderItem}
-                />
-            </>
-        );
+                <Layout style={styles.container}>
+                    <Spinner size='large' />
+                </Layout>
+                </>
+            );
+        }
     } 
 }
+
+const styles = StyleSheet.create({
+    container: {
+        height: '100%',
+        alignItems: "center",
+        justifyContent: 'center',
+    },
+});
