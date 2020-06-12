@@ -41,57 +41,47 @@ export class StartBeepingScreen extends Component {
      */
     retrieveData = async () => {
         try {
-            let username = await AsyncStorage.getItem('@username');
-            let token = await AsyncStorage.getItem('@token');
-            let id = await AsyncStorage.getItem('@id');
-            let tokenid = await AsyncStorage.getItem('@tokenid');
-            let singlesRate = await AsyncStorage.getItem('@singlesRate');
-            let groupRate = await AsyncStorage.getItem('@groupRate');
+            const data = await AsyncStorage.multiGet(["@username", "@token", "@id", "@singlesRate", "@groupRate"]);
             
-            if (id !== null) {
-                this.setState({
-                    username: username,
-                    token: token,
-                    tokenid: tokenid,
-                    id: id,
-                    singlesRate: singlesRate,
-                    groupRate: groupRate
-                });
+            this.setState({
+                username: data[0][1],
+                token: data[1][1],
+                id: data[2][1],
+                singlesRate: data[3][1],
+                groupRate: data[4][1]
+            });
 
-                console.log("[StartBeeping.js] Fetch beeper status for user id: ", id);
-
-                //Upon loading user data into states, get User's bepper status
-                //to make sure our toggle switch is accurate with our database
-                fetch('https://beep.nussman.us/api/beeper/status/' + id)
-                .then((response) => response.json())
-                .then(async (responseJson) =>
+            //Upon loading user data into states, get User's bepper status
+            //to make sure our toggle switch is accurate with our database
+            fetch('https://beep.nussman.us/api/beeper/status/' + data[2][1])
+            .then((response) => response.json())
+            .then(async (responseJson) =>
+            {
+                console.log("[StartBeeping.js] [API] Load Beeper's State Responce: ", responseJson);
+                console.log("[StartBeeping.js] [API] Changing isBeeping to: ", responseJson.isBeeping);
+                this.setState({isBeeping: (responseJson.isBeeping == "1")});
+                if((responseJson.isBeeping == "1"))
                 {
-                    console.log("[StartBeeping.js] [API] Load Beeper's State Responce: ", responseJson);
-                    console.log("[StartBeeping.js] [API] Changing isBeeping to: ", responseJson.isBeeping);
-                    this.setState({isBeeping: (responseJson.isBeeping == "1")});
-                    if((responseJson.isBeeping == "1"))
-                    {
-                        //if user turns 'isBeeping' on (to true), subscribe to rethinkdb changes
-                        this.enableGetQueue();
-                        this.getQueue();
-                        let { status } = await Location.requestPermissionsAsync();
-                        if (status !== 'granted') {
-                            this.setState({isBeeping: false});
-                            this.disableGetQueue();
-                            alert("ERROR: You must allow location to beep!");
-                        }
-                    }
-                    else
-                    {
-                        //if user turns 'isBeeping' off (to false), unsubscribe to rethinkdb changes
+                    //if user turns 'isBeeping' on (to true), subscribe to rethinkdb changes
+                    this.enableGetQueue();
+                    this.getQueue();
+                    let { status } = await Location.requestPermissionsAsync();
+                    if (status !== 'granted') {
+                        this.setState({isBeeping: false});
                         this.disableGetQueue();
+                        alert("ERROR: You must allow location to beep!");
                     }
-                })
-                .catch((error) =>
+                }
+                else
                 {
-                    console.error("[StartBeeping.js] [API] ", error);
-                });
-            }
+                    //if user turns 'isBeeping' off (to false), unsubscribe to rethinkdb changes
+                    this.disableGetQueue();
+                }
+            })
+            .catch((error) =>
+            {
+                console.error("[StartBeeping.js] [API] ", error);
+            });
         }
         catch (error) {
           console.log("[StartBeeping.js] [AsyncStorage] ", error);

@@ -43,22 +43,18 @@ export class MainFindBeepScreen extends Component {
             groupSize: '1',
             startLocation: '',
             destination: '',
-            pickBeeper: false
+            pickBeeper: true
         }
     }
     
     async retrieveData () {
         try {
-            let username = await AsyncStorage.getItem('@username');
-            let token = await AsyncStorage.getItem('@token');
-            let id = await AsyncStorage.getItem('@id');
-            let tokenid = await AsyncStorage.getItem('@tokenid');
+            const data = await AsyncStorage.multiGet(["@username", "@token", "@id"]);
 
             this.setState({
-                username: username,
-                token: token,
-                tokenid: tokenid,
-                id: id
+                username: data[0][1],
+                token: data[1][1],
+                id: data[2][1] 
             });
 
             //Once we know things like the user's id, we can now get the status of the rider

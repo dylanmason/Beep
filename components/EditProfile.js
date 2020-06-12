@@ -26,24 +26,16 @@ export class EditProfileScreen extends Component {
      */
     async retrieveData () {
         try {
-            //TODO: improve the perfomance of loading this data, in the future, find a way
-            //to not even use AsyncStorage on every single new screen
-            let username = await AsyncStorage.getItem('@username');
-            let token = await AsyncStorage.getItem('@token');
-            let first = await AsyncStorage.getItem('@first');
-            let last = await AsyncStorage.getItem('@last');
-            let email = await AsyncStorage.getItem('@email');
-            let phone = await AsyncStorage.getItem('@phone');
-            let venmo = await AsyncStorage.getItem('@venmo');
+            const data = await AsyncStorage.multiGet(['@token', '@username', '@first', '@last', '@email', '@phone', '@venmo']);
 
             this.setState({
-                token: token,
-                username: username,
-                first: first,
-                last: last,
-                email: email,
-                phone: phone,
-                venmo: venmo
+                token: data[0][1],
+                username: data[1][1],
+                first: data[2][1],
+                last: data[3][1],
+                email: data[4][1],
+                phone: data[5][1],
+                venmo: data[6][1]
             });
         }
         catch (error) {
