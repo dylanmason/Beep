@@ -3,8 +3,6 @@ import { StyleSheet, TouchableOpacity, AsyncStorage } from 'react-native';
 import { Toggle, Layout, Text, Button, Input } from '@ui-kitten/components';
 import { ThemeContext } from '../utils/theme-context';
 import socket from '../utils/Socket'
-import { CommonActions } from '@react-navigation/native';
-
 
 async function logout({ navigation }) {
     

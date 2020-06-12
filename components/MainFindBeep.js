@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import socket from '../utils/Socket'
 import * as SplashScreen from 'expo-splash-screen';
 import { YellowBox } from 'react-native';
+import { ThemeContext } from '../utils/theme-context';
 
 YellowBox.ignoreWarnings([
   'Non-serializable values were found in the navigation state',
