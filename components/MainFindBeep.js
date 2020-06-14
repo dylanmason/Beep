@@ -31,6 +31,14 @@ const CurrentLocationIcon = (props) => (
   <Icon {...props} name='navigation-2-outline'/>
 );
 
+const BackIcon = (props) => (
+  <Icon {...props} name='arrow-back-outline'/>
+);
+
+const GetIcon = (props) => (
+  <Icon {...props} name='person-done-outline'/>
+);
+
 export class MainFindBeepScreen extends Component {
     
     constructor(props) {
@@ -215,7 +223,7 @@ export class MainFindBeepScreen extends Component {
                         }
                         else {
                             console.log("[FindBeep.js] [API] " , data.message);
-                            this.setState({isLoading: false, foundBeep: false, isAccepted: false});
+                            this.setState({isLoading: false, foundBeep: false, isAccepted: false, beepersID: ''});
                             this.disableGetRiderStatus();
                         }
                     }.bind(this)
@@ -228,6 +236,7 @@ export class MainFindBeepScreen extends Component {
     }
 
     chooseBeep = (id) => {
+        this.setState({isLoading: true});
         var data = {
             "token": this.state.token,
             "origin": this.state.startLocation,
@@ -295,10 +304,7 @@ export class MainFindBeepScreen extends Component {
         this.setState({isLoading: true});
 
         var data = {
-            "token": this.state.token,
-            "origin": this.state.startLocation,
-            "destination": this.state.destination,
-            "groupSize": this.state.groupSize
+            "token": this.state.token
         }
 
         fetch("https://beep.nussman.us/api/rider/find", {
@@ -324,18 +330,13 @@ export class MainFindBeepScreen extends Component {
                                 beepersID: data.beepersID,
                                 beepersFirstName: data.beepersFirstName,
                                 beepersLastName: data.beepersLastName,
-                                beepersQueueSize: data.beepersQueueSize + 1,
+                                beepersQueueSize: data.beepersQueueSize,
                                 beepersSinglesRate: data.beepersSinglesRate,
                                 beepersGroupRate: data.beepersGroupRate,
-                                queueID: data.queueID,
-                                foundBeep: true,
                                 isLoading: false
                             });
-                            //tell socket server to listen for updates
-                            this.enableGetRiderStatus();
                         }
                         else {
-                            //alert(data.message);
                             this.setState({isLoading: false, findBeepError: data.message, showFindBeepError: true});
                         }
                     }.bind(this)
@@ -423,70 +424,130 @@ export class MainFindBeepScreen extends Component {
     render () {
         console.log("[MainFindBeep.js] Rendering Main Find Beep");
         if (!this.state.foundBeep) {
-            return (
-                <Layout style={styles.container}>
-                    <Input
-                        label='Group Size'
-                        style={styles.buttons}
-                        placeholder='Group Size'
-                        value={this.state.groupSize}
-                        onChangeText={value => this.setState({groupSize: value})}
-                    />
-                    <Layout style={styles.groupConatiner}>
-                        <Layout style={styles.layout}>
-                            <Input
-                                label='Pick-up Location'
-                                style={styles.rowItem}
-                                placeholder='Pickup Location'
-                                value={this.state.startLocation}
-                                onChangeText={value => this.setState({startLocation: value})}
-                            />
+            if (this.state.beepersID) {
+                return(
+                    <Layout style={styles.container}>
+                        <Layout style={styles.group}>
+                            <Text category='h6'>{this.state.beepersFirstName} {this.state.beepersLastName}</Text>
+                            <Text appearance='hint'>is avalible to beep you!</Text>
                         </Layout>
-                        <Layout style={styles.layout, {width: '15%', marginTop: 15}}>
+
+                        <Layout style={styles.group}>
+                            <Text category='h6'>{this.state.beepersFirstName}'s Rates</Text>
+                            <Layout style={styles.rateGroup}>
+                                <Layout style={styles.rateLayout}>
+                                    <Text appearance='hint'>Single</Text>
+                                    <Text>${this.state.beepersSinglesRate}</Text>
+                                </Layout>
+                                <Layout style={styles.rateLayout} >
+                                    <Text appearance='hint'>Group</Text>
+                                    <Text>${this.state.beepersGroupRate}</Text>
+                                </Layout>
+                            </Layout>
+                        </Layout>
+
+                        <Layout style={styles.group}>
+                        <Text appearance='hint'>{this.state.beepersFirstName}'s total queue size is</Text>
+                        <Text category='h6'>{this.state.beepersQueueSize}</Text>
+                        </Layout>
+                        {!this.state.isLoading ?
                             <Button
-                                icon={CurrentLocationIcon}
-                                onPress={this.useCurrentLocation}
+                                style={styles.buttons}
+                                icon={GetIcon}
+                                onPress={() => this.chooseBeep(this.state.beepersID)}
                             >
+                            Get Beep
                             </Button>
-                        </Layout>
-                    </Layout>
-                    <Input
-                        label='Destination Location'
-                        style={styles.buttons}
-                        placeholder='Destination'
-                        value={this.state.destination}
-                        onChangeText={value => this.setState({destination: value})}
-                    />
-                    <CheckBox text='Pick your own beeper' checked={this.state.pickBeeper} onChange={(value) => this.setState({pickBeeper: value})}>
-                    </CheckBox>
-                    {!this.state.isLoading ?
+                            :
+                            <Button appearance='outline' style={styles.buttons}>
+                                Loading
+                            </Button>
+                        }
                         <Button
-                            onPress={this.findBeep}
+                            status='basic'
+                            style={styles.buttons}
+                            icon={BackIcon}
+                            onPress={() => this.setState({'beepersID': ''})}
                         >
-                        Find a Beep
+                        Go Back
                         </Button>
-                        :
-                        <Button appearance='outline'>
-                            Loading
-                        </Button>
-                    }
-                    <Modal visible={this.state.showFindBeepError}>
-                        <Card disabled={true}>
-                        <Text>
-                            {this.state.findBeepError}
-                        </Text>
-                            <Button onPress={() => this.setState({showFindBeepError: false})}>
-                            Close
+                        <Modal visible={this.state.showFindBeepError}>
+                            <Card disabled={true}>
+                            <Text>
+                                {this.state.findBeepError}
+                            </Text>
+                                <Button onPress={() => this.setState({showFindBeepError: false})}>
+                                Close
+                                </Button>
+                            </Card>
+                        </Modal>
+                    </Layout>
+                );
+            }
+            else {
+                return (
+                    <Layout style={styles.container}>
+                        <Input
+                            label='Group Size'
+                            style={styles.buttons}
+                            placeholder='Group Size'
+                            value={this.state.groupSize}
+                            onChangeText={value => this.setState({groupSize: value})}
+                        />
+                        <Layout style={styles.groupConatiner}>
+                            <Layout style={styles.layout}>
+                                <Input
+                                    label='Pick-up Location'
+                                    style={styles.rowItem}
+                                    placeholder='Pickup Location'
+                                    value={this.state.startLocation}
+                                    onChangeText={value => this.setState({startLocation: value})}
+                                />
+                            </Layout>
+                            <Layout style={styles.layout, {width: '15%', marginTop: 15}}>
+                                <Button
+                                    icon={CurrentLocationIcon}
+                                    onPress={this.useCurrentLocation}
+                                >
+                                </Button>
+                            </Layout>
+                        </Layout>
+                        <Input
+                            label='Destination Location'
+                            style={styles.buttons}
+                            placeholder='Destination'
+                            value={this.state.destination}
+                            onChangeText={value => this.setState({destination: value})}
+                        />
+                        <CheckBox text='Pick your own beeper' checked={this.state.pickBeeper} onChange={(value) => this.setState({pickBeeper: value})}>
+                        </CheckBox>
+                        {!this.state.isLoading ?
+                            <Button
+                                onPress={this.findBeep}
+                            >
+                            Find a Beep
                             </Button>
-                        </Card>
-                    </Modal>
-                </Layout>
-            );
+                            :
+                            <Button appearance='outline'>
+                                Loading
+                            </Button>
+                        }
+                        <Modal visible={this.state.showFindBeepError}>
+                            <Card disabled={true}>
+                            <Text>
+                                {this.state.findBeepError}
+                            </Text>
+                                <Button onPress={() => this.setState({showFindBeepError: false})}>
+                                Close
+                                </Button>
+                            </Card>
+                        </Modal>
+                    </Layout>
+                );
+            }
         }
-        else
-        {
-            if (this.state.isAccepted)
-            {
+        else {
+            if (this.state.isAccepted) {
                 return (
                     <Layout style={styles.container}>
                         <Layout style={styles.group}>
@@ -538,8 +599,7 @@ export class MainFindBeepScreen extends Component {
                     </Layout>
                 );
             }
-            else
-            {
+            else {
                 return (
                     <Layout style={styles.container}>
 
