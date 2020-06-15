@@ -82,7 +82,7 @@ export class PickBeepScreen extends Component {
         if (!this.state.isLoading) {
             return (
                 <>
-                    <TopNavigation title='Beeper List' alignment='center' leftControl={BackAction()}/>
+                    <TopNavigation title='Beeper List' alignment='center' accessoryLeft={BackAction}/>
                     <List
                         data={this.state.beeperList}
                         ItemSeparatorComponent={Divider}

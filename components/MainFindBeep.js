@@ -453,7 +453,7 @@ export class MainFindBeepScreen extends Component {
                         {!this.state.isLoading ?
                             <Button
                                 style={styles.buttons}
-                                icon={GetIcon}
+                                accessoryRight={GetIcon}
                                 onPress={() => this.chooseBeep(this.state.beepersID)}
                             >
                             Get Beep
@@ -466,7 +466,7 @@ export class MainFindBeepScreen extends Component {
                         <Button
                             status='basic'
                             style={styles.buttons}
-                            icon={BackIcon}
+                            accessoryRight={BackIcon}
                             onPress={() => this.setState({'beepersID': ''})}
                         >
                         Go Back
@@ -506,7 +506,7 @@ export class MainFindBeepScreen extends Component {
                             </Layout>
                             <Layout style={styles.layout, {width: '15%', marginTop: 15}}>
                                 <Button
-                                    icon={CurrentLocationIcon}
+                                    accessoryRight={CurrentLocationIcon}
                                     onPress={this.useCurrentLocation}
                                 >
                                 </Button>
@@ -519,7 +519,8 @@ export class MainFindBeepScreen extends Component {
                             value={this.state.destination}
                             onChangeText={value => this.setState({destination: value})}
                         />
-                        <CheckBox text='Pick your own beeper' checked={this.state.pickBeeper} onChange={(value) => this.setState({pickBeeper: value})}>
+                        <CheckBox checked={this.state.pickBeeper} onChange={(value) => this.setState({pickBeeper: value})}>
+                        Pick your own beeper
                         </CheckBox>
                         {!this.state.isLoading ?
                             <Button
@@ -572,7 +573,7 @@ export class MainFindBeepScreen extends Component {
 
                         <Button
                             status='basic'
-                            icon={PhoneIcon}
+                            accessoryRight={PhoneIcon}
                             style={styles.buttons}
                             title="Text Beeper"
                             onPress={() =>{ Linking.openURL('tel:' + this.state.beepersPhone); } }
@@ -582,7 +583,7 @@ export class MainFindBeepScreen extends Component {
 
                         <Button
                             status='basic'
-                            icon={TextIcon}
+                            accessoryRight={TextIcon}
                             style={styles.buttons}
                             onPress={() =>{ Linking.openURL('sms:' + this.state.beepersPhone); } }
                         >
@@ -590,7 +591,7 @@ export class MainFindBeepScreen extends Component {
                         </Button>
                         <Button
                             status='info'
-                            icon={VenmoIcon}
+                            accessoryRight={VenmoIcon}
                             style={styles.buttons}
                             onPress={() =>{ Linking.openURL('venmo://paycharge?txn=pay&recipients='+ this.state.beepersVenmo + '&amount= + this.state.beepersGroupRate + &note=Beep'); } }
                         >
@@ -630,7 +631,7 @@ export class MainFindBeepScreen extends Component {
                         
                         {!this.state.isLoading ?
                             <Button
-                                icon={LeaveIcon}
+                                accessoryRight={LeaveIcon}
                                 onPress={() => this.leaveQueue()}
                             >
                             Leave Queue

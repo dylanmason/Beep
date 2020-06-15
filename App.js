@@ -83,9 +83,19 @@ export default function App() {
 
     const toggleTheme = () => {
         const nextTheme = theme === 'light' ? 'dark' : 'light';
-        //TODO: Push theme to AsyncStorage
         setTheme(nextTheme);
+        AsyncStorage.setItem('@theme', nextTheme);
     };
+
+    AsyncStorage.getItem('@theme').then((theme) => {
+        if(theme) {
+            setTheme(theme);
+        }
+      }, (error) => {
+        //AsyncStorage could not get data from storage
+        console.log("[App.js] [AsyncStorage] ", error);
+    });
+
 
     //If we haven't deturmined an initial screen, run this code
     //We DONT want to run this code if we already know what screen to load

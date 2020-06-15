@@ -112,7 +112,7 @@ export class EditProfileScreen extends Component {
 
         return (
             <>
-                <TopNavigation title='Edit Profile' alignment='center' leftControl={BackAction()}/>
+                <TopNavigation title='Edit Profile' alignment='center' accessoryLeft={BackAction}/>
                 <Layout style={styles.container}>
                     <Layout style={styles.form}>
                         <Input

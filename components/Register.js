@@ -215,7 +215,7 @@ export class RegisterScreen extends Component {
 
         return (
             <>
-                <TopNavigation title=' ' alignment='center' leftControl={BackAction()}/>
+                <TopNavigation title='' alignment='center' accessoryLeft={BackAction}/>
                 <Layout style={styles.container}>
                     <Text style={styles.title} category='h6'>Sign Up</Text>
                     <Layout style={styles.form}>
