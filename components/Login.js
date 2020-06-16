@@ -71,7 +71,7 @@ export class LoginScreen extends Component {
             console.log("[Login.js] [AsyncStorage] ", error);
         }
     }
-    
+
     //TODO: is this bad?
     async componentDidMount() {
         //when we make it to the login screen, tell Expo we are ready to hide the SplashScreen
@@ -131,7 +131,7 @@ export class LoginScreen extends Component {
                             const email = ["@email", data.email];
                             const phone = ["@phone", data.phone];
                             const venmo = ["@venmo", data.venmo];
-                            
+
                             try {
                                 //Store data in AsyncStorage
                                 AsyncStorage.multiSet([idData, usernameData, tokenData, tokenidData, singlesRate, groupRate, capacity, first, last, email, phone, venmo]);
@@ -139,7 +139,7 @@ export class LoginScreen extends Component {
                             catch (e) {
                                 console.log("[Login.js] [AsyncStorage] Could not store login data: ", e);
                             }
-                            
+
                             //async function that will send Expo Push Token to db
                             if (this.state.expoPushToken) {
                                 //send push token to server it is exists (not null)
@@ -222,7 +222,7 @@ export class LoginScreen extends Component {
                         ref={(input)=>this.secondTextInput = input}
                         onChangeText={(text) => this.setState({password:text})}
                         onSubmitEditing={() => this.handleLogin()} />
-                    {!this.state.isLoading ? 
+                    {!this.state.isLoading ?
                         <Button
                           onPress={() => this.handleLogin()}
                         >

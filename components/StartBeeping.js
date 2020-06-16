@@ -42,7 +42,7 @@ export class StartBeepingScreen extends Component {
     retrieveData = async () => {
         try {
             const data = await AsyncStorage.multiGet(["@username", "@token", "@id", "@singlesRate", "@groupRate", "@isBeeping", "@capacity"]);
-            
+
             this.setState({
                 username: data[0][1],
                 token: data[1][1],
@@ -80,7 +80,7 @@ export class StartBeepingScreen extends Component {
                 }
                 AsyncStorage.setItem(
                     '@isBeeping',
-                    '' + this.state.isBeeping 
+                    '' + this.state.isBeeping
                 );
             })
             .catch((error) =>
@@ -139,7 +139,6 @@ export class StartBeepingScreen extends Component {
                                 for(let i = 0;  i < data.queue.length; i++) {
                                     if (data.queue[i].isAccepted) {
                                         currentIndex = i;
-                                        console.log(i);
                                         break;
                                     }
                                 }
@@ -225,8 +224,8 @@ export class StartBeepingScreen extends Component {
                                 this.setState({startBeepingError: data.message, showStartBeepingError: true, isBeeping: !this.state.isBeeping});
                                 //we also need to resubscribe to the socket
                                 if (this.state.isBeeping) {
-                                    this.enableGetQueue(); 
-                                } 
+                                    this.enableGetQueue();
+                                }
                                 else {
                                     this.disableGetQueue();
                                 }
@@ -240,7 +239,7 @@ export class StartBeepingScreen extends Component {
         });
         AsyncStorage.setItem(
             '@isBeeping',
-            '' +this.state.isBeeping 
+            '' +this.state.isBeeping
         );
     }
 
@@ -396,15 +395,60 @@ export class StartBeepingScreen extends Component {
                         </Button>
                     </Layout>
                 );
-                const renderCurrentBeep = (id, riderid) => (
+                const renderCurrentBeep = (id, riderid, state) => (
                     <Layout style={styles.row}>
                         <Button size='tiny' appearance='outline' style={{marginRight: 5}}>Current Beep</Button>
-                        <Button
-                            size='small'
-                            onPress={()=> this.AcceptDeny(id, riderid, "complete")}
-                        >
-                            Done Beeping
-                        </Button>
+                        {(state == 0) ?
+                            <Button
+                                size='small'
+                                onPress={()=> this.AcceptDeny(id, riderid, "next")}
+                            >
+                                i'm on the way
+                            </Button>
+
+                            :
+
+                            null
+                        }
+
+                        {(state == 1) ?
+                            <Button
+                                size='small'
+                                onPress={()=> this.AcceptDeny(id, riderid, "next")}
+                            >
+                                i'm here
+                            </Button>
+
+                            :
+
+                            null
+                        }
+
+                        {(state == 2) ?
+                            <Button
+                                size='small'
+                                onPress={()=> this.AcceptDeny(id, riderid, "next")}
+                            >
+                                i'm now beeping this rider
+                            </Button>
+
+                            :
+
+                            null
+                        }
+
+                        {(state == 3) ?
+                            <Button
+                                size='small'
+                                onPress={()=> this.AcceptDeny(id, riderid, "complete")}
+                            >
+                                i'm done beeping rider
+                            </Button>
+
+                            :
+
+                            null
+                        }
                     </Layout>
                 );
                 return (
@@ -421,14 +465,14 @@ export class StartBeepingScreen extends Component {
                             data={this.state.queue}
                             keyExtractor={item => item.id.toString()}
                             renderItem={({item, index}) =>
-                                item.isAccepted ? 
-                                
+                                item.isAccepted ?
+
                                 <>
                                 {(this.state.currentIndex == index) ?
                                     <ListItem
                                         title={`${item.personalInfo.first} ${item.personalInfo.last}`}
                                         description={`Group Size: ${item.groupSize}\nPick Up: ${item.origin}\nDestination: ${item.destination}`}
-                                        accessoryRight={() => renderCurrentBeep(item.id, item.riderid)}
+                                        accessoryRight={() => renderCurrentBeep(item.id, item.riderid, item.state)}
                                     />
                                     :
                                     <ListItem
@@ -439,7 +483,7 @@ export class StartBeepingScreen extends Component {
                                 </>
 
                                 :
-                                
+
                                 <ListItem
                                     title={`${item.personalInfo.first} ${item.personalInfo.last}`}
                                     description={`Group Size: ${item.groupSize}`}
@@ -512,7 +556,7 @@ const styles = StyleSheet.create({
         width: "94%"
     },
     toggle: {
-        marginBottom: 7 
+        marginBottom: 7
     },
     inputs: {
         width: "80%"

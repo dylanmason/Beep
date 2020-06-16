@@ -40,7 +40,7 @@ const GetIcon = (props) => (
 );
 
 export class MainFindBeepScreen extends Component {
-    
+
     constructor(props) {
         super(props);
         this.state = {
@@ -54,7 +54,7 @@ export class MainFindBeepScreen extends Component {
             pickBeeper: true
         }
     }
-    
+
     async retrieveData () {
         try {
             const data = await AsyncStorage.multiGet(["@username", "@token", "@id"]);
@@ -62,7 +62,7 @@ export class MainFindBeepScreen extends Component {
             this.setState({
                 username: data[0][1],
                 token: data[1][1],
-                id: data[2][1] 
+                id: data[2][1]
             });
 
             //Once we know things like the user's id, we can now get the status of the rider
@@ -81,7 +81,7 @@ export class MainFindBeepScreen extends Component {
         console.log("mounted MainFindBeep");
         //Run retrieveData to get user's data and save it in states
         this.retrieveData();
-        
+
         socket.on('updateRiderStatus', data => {
             console.log("[FindBeep.js] [Socket.io] Socket.io told us to update rider status.");
             this.getRiderStatus();
@@ -204,7 +204,8 @@ export class MainFindBeepScreen extends Component {
                                     beepersGroupRate: data.beepersGroupRate,
                                     beepersPhone: data.beepersPhone,
                                     beepersVenmo: data.beepersVenmo,
-                                    ridersQueuePosition: data.ridersQueuePosition
+                                    ridersQueuePosition: data.ridersQueuePosition,
+                                    state: data.state
                                 });
                             }
                             else {
@@ -563,7 +564,39 @@ export class MainFindBeepScreen extends Component {
                         </Layout>
 
                         <Layout style={styles.group}>
-                            {(this.state.ridersQueuePosition == 0) ? 
+                            <Text category='h6'>Current Status</Text>
+                            {this.state.state == 0 ?
+                                <Text appearance='hint'>
+                                    Beeper is getting ready to come get you.
+                                </Text>
+                                :
+                                null
+                            }
+                            {this.state.state == 1 ?
+                                <Text appearance='hint'>
+                                    Beeper is on their way to get you.
+                                </Text>
+                                :
+                                null
+                            }
+                            {this.state.state == 2 ?
+                                <Text appearance='hint'>
+                                    Beeper is here to pick you up!
+                                </Text>
+                                :
+                                null
+                            }
+                            {this.state.state == 3 ?
+                                <Text appearance='hint'>
+                                    You are currenly in the car with your beeper.
+                                </Text>
+                                :
+                                null
+                            }
+                        </Layout>
+
+                        <Layout style={styles.group}>
+                            {(this.state.ridersQueuePosition == 0) ?
                                 <>
                                 <Text>You are at the top of {this.state.beepersFirstName}'s queue.</Text>
                                 <Text appearance='hint'>{this.state.beepersFirstName} is currently serving you.</Text>
@@ -634,7 +667,7 @@ export class MainFindBeepScreen extends Component {
                         <Text appearance='hint'>{this.state.beepersFirstName}'s total queue size is</Text>
                         <Text category='h6'>{this.state.beepersQueueSize}</Text>
                         </Layout>
-                        
+
                         {!this.state.isLoading ?
                             <Button
                                 accessoryRight={LeaveIcon}
