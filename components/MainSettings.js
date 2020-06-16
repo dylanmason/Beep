@@ -5,7 +5,7 @@ import { ThemeContext } from '../utils/theme-context';
 import socket from '../utils/Socket'
 
 async function logout({ navigation }) {
-    
+
     //get token from AsyncStorage to authenticate with the api
     var token = await AsyncStorage.getItem('@token');
 
@@ -90,6 +90,7 @@ export function MainSettingsScreen({ navigation }) {
             <Button style={styles.buttons} onPress={themeContext.toggleTheme}>Toggle Theme</Button>
             <Button style={styles.buttons} onPress={() => logout({ navigation })}>Logout</Button>
             <Button style={styles.buttons} onPress={() => navigation.navigate("EditProfileScreen")}>Edit Profile</Button>
+            <Button style={styles.buttons} onPress={() => navigation.navigate("ChangePasswordScreen")}>Change Password</Button>
         </Layout>
     );
 }

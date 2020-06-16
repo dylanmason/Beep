@@ -563,43 +563,49 @@ export class MainFindBeepScreen extends Component {
                             <Text appearance='hint'>is your beeper!</Text>
                         </Layout>
 
-                        <Layout style={styles.group}>
-                            <Text category='h6'>Current Status</Text>
-                            {this.state.state == 0 ?
-                                <Text appearance='hint'>
-                                    Beeper is getting ready to come get you.
-                                </Text>
-                                :
-                                null
-                            }
-                            {this.state.state == 1 ?
-                                <Text appearance='hint'>
-                                    Beeper is on their way to get you.
-                                </Text>
-                                :
-                                null
-                            }
-                            {this.state.state == 2 ?
-                                <Text appearance='hint'>
-                                    Beeper is here to pick you up!
-                                </Text>
-                                :
-                                null
-                            }
-                            {this.state.state == 3 ?
-                                <Text appearance='hint'>
-                                    You are currenly in the car with your beeper.
-                                </Text>
-                                :
-                                null
-                            }
-                        </Layout>
+                        {(this.state.ridersQueuePosition == 0) ?
+                            <Layout style={styles.group}>
+                                <Text category='h6'>Current Status</Text>
+                                {this.state.state == 0 ?
+                                    <Text appearance='hint'>
+                                        Beeper is getting ready to come get you.
+                                    </Text>
+                                    :
+                                    null
+                                }
+                                {this.state.state == 1 ?
+                                    <Text appearance='hint'>
+                                        Beeper is on their way to get you.
+                                    </Text>
+                                    :
+                                    null
+                                }
+                                {this.state.state == 2 ?
+                                    <Text appearance='hint'>
+                                        Beeper is here to pick you up!
+                                    </Text>
+                                    :
+                                    null
+                                }
+                                {this.state.state == 3 ?
+                                    <Text appearance='hint'>
+                                        You are currenly in the car with your beeper.
+                                    </Text>
+                                    :
+                                    null
+                                }
+                            </Layout>
+                            :
+                            null
+                        }
 
                         <Layout style={styles.group}>
                             {(this.state.ridersQueuePosition == 0) ?
                                 <>
                                 <Text>You are at the top of {this.state.beepersFirstName}'s queue.</Text>
                                 <Text appearance='hint'>{this.state.beepersFirstName} is currently serving you.</Text>
+
+
                                 </>
 
                                 :
