@@ -41,7 +41,7 @@ export class StartBeepingScreen extends Component {
      */
     retrieveData = async () => {
         try {
-            const data = await AsyncStorage.multiGet(["@username", "@token", "@id", "@singlesRate", "@groupRate", "@isBeeping"]);
+            const data = await AsyncStorage.multiGet(["@username", "@token", "@id", "@singlesRate", "@groupRate", "@isBeeping", "@capacity"]);
             
             this.setState({
                 username: data[0][1],
@@ -49,7 +49,8 @@ export class StartBeepingScreen extends Component {
                 id: data[2][1],
                 singlesRate: data[3][1],
                 groupRate: data[4][1],
-                isBeeping: (data[5][1] == 'true')
+                isBeeping: (data[5][1] == 'true'),
+                capacity: data[6][1]
             });
 
             //Upon loading user data into states, get User's bepper status
@@ -187,7 +188,8 @@ export class StartBeepingScreen extends Component {
             "token": this.state.token,
             "isBeeping": value,
             "singlesRate": this.state.singlesRate,
-            "groupRate": this.state.groupRate
+            "groupRate": this.state.groupRate,
+            "capacity": this.state.capacity
         }
 
         fetch("https://beep.nussman.us/api/beeper/status", {
@@ -299,13 +301,16 @@ export class StartBeepingScreen extends Component {
     updateSingles = (value) => {
         this.setState({singlesRate: value});
         AsyncStorage.setItem('@singlesRate', value);
-        console.log("[StartBeeping.js] Setting singles rate to: ", value);
     }
 
     updateGroup = (value) => {
         this.setState({groupRate: value});
         AsyncStorage.setItem('@groupRate', value);
-        console.log("[StartBeeping.js] Setting group rate to: ", value);
+    }
+
+    updateCapacity = (value) => {
+        this.setState({capacity: value});
+        AsyncStorage.setItem('@capacity', value);
     }
 
     handleDirections = (origin, dest) => {
@@ -330,6 +335,15 @@ export class StartBeepingScreen extends Component {
                     >
                     Toggle Beeping Status
                     </Toggle>
+                    <Input
+                        label='Max Capacity'
+                        caption='The maximum number of people you can fit in your vehicle not including yourself.'
+                        placeholder='Max Capcity'
+                        keyboardType='numeric'
+                        style={styles.inputs}
+                        value={this.state.capacity}
+                        onChangeText={(value) => this.updateCapacity(value)}
+                    />
                     <Input
                         label='Singles Rate'
                         caption='Riders who need a ride alone will pay this price.'

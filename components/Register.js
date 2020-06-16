@@ -127,6 +127,7 @@ export class RegisterScreen extends Component {
                             const tokenidData = ["@tokenid", data.tokenid];
                             const singlesRate = ["@singlesRate", "" + data.singlesRate];
                             const groupRate = ["@groupRate", "" + data.groupRate];
+                            const capacity = ["@capacity", "" + data.capacity];
                             const first = ["@first", data.first];
                             const last = ["@last", data.last];
                             const email = ["@email", data.email];
@@ -135,7 +136,7 @@ export class RegisterScreen extends Component {
 
                             try {
                                 //Store data in AsyncStorage
-                                AsyncStorage.multiSet([idData, usernameData, tokenData, tokenidData, singlesRate, groupRate, first, last, email, phone, venmo]);
+                                AsyncStorage.multiSet([idData, usernameData, tokenData, tokenidData, singlesRate, groupRate, capacity, first, last, email, phone, venmo]);
                             }
                             catch (e) {
                                 console.log("[Register.js] [AsyncStorage] Could not store signup data: ", e);

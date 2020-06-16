@@ -333,6 +333,7 @@ export class MainFindBeepScreen extends Component {
                                 beepersQueueSize: data.beepersQueueSize,
                                 beepersSinglesRate: data.beepersSinglesRate,
                                 beepersGroupRate: data.beepersGroupRate,
+                                beepersCapacity: data.beepersCapacity,
                                 isLoading: false
                             });
                         }
@@ -447,8 +448,13 @@ export class MainFindBeepScreen extends Component {
                         </Layout>
 
                         <Layout style={styles.group}>
-                        <Text appearance='hint'>{this.state.beepersFirstName}'s total queue size is</Text>
-                        <Text category='h6'>{this.state.beepersQueueSize}</Text>
+                            <Text appearance='hint'>{this.state.beepersFirstName}'s rider capacity is</Text>
+                            <Text category='h6'>{this.state.beepersCapacity}</Text>
+                        </Layout>
+
+                        <Layout style={styles.group}>
+                            <Text appearance='hint'>{this.state.beepersFirstName}'s total queue size is</Text>
+                            <Text category='h6'>{this.state.beepersQueueSize}</Text>
                         </Layout>
                         {!this.state.isLoading ?
                             <Button

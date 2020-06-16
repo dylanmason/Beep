@@ -87,14 +87,6 @@ export default function App() {
         AsyncStorage.setItem('@theme', nextTheme);
     };
 
-    AsyncStorage.getItem('@theme').then((theme) => {
-        if(theme) {
-            setTheme(theme);
-        }
-      }, (error) => {
-        //AsyncStorage could not get data from storage
-        console.log("[App.js] [AsyncStorage] ", error);
-    });
 
 
     //If we haven't deturmined an initial screen, run this code
@@ -114,7 +106,17 @@ export default function App() {
                 //Log this to console
                 console.log("[App.js] [Auth] Token found in storage: ", token);
                 //Store token in state
-                setToken(token);
+                AsyncStorage.getItem('@theme').then((theme) => {
+                    if(theme) {
+                        setTheme(theme);
+                    }
+                    else {
+                        setToken(token);
+                    }
+                  }, (error) => {
+                    //AsyncStorage could not get data from storage
+                    console.log("[App.js] [AsyncStorage] ", error);
+                });
             }
             else
             {
@@ -123,7 +125,18 @@ export default function App() {
                 initialScreen = "Login";
                 //Log this to console
                 console.log("[App.js] [Auth] No token found, send user to Login");
-                setToken(null);
+                //Call a set state to ensure a render happens
+                AsyncStorage.getItem('@theme').then((theme) => {
+                    if(theme) {
+                        setTheme(theme);
+                    }
+                    else {
+                        setToken(null);
+                    }
+                  }, (error) => {
+                    //AsyncStorage could not get data from storage
+                    console.log("[App.js] [AsyncStorage] ", error);
+                });
             }
           }, (error) => {
             //AsyncStorage could not get data from storage
