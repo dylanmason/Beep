@@ -28,6 +28,9 @@ const MapsIcon = (props) => (
   <Icon {...props} name='map-outline'/>
 );
 
+const DollarIcon = (props) => (
+  <Text>$</Text>
+);
 
 export class StartBeepingScreen extends Component {
 
@@ -350,6 +353,7 @@ export class StartBeepingScreen extends Component {
                         keyboardType='numeric'
                         style={styles.inputs}
                         value={this.state.singlesRate}
+                        accessoryLeft={DollarIcon}
                         onChangeText={(value) => this.updateSingles(value)}
                     />
                     <Input
@@ -359,6 +363,7 @@ export class StartBeepingScreen extends Component {
                         keyboardType='numeric'
                         style={styles.inputs}
                         value={this.state.groupRate}
+                        accessoryLeft={DollarIcon}
                         onChangeText={(value) => this.updateGroup(value)}
                     />
                     <Modal visible={this.state.showStartBeepingError}>

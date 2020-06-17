@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, AsyncStorage, Linking } from 'react-native';
+import { StyleSheet, AsyncStorage, Linking, TouchableWithoutFeedback } from 'react-native';
 import { Icon, Layout, Text, Button, Input, CheckBox, Modal, Card } from '@ui-kitten/components';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
@@ -27,16 +27,16 @@ const LeaveIcon = (props) => (
   <Icon {...props} name='person-remove-outline'/>
 );
 
-const CurrentLocationIcon = (props) => (
-  <Icon {...props} name='navigation-2-outline'/>
-);
-
 const BackIcon = (props) => (
   <Icon {...props} name='arrow-back-outline'/>
 );
 
 const GetIcon = (props) => (
   <Icon {...props} name='person-done-outline'/>
+);
+
+const FindIcon = (props) => (
+  <Icon {...props} name='search'/>
 );
 
 export class MainFindBeepScreen extends Component {
@@ -424,7 +424,14 @@ export class MainFindBeepScreen extends Component {
     }
 
     render () {
+        const CurrentLocationIcon = (props) => (
+            <TouchableWithoutFeedback onPress={this.useCurrentLocation}>
+                <Icon {...props} name='pin'/>
+            </TouchableWithoutFeedback>
+        );
+
         console.log("[MainFindBeep.js] Rendering Main Find Beep");
+
         if (!this.state.foundBeep) {
             if (this.state.beepersID) {
                 return(
@@ -501,24 +508,14 @@ export class MainFindBeepScreen extends Component {
                             value={this.state.groupSize}
                             onChangeText={value => this.setState({groupSize: value})}
                         />
-                        <Layout style={styles.groupConatiner}>
-                            <Layout style={styles.layout}>
-                                <Input
-                                    label='Pick-up Location'
-                                    style={styles.rowItem}
-                                    placeholder='Pickup Location'
-                                    value={this.state.startLocation}
-                                    onChangeText={value => this.setState({startLocation: value})}
-                                />
-                            </Layout>
-                            <Layout style={styles.layout, {width: '15%', marginTop: 15}}>
-                                <Button
-                                    accessoryRight={CurrentLocationIcon}
-                                    onPress={this.useCurrentLocation}
-                                >
-                                </Button>
-                            </Layout>
-                        </Layout>
+                        <Input
+                            label='Pick-up Location'
+                            style={styles.buttons}
+                            placeholder='Pickup Location'
+                            accessoryRight={CurrentLocationIcon}
+                            value={this.state.startLocation}
+                            onChangeText={value => this.setState({startLocation: value})}
+                        />
                         <Input
                             label='Destination Location'
                             style={styles.buttons}
@@ -526,17 +523,27 @@ export class MainFindBeepScreen extends Component {
                             value={this.state.destination}
                             onChangeText={value => this.setState({destination: value})}
                         />
-                        <CheckBox checked={this.state.pickBeeper} onChange={(value) => this.setState({pickBeeper: value})}>
-                        Pick your own beeper
+                        <CheckBox
+                            checked={this.state.pickBeeper}
+                            onChange={(value) => this.setState({pickBeeper: value})}
+                        >
+                            Pick your own beeper
                         </CheckBox>
                         {!this.state.isLoading ?
                             <Button
+                                accessoryRight={FindIcon}
                                 onPress={this.findBeep}
+                                size='large'
+                                style={{marginTop:15}}
                             >
                             Find a Beep
                             </Button>
                             :
-                            <Button appearance='outline'>
+                            <Button
+                                size='large'
+                                style={{marginTop:15}}
+                                appearance='outline'
+                            >
                                 Loading
                             </Button>
                         }
