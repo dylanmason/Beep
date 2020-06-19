@@ -368,6 +368,8 @@ export class MainFindBeepScreen extends Component {
     useCurrentLocation = async () => {
         //TODO: find amore elegent solution to tell user we are loading location data
         this.setState({ startLocation: "Loading Current Location..." });
+        
+        Location.setApiKey("AIzaSyBgabJrpu7-ELWiUIKJlpBz2mL6GYjwCVI");
 
         let { status } = await Location.requestPermissionsAsync();
 
@@ -379,15 +381,21 @@ export class MainFindBeepScreen extends Component {
         }
 
         //get location
-        let location = await Location.getCurrentPositionAsync({});
+        let position = await Location.getCurrentPositionAsync({});
+        let location = await Location.reverseGeocodeAsync({ latitude: position.coords.latitude, longitude: position.coords.longitude });
 
-        console.log("[FindBeep.js] Setting Origin Location to ", location);
+        let string;
 
-        //Make a string we will use to populate the textbox
-        let locationString = location.coords.latitude + "," + location.coords.longitude;
+        if (!location[0].name) {
+            string = position.coords.latitude + ", "+ position.coords.longitude;
+        }
+        else {
+            string = location[0].name + " " + location[0].street + " " + location[0].city + ", " + location[0].region + " " + location[0].postalCode;  
+        }
+
 
         //Update Origin Location
-        this.setState({ startLocation: locationString });
+        this.setState({ startLocation: string });
     }
 
     leaveQueue = () => {
