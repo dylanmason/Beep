@@ -36,7 +36,8 @@ export class StartBeepingScreen extends Component {
 
     state = {
         showStartBeepingError: false,
-        isBeeping: false
+        isBeeping: false,
+        queue: []
     };
 
     /**
@@ -63,7 +64,9 @@ export class StartBeepingScreen extends Component {
             .then(async (responseJson) =>
             {
                 console.log("[StartBeeping.js] [API] Load Beeper's State Responce: ", responseJson);
-                this.setState({isBeeping: responseJson.isBeeping});
+                if (this.state.isBeeping !== responseJson.isBeeping) {
+                    this.setState({isBeeping: responseJson.isBeeping});
+                }
 
                 if(responseJson.isBeeping) {
                     //if user turns 'isBeeping' on (to true), subscribe to rethinkdb changes
@@ -71,6 +74,8 @@ export class StartBeepingScreen extends Component {
                     this.getQueue();
                     let { status } = await Location.requestPermissionsAsync();
                     if (status !== 'granted') {
+                        //if we have no location access, dont let the user beep
+                        //TODO: we only disable beeping client side, should we push false to server also?
                         this.setState({isBeeping: false});
                         this.disableGetQueue();
                         alert("ERROR: You must allow location to beep!");
@@ -78,7 +83,7 @@ export class StartBeepingScreen extends Component {
                 }
                 else {
                     //if user turns 'isBeeping' off (to false), unsubscribe to rethinkdb changes
-                    this.setState({isBeeping: false});
+                    //this.setState({isBeeping: false});
                     this.disableGetQueue();
                 }
                 AsyncStorage.setItem(

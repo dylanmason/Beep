@@ -55,6 +55,7 @@ export class MainFindBeepScreen extends Component {
         }
     }
 
+    /*
     async retrieveData () {
         try {
             const data = await AsyncStorage.multiGet(["@username", "@token", "@id"]);
@@ -72,13 +73,27 @@ export class MainFindBeepScreen extends Component {
           console.log("[FindBeep.js] [AsyncStorage] ", error);
         }
     }
+    */
+
+    retrieveData () {
+        AsyncStorage.multiGet(["@username", "@token", "@id"], (error, data) => {
+            this.setState({
+                username: data[0][1],
+                token: data[1][1],
+                id: data[2][1]
+            });
+
+            //Once we know things like the user's id, we can now get the status of the rider
+            this.getInitialRiderStatus();
+        });
+
+    }
 
     async doneSplash () {
         await SplashScreen.hideAsync();
     }
 
     componentDidMount () {
-        console.log("mounted MainFindBeep");
         //Run retrieveData to get user's data and save it in states
         this.retrieveData();
 
@@ -153,7 +168,7 @@ export class MainFindBeepScreen extends Component {
                         }
                         else {
                             console.log("[FindBeep.js] [API] " , data.message);
-                            this.setState({isLoading: false, foundBeep: false, isAccepted: false});
+                            //this.setState({isLoading: false, foundBeep: false, isAccepted: false});
                         }
                     }.bind(this)
                 );

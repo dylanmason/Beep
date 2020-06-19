@@ -76,33 +76,24 @@ async function startSplash() {
 export default function App() {
     startSplash();
 
-    const [expoPushToken, setExpoPushToken] = React.useState('');
+    //const [expoPushToken, setExpoPushToken] = React.useState('');
     const [notification, setNotification] = React.useState({});
     const [token, setToken] = React.useState('');
     const [theme, setTheme] = React.useState('light');
+    const [isLoading, setIsLoading] = React.useState(true);
 
     const toggleTheme = () => {
         const nextTheme = theme === 'light' ? 'dark' : 'light';
         setTheme(nextTheme);
         AsyncStorage.setItem('@theme', nextTheme);
     };
-
-    AsyncStorage.getItem('@theme').then((theme) => {
-        if(theme) {
-            setTheme(theme);
-        }
-      }, (error) => {
-        //AsyncStorage could not get data from storage
-        console.log("[App.js] [AsyncStorage] ", error);
-    });
-
-
+    
     //If we haven't deturmined an initial screen, run this code
     //We DONT want to run this code if we already know what screen to load
     if (initialScreen == null) {
         //When App loads initially, get token from AsyncStorage
-        AsyncStorage.getItem('@token').then((token) => {
-            if(token) {
+        AsyncStorage.multiGet(['@token', '@theme']).then((result) => {
+            if(result[0][1]) {
                 //Register for Expo Push Notifications
                 registerForPushNotificationsAsync();
                 //Add Listiner for Push Notifications
@@ -112,19 +103,24 @@ export default function App() {
                 //Because user is logged in, send them to Main initially
                 initialScreen = "Main";
                 //Log this to console
-                console.log("[App.js] [Auth] Token found in storage: ", token);
-                //Store token in state
-                setToken(token);
+                console.log("[App.js] [Auth] Token found in storage: ", result[0][1]);
             }
-            else
-            {
+            else {
                 //No Token found in AsyncStorage
                 //This mean no one is logged in, send them to login page initally
                 initialScreen = "Login";
                 //Log this to console
                 console.log("[App.js] [Auth] No token found, send user to Login");
-                setToken(null);
             }
+
+            if(result[1][1]) {
+                //re-render may happen, if a re-render happens, this code will not run agian because
+                //initialScreen has been defined. 
+                setTheme(result[1][1]);
+            }
+
+            //we didn't have a theme to set, so just use this state to tigger a re-render to get into the app
+            setIsLoading(false);
           }, (error) => {
             //AsyncStorage could not get data from storage
             console.log("[App.js] [AsyncStorage] ", error);
@@ -132,6 +128,7 @@ export default function App() {
 
         //We are checking if a token exists in AsyncStorage
         console.log("[App.js] Rendering Loading Screen");
+        //this render is needed below, not sure why
         return(null);
     }
 
@@ -160,6 +157,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
+    //TODO: handle notch on iPhone X or newer
     statusbar: {
         paddingTop: Platform.OS === 'ios' ? 20 : 0
     }
