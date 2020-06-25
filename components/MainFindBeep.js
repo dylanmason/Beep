@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import socket from '../utils/Socket'
 import * as SplashScreen from 'expo-splash-screen';
 import { YellowBox } from 'react-native';
+import { UserContext } from '../utils/UserContext.js';
 
 YellowBox.ignoreWarnings([
   'Non-serializable values were found in the navigation state',
@@ -40,6 +41,7 @@ const FindIcon = (props) => (
 );
 
 export class MainFindBeepScreen extends Component {
+    static contextType = UserContext;
 
     constructor(props) {
         super(props);
@@ -55,47 +57,12 @@ export class MainFindBeepScreen extends Component {
         }
     }
 
-    /*
-    async retrieveData () {
-        try {
-            const data = await AsyncStorage.multiGet(["@username", "@token", "@id"]);
-
-            this.setState({
-                username: data[0][1],
-                token: data[1][1],
-                id: data[2][1]
-            });
-
-            //Once we know things like the user's id, we can now get the status of the rider
-            this.getInitialRiderStatus();
-        }
-        catch (error) {
-          console.log("[FindBeep.js] [AsyncStorage] ", error);
-        }
-    }
-    */
-
-    retrieveData () {
-        AsyncStorage.multiGet(["@username", "@token", "@id"], (error, data) => {
-            this.setState({
-                username: data[0][1],
-                token: data[1][1],
-                id: data[2][1]
-            });
-
-            //Once we know things like the user's id, we can now get the status of the rider
-            this.getInitialRiderStatus();
-        });
-
-    }
-
     async doneSplash () {
         await SplashScreen.hideAsync();
     }
 
     componentDidMount () {
-        //Run retrieveData to get user's data and save it in states
-        this.retrieveData();
+        this.getInitialRiderStatus();
 
         socket.on('updateRiderStatus', data => {
             console.log("[FindBeep.js] [Socket.io] Socket.io told us to update rider status.");
@@ -104,8 +71,9 @@ export class MainFindBeepScreen extends Component {
     }
 
     getInitialRiderStatus() {
+        console.log(this.context);
         //We will need to use user's token to update their status
-        let token = this.state.token;
+        let token = this.context.user.token;
 
         //Data we will POST to beeper status enpoint API
         var data = {
@@ -182,7 +150,7 @@ export class MainFindBeepScreen extends Component {
 
     getRiderStatus() {
         //We will need to use user's token to update their status
-        let token = this.state.token;
+        let token = this.context.user.token;
 
         //Data we will POST to beeper status enpoint API
         var data = {
@@ -254,7 +222,7 @@ export class MainFindBeepScreen extends Component {
     chooseBeep = (id) => {
         this.setState({isLoading: true});
         var data = {
-            "token": this.state.token,
+            "token": this.context.user.token,
             "origin": this.state.startLocation,
             "destination": this.state.destination,
             "groupSize": this.state.groupSize,
@@ -320,7 +288,7 @@ export class MainFindBeepScreen extends Component {
         this.setState({isLoading: true});
 
         var data = {
-            "token": this.state.token
+            "token": this.context.user.token
         }
 
         fetch("https://beep.nussman.us/api/rider/find", {
@@ -400,7 +368,7 @@ export class MainFindBeepScreen extends Component {
 
     leaveQueue = () => {
         this.setState({isLoading: true});
-        let token = this.state.token;
+        let token = this.context.user.token;
 
         var data = {
             "token": token,

@@ -2,86 +2,8 @@ import React, { Component } from 'react';
 import { StyleSheet, TouchableOpacity, AsyncStorage } from 'react-native';
 import { Icon, Toggle, Layout, Text, Button, Input, Menu, MenuItem } from '@ui-kitten/components';
 import { ThemeContext } from '../utils/theme-context';
-import socket from '../utils/Socket'
-
-async function logout({ navigation }) {
-
-    //get token from AsyncStorage to authenticate with the api
-    var token = await AsyncStorage.getItem('@token');
-
-    //POST to our Logout API
-    fetch("https://beep.nussman.us/api/auth/logout", {
-        method: "POST",
-        headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            "token": token
-        })
-    })
-    .then(
-        function(response) {
-            if (response.status !== 200) {
-                console.log('[Settings.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
-                return;
-            }
-
-            response.json().then(
-                function(data) {
-                    //Log the result from the Logout API to debug
-                    console.log("[Settings.js] [API] Logout API Responce: ", data);
-
-                    if (data.status == "success") {
-                        //Logout was successfull
-                        console.log("[Settings.js] [Logout] We have internet connection.");
-                        //Define the keys we want to unset
-                        let keys = ['@username', '@id', '@token', '@tokenid', '@singlesRate' , '@groupRate', '@first', '@last', '@email', '@phone', '@venmo', '@isBeeping'];
-                        //Using AsyncStorage, remove keys on logout.
-                        //IMPORTANT: we do NOT remove the expo push token beause we need that for any other user that may login
-                        //We can't remove it because it is only set on App.js when we initialize notifications, we may not re-run that code
-                        AsyncStorage.multiRemove(keys, (err) => {
-                            console.log("[Settings.js] [Logout] Removed all from storage except our push token.");
-                        });
-                        //these two emits tell our socket server that we no longer want the rethinkdb watcher open
-                        socket.emit('stopGetQueue');
-                        socket.emit('stopGetRiderStatus');
-                        //this tells our client to stop listening to updates
-                        socket.off('updateRiderStatus');
-                        socket.off('updateQueue');
-                    }
-                    else {
-                        //Our API returned an error, we didn't logout.
-                        //Use Native Alert to tell user they were not logged out
-                        alert("Could not logout!");
-                    }
-                }
-            );
-        }
-    )
-    .catch((error) => {
-        //The fetch encountered an error.
-        console.log("[Settings.js] [Logout] We have no internet!");
-        //Define the keys we will remove from storage
-        //IMPORTANT: notice how we did NOT remove the 'tokenid'
-        //This is because use is offline, we will remove it upon the next signin or signup
-        //Also, we still keep expoPushToken
-        let keys = ['@username', '@id', '@token', '@singlesRate' , '@groupRate', '@first', '@last', '@email', '@phone', '@venmo', '@isBeeping'];
-        //Remove data from AsyncStorage
-        AsyncStorage.multiRemove(keys, (err) => {
-            console.log("Removed all except tokenid and expoPushToken from storage.");
-        });
-    });
-
-    //Now that we have completed the logout procedue, send them to the Login page.
-    navigation.reset({
-        index: 0,
-        routes: [
-            { name: 'Login' },
-        ],
-        key: null
-    });
-}
+import socket from '../utils/Socket';
+import { UserContext } from '../utils/UserContext.js';
 
 const ThemeIcon = (props) => (
   <Icon {...props} name='color-palette'/>
@@ -105,6 +27,86 @@ const ForwardIcon = (props) => (
 
 export function MainSettingsScreen({ navigation }) {
     const themeContext = React.useContext(ThemeContext);
+    const userContext = React.useContext(UserContext);
+
+    async function logout() {
+
+        //POST to our Logout API
+        fetch("https://beep.nussman.us/api/auth/logout", {
+            method: "POST",
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "token": userContext.user.token
+            })
+        })
+        .then(
+            function(response) {
+                if (response.status !== 200) {
+                    console.log('[Settings.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
+                    return;
+                }
+
+                response.json().then(
+                    function(data) {
+                        //Log the result from the Logout API to debug
+                        console.log("[Settings.js] [API] Logout API Responce: ", data);
+
+                        if (data.status == "success") {
+                            //Logout was successfull
+                            console.log("[Settings.js] [Logout] We have internet connection.");
+                            //Define the keys we want to unset
+                            let keys = ['@user', '@isBeeping', '@capacity'];
+                            //Using AsyncStorage, remove keys on logout.
+                            //IMPORTANT: we do NOT remove the expo push token beause we need that for any other user that may login
+                            //We can't remove it because it is only set on App.js when we initialize notifications, we may not re-run that code
+                            AsyncStorage.multiRemove(keys, (err) => {
+                                console.log("[Settings.js] [Logout] Removed all from storage except our push token.");
+                            });
+                            //these two emits tell our socket server that we no longer want the rethinkdb watcher open
+                            socket.emit('stopGetQueue');
+                            socket.emit('stopGetRiderStatus');
+                            //this tells our client to stop listening to updates
+                            socket.off('updateRiderStatus');
+                            socket.off('updateQueue');
+                        }
+                        else {
+                            //Our API returned an error, we didn't logout.
+                            //Use Native Alert to tell user they were not logged out
+                            alert("Could not logout!");
+                        }
+                    }
+                );
+            }
+        )
+        .catch((error) => {
+            //The fetch encountered an error.
+            console.log("[Settings.js] [Logout] We have no internet!");
+            //Define the keys we will remove from storage
+            //IMPORTANT: notice how we did NOT remove the 'tokenid'
+            //This is because use is offline, we will remove it upon the next signin or signup
+            //Also, we still keep expoPushToken
+            let keys = ['@user', '@isBeeping', '@capacity'];
+            //Remove data from AsyncStorage
+            AsyncStorage.multiRemove(keys, (err) => {
+                console.log("Removed all except tokenid and expoPushToken from storage.");
+            });
+        });
+
+        //Now that we have completed the logout procedue, send them to the Login page.
+        navigation.reset({
+            index: 0,
+            routes: [
+                { name: 'Login' },
+            ],
+            key: null
+        });
+    }
+
+
+
     return (
         <Menu>
             <MenuItem
@@ -115,7 +117,7 @@ export function MainSettingsScreen({ navigation }) {
             />
             <MenuItem
                 title="Logout"
-                onPress={() => logout({ navigation })}
+                onPress={logout}
                 accessoryLeft={LogOutIcon}
                 accessoryRight={ForwardIcon}
             />

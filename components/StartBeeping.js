@@ -3,6 +3,7 @@ import * as Location from 'expo-location';
 import { StyleSheet, AsyncStorage, Linking, Platform } from 'react-native';
 import { Card, Icon, Layout, Text, Button, Input, Toggle, List, ListItem, Modal } from '@ui-kitten/components';
 import socket from '../utils/Socket'
+import { UserContext } from '../utils/UserContext.js';
 
 const AcceptIcon = (props) => (
   <Icon {...props} name='checkmark-circle-outline'/>
@@ -33,33 +34,24 @@ const DollarIcon = (props) => (
 );
 
 export class StartBeepingScreen extends Component {
+    static contextType = UserContext;
 
     state = {
         showStartBeepingError: false,
-        isBeeping: false,
-        queue: []
+        isBeeping: this.context.user.isBeeping,
+        queue: [],
+        capacity: this.context.user.capacity,
+        singlesRate: this.context.user.singlesRate,
+        groupRate: this.context.user.groupRate
     };
 
     /**
      * Get User's Data from AsyncStorage
      */
     retrieveData = async () => {
-        try {
-            const data = await AsyncStorage.multiGet(["@username", "@token", "@id", "@singlesRate", "@groupRate", "@isBeeping", "@capacity"]);
-
-            this.setState({
-                username: data[0][1],
-                token: data[1][1],
-                id: data[2][1],
-                singlesRate: data[3][1],
-                groupRate: data[4][1],
-                isBeeping: (data[5][1] == 'true'),
-                capacity: data[6][1]
-            });
-
             //Upon loading user data into states, get User's bepper status
             //to make sure our toggle switch is accurate with our database
-            fetch('https://beep.nussman.us/api/beeper/status/' + data[2][1])
+            fetch('https://beep.nussman.us/api/beeper/status/' + this.context.user.id)
             .then((response) => response.json())
             .then(async (responseJson) =>
             {
@@ -86,19 +78,11 @@ export class StartBeepingScreen extends Component {
                     //this.setState({isBeeping: false});
                     this.disableGetQueue();
                 }
-                AsyncStorage.setItem(
-                    '@isBeeping',
-                    '' + this.state.isBeeping
-                );
             })
             .catch((error) =>
             {
                 console.error("[StartBeeping.js] [API] ", error);
             });
-        }
-        catch (error) {
-          console.log("[StartBeeping.js] [AsyncStorage] ", error);
-        }
     }
 
     componentDidMount () {
@@ -114,7 +98,7 @@ export class StartBeepingScreen extends Component {
 
     getQueue() {
         //We will need to use user's token to update their status
-        let token = this.state.token;
+        let token = this.context.user.token;
 
         //Data we will POST to beeper status enpoint API
         var data = {
@@ -192,7 +176,7 @@ export class StartBeepingScreen extends Component {
 
         //Data we will POST to beeper status enpoint API
         var data = {
-            "token": this.state.token,
+            "token": this.context.user.token,
             "isBeeping": value,
             "singlesRate": this.state.singlesRate,
             "groupRate": this.state.groupRate,
@@ -222,7 +206,9 @@ export class StartBeepingScreen extends Component {
                             {
                                 //We sucessfuly updated beeper status in database
                                 console.log("[StartBeeping.js] [API] Successfully updated beeper's status!");
-                                this.getQueue();
+                                if (value) {
+                                    this.getQueue();
+                                }
                             }
                             else
                             {
@@ -245,15 +231,11 @@ export class StartBeepingScreen extends Component {
         .catch((error) => {
              console.log("[StartBeeping.js] [API] Error fetching from the Beep API: ", error);
         });
-        AsyncStorage.setItem(
-            '@isBeeping',
-            '' +this.state.isBeeping
-        );
     }
 
     enableGetQueue = () => {
         //tell the socket server we want to get updates of our queue
-        socket.emit('getQueue', this.state.id);
+        socket.emit('getQueue', this.context.user.id);
     }
 
     disableGetQueue = () => {
@@ -263,7 +245,7 @@ export class StartBeepingScreen extends Component {
 
     AcceptDeny = (queueID, riderID, value) => {
 
-        let token = this.state.token;
+        let token = this.context.user.token;
 
         var data = {
             "token": token,
@@ -307,17 +289,26 @@ export class StartBeepingScreen extends Component {
 
     updateSingles = (value) => {
         this.setState({singlesRate: value});
-        AsyncStorage.setItem('@singlesRate', value);
+
+        let tempUser = JSON.parse(JSON.stringify(this.context.user));
+        tempUser.singlesRate = value;
+        AsyncStorage.setItem('@user', JSON.stringify(tempUser));
     }
 
     updateGroup = (value) => {
         this.setState({groupRate: value});
-        AsyncStorage.setItem('@groupRate', value);
+
+        let tempUser = JSON.parse(JSON.stringify(this.context.user));
+        tempUser.groupRate = value;
+        AsyncStorage.setItem('@user', JSON.stringify(tempUser));
     }
 
     updateCapacity = (value) => {
         this.setState({capacity: value});
-        AsyncStorage.setItem('@capacity', value);
+
+        let tempUser = JSON.parse(JSON.stringify(this.context.user));
+        tempUser.capacity = value;
+        AsyncStorage.setItem('@user', JSON.stringify(tempUser));
     }
 
     handleDirections = (origin, dest) => {

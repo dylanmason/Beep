@@ -1,47 +1,20 @@
 import React, { Component } from 'react';
 import { StyleSheet, AsyncStorage } from 'react-native';
 import { Icon, Layout, Text, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
+import { UserContext } from '../utils/UserContext.js';
 
 export class EditProfileScreen extends Component {
+    static contextType = UserContext;
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            username: '',
-            first: '',
-            last: '',
-            email: '',
-            phone: '',
-            venmo: ''
-        }
-    }
-
-    componentDidMount () {
-        //Run retrieveData to get user's data and save it in states
-        this.retrieveData();
-    }
-
-    /**
-     * Get User's Data from AsyncStorage
-     */
-    async retrieveData () {
-        try {
-            const data = await AsyncStorage.multiGet(['@token', '@username', '@first', '@last', '@email', '@phone', '@venmo']);
-
-            this.setState({
-                token: data[0][1],
-                username: data[1][1],
-                first: data[2][1],
-                last: data[3][1],
-                email: data[4][1],
-                phone: data[5][1],
-                venmo: data[6][1]
-            });
-        }
-        catch (error) {
-          console.log("[FindBeep.js] [AsyncStorage] ", error);
-        }
-    }
+    state = {
+        token: this.context.user.token,
+        username: this.context.user.username,
+        first: this.context.user.first,
+        last: this.context.user.last,
+        email: this.context.user.email,
+        phone: this.context.user.phone,
+        venmo: this.context.user.venmo
+    };
 
     handleUpdate () {
         //Define our Main Navigation, use this so send user back a page
@@ -73,18 +46,15 @@ export class EditProfileScreen extends Component {
                 response.json().then(
                     function(data) {
                         if (data.status === "success") {
-                            const first = ["@first", this.state.first];
-                            const last = ["@last", this.state.last];
-                            const email = ["@email", this.state.email];
-                            const phone = ["@phone", this.state.phone];
-                            const venmo = ["@venmo", this.state.venmo];
 
-                            try {
-                                AsyncStorage.multiSet([first, last, email, phone, venmo]);
-                            }
-                            catch (e) {
-                                console.log("[EditProfile.js] [AsyncStorage] Could not store signup data: ", e);
-                            }
+                            let tempUser = JSON.parse(JSON.stringify(this.context.user));
+                            tempUser.first = this.state.first;
+                            tempUser.last = this.state.last;
+                            tempUser.email = this.state.email;
+                            tempUser.phone = this.state.phone;
+                            tempUser.venmo = this.state.venmo;
+                            AsyncStorage.setItem('@user', JSON.stringify(tempUser));
+                            this.context.setUser(tempUser);
 
                             navigationStuff.goBack();
                         }

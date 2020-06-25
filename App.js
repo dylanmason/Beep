@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Platform, StyleSheet, StatusBar, AsyncStorage, Vibration } from 'react-native';
 import { RegisterScreen } from './components/Register'
-import { LoginScreen } from './components/Login'
+import LoginScreen from './components/Login'
 import { MainScreen } from './components/MainScreen'
 import { Notifications } from 'expo';
 import * as Permissions from 'expo-permissions';
@@ -14,6 +14,7 @@ import { ApplicationProvider, IconRegistry, Layout } from '@ui-kitten/components
 import { default as beepTheme } from './utils/theme.json';
 import { EvaIconsPack } from '@ui-kitten/eva-icons';
 import { ThemeContext } from './utils/theme-context';
+import { UserContext } from './utils/UserContext.js';
 import * as SplashScreen from 'expo-splash-screen';
 
 const Stack = createStackNavigator();
@@ -73,10 +74,16 @@ async function startSplash() {
     }
 }
 
+function getInitialUser() {
+    AsyncStorage.getItem("@user").then( (result) => {
+        return result;
+    });
+}
+
 export default function App() {
     startSplash();
 
-    //const [expoPushToken, setExpoPushToken] = React.useState('');
+    const [user, setUser] = React.useState();
     const [notification, setNotification] = React.useState({});
     const [token, setToken] = React.useState('');
     const [theme, setTheme] = React.useState('light');
@@ -92,7 +99,7 @@ export default function App() {
     //We DONT want to run this code if we already know what screen to load
     if (initialScreen == null) {
         //When App loads initially, get token from AsyncStorage
-        AsyncStorage.multiGet(['@token', '@theme']).then((result) => {
+        AsyncStorage.multiGet(['@user', '@theme']).then((result) => {
             if(result[0][1]) {
                 //Register for Expo Push Notifications
                 registerForPushNotificationsAsync();
@@ -104,6 +111,18 @@ export default function App() {
                 initialScreen = "Main";
                 //Log this to console
                 console.log("[App.js] [Auth] Token found in storage: ", result[0][1]);
+                if(result[1][1]) {
+                    //re-render may happen, if a re-render happens, this code will not run agian because
+                    //initialScreen has been defined. 
+                    setTheme(result[1][1]);
+                    setUser(JSON.parse(result[0][1]));
+                    setIsLoading(false);
+                }
+                else {
+                    setUser(JSON.parse(result[0][1]));
+                    setIsLoading(false);
+                }
+                console.log("Setting user to:", JSON.parse(result[0][1]));
             }
             else {
                 //No Token found in AsyncStorage
@@ -111,16 +130,14 @@ export default function App() {
                 initialScreen = "Login";
                 //Log this to console
                 console.log("[App.js] [Auth] No token found, send user to Login");
+                if(result[1][1]) {
+                    //re-render may happen, if a re-render happens, this code will not run agian because
+                    //initialScreen has been defined. 
+                    setTheme(result[1][1]);
+                }
+                //we didn't have a theme to set, so just use this state to tigger a re-render to get into the app
+                setIsLoading(false);
             }
-
-            if(result[1][1]) {
-                //re-render may happen, if a re-render happens, this code will not run agian because
-                //initialScreen has been defined. 
-                setTheme(result[1][1]);
-            }
-
-            //we didn't have a theme to set, so just use this state to tigger a re-render to get into the app
-            setIsLoading(false);
           }, (error) => {
             //AsyncStorage could not get data from storage
             console.log("[App.js] [AsyncStorage] ", error);
@@ -132,26 +149,32 @@ export default function App() {
         return(null);
     }
 
+    if (isLoading) {
+        return null;
+    }
+
     //Loading is done! Render our main app
     console.log("[App.js] Rendering App with Intial Screen: ", initialScreen);
 
     return (
         <>
         <IconRegistry icons={EvaIconsPack} />
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
-            <ApplicationProvider {...eva} theme={{ ...eva[theme], ...beepTheme }}>
-                <Layout style={styles.statusbar}>
-                    <StatusBar barStyle={(theme === 'light' ? 'dark' : 'light') + "-content"} />
-                </Layout>
-                <NavigationContainer>
-                    <Stack.Navigator initialRouteName={initialScreen} screenOptions={{ headerShown: false }} >
-                        <Stack.Screen name="Login" component={LoginScreen} />
-                        <Stack.Screen name="Register" component={RegisterScreen} />
-                        <Stack.Screen name="Main" component={MainScreen} />
-                    </Stack.Navigator>
-                </NavigationContainer>
-            </ApplicationProvider>
-        </ThemeContext.Provider>
+        <UserContext.Provider value={{user, setUser}}>
+            <ThemeContext.Provider value={{ theme, toggleTheme }}>
+                <ApplicationProvider {...eva} theme={{ ...eva[theme], ...beepTheme }}>
+                    <Layout style={styles.statusbar}>
+                        <StatusBar barStyle={(theme === 'light' ? 'dark' : 'light') + "-content"} />
+                    </Layout>
+                    <NavigationContainer>
+                        <Stack.Navigator initialRouteName={initialScreen} screenOptions={{ headerShown: false }} >
+                            <Stack.Screen name="Login" component={LoginScreen} />
+                            <Stack.Screen name="Register" component={RegisterScreen} />
+                            <Stack.Screen name="Main" component={MainScreen} />
+                        </Stack.Navigator>
+                    </NavigationContainer>
+                </ApplicationProvider>
+            </ThemeContext.Provider>
+        </UserContext.Provider>
         </>
     );
 }
