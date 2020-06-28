@@ -73,5 +73,17 @@
   "color-danger-transparent-300": "rgba(255, 108, 79, 0.24)",
   "color-danger-transparent-400": "rgba(255, 108, 79, 0.32)",
   "color-danger-transparent-500": "rgba(255, 108, 79, 0.4)",
-  "color-danger-transparent-600": "rgba(255, 108, 79, 0.48)"
+  "color-danger-transparent-600": "rgba(255, 108, 79, 0.48)",
+
+  "color-basic-100": "#FFFFFF",
+  "color-basic-200": "#fcfcfc",
+  "color-basic-300": "#fcfcfc",
+  "color-basic-400": "#D4D4D4",
+  "color-basic-500": "#B3B3B3",
+  "color-basic-600": "#808080",
+  "color-basic-700": "#4A4A4A",
+  "color-basic-800": "#121212",
+  "color-basic-900": "#1f1f1f",
+  "color-basic-1000": "#1F1F1F",
+  "color-basic-1100": "#141414"
 }
