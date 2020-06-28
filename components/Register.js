@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import { StyleSheet, AsyncStorage } from 'react-native';
 import { Icon, Layout, Text, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
-
+import { UserContext } from '../utils/UserContext.js';
+ 
 export class RegisterScreen extends Component {
+    static contextType = UserContext;
 
     constructor(props) {
         super(props);

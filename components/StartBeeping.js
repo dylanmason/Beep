@@ -209,6 +209,10 @@ export class StartBeepingScreen extends Component {
                                 if (value) {
                                     this.getQueue();
                                 }
+
+                                let tempUser = JSON.parse(JSON.stringify(this.context.user));
+                                tempUser.isBeeping = value;
+                                AsyncStorage.setItem('@user', JSON.stringify(tempUser));
                             }
                             else
                             {
