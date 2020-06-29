@@ -58,7 +58,7 @@ export function MainSettingsScreen({ navigation }) {
                             //Logout was successfull
                             console.log("[Settings.js] [Logout] We have internet connection.");
                             //Define the keys we want to unset
-                            let keys = ['@user', '@isBeeping', '@capacity'];
+                            let keys = ['@user'];
                             //Using AsyncStorage, remove keys on logout.
                             //IMPORTANT: we do NOT remove the expo push token beause we need that for any other user that may login
                             //We can't remove it because it is only set on App.js when we initialize notifications, we may not re-run that code
@@ -88,7 +88,8 @@ export function MainSettingsScreen({ navigation }) {
             //IMPORTANT: notice how we did NOT remove the 'tokenid'
             //This is because use is offline, we will remove it upon the next signin or signup
             //Also, we still keep expoPushToken
-            let keys = ['@user', '@isBeeping', '@capacity'];
+            let keys = ['@user'];
+            AsyncStorage.setItem("@tokenid", userContext.user.tokenid);
             //Remove data from AsyncStorage
             AsyncStorage.multiRemove(keys, (err) => {
                 console.log("Removed all except tokenid and expoPushToken from storage.");

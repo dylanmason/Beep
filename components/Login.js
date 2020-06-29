@@ -3,6 +3,7 @@ import { StyleSheet, AsyncStorage, View } from 'react-native';
 import { Layout, Text, Button, Input, Modal, Card } from '@ui-kitten/components';
 import * as SplashScreen from 'expo-splash-screen';
 import { UserContext } from '../utils/UserContext.js';
+import { removeOldToken } from '../utils/OfflineToken.js';
 
 export default function LoginScreen({ navigation }) {
     const {user, setUser} = useContext(UserContext);
@@ -13,9 +14,12 @@ export default function LoginScreen({ navigation }) {
 
     SplashScreen.hideAsync();
 
-    function handleLogin() {
+    async function handleLogin() {
         setIsLoading(true);
 
+        removeOldToken();
+
+        let expoPushToken = await AsyncStorage.getItem('@expoPushToken');
         //POST to our login API
         fetch("https://beep.nussman.us/api/auth/login", {
             method: "POST",
@@ -25,7 +29,8 @@ export default function LoginScreen({ navigation }) {
             },
             body: JSON.stringify({
                 "username": username,
-                "password": password
+                "password": password,
+                "expoPushToken": expoPushToken
             })
         })
         .then(

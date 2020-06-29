@@ -40,7 +40,7 @@ export class StartBeepingScreen extends Component {
         showStartBeepingError: false,
         isBeeping: this.context.user.isBeeping,
         queue: [],
-        capacity: this.context.user.capacity,
+        capacity: "" + this.context.user.capacity,
         singlesRate: this.context.user.singlesRate,
         groupRate: this.context.user.groupRate
     };
