@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useRef } from 'react';
 import { StyleSheet, AsyncStorage, View } from 'react-native';
 import { Layout, Text, Button, Input, Modal, Card } from '@ui-kitten/components';
 import * as SplashScreen from 'expo-splash-screen';
@@ -11,6 +11,11 @@ export default function LoginScreen({ navigation }) {
     const [error, setError] = useState();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
+    const inputEl = useRef(null);
+    const onButtonClick = () => {
+        // `current` points to the mounted text input element
+        inputEl.current.focus();
+    };
 
     SplashScreen.hideAsync();
 
@@ -20,7 +25,7 @@ export default function LoginScreen({ navigation }) {
         removeOldToken();
 
         let expoPushToken = await AsyncStorage.getItem('@expoPushToken');
-        //POST to our login API
+
         fetch("https://beep.nussman.us/api/auth/login", {
             method: "POST",
             headers: {
@@ -79,14 +84,19 @@ export default function LoginScreen({ navigation }) {
                     textContentType="username"
                     placeholder="Username"
                     returnKeyType="next"
-                    onChangeText={(text) => setUsername(text)} />
+                    onChangeText={(text) => setUsername(text)}
+                    onSubmitEditing={onButtonClick}
+                    blurOnSubmit={false}
+                />
                 <Input
                     textContentType="password"
                     placeholder="Password"
                     returnKeyType="go"
                     secureTextEntry={true}
                     onChangeText={(text) => setPassword(text)}
-                    onSubmitEditing={handleLogin} />
+                    onSubmitEditing={handleLogin}
+                    ref={inputEl}
+                />
                 {!isLoading ?
                     <Button
                       onPress={handleLogin}
