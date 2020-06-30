@@ -30,7 +30,6 @@ export function MainSettingsScreen({ navigation }) {
     const userContext = React.useContext(UserContext);
 
     async function logout() {
-
         //POST to our Logout API
         fetch("https://beep.nussman.us/api/auth/logout", {
             method: "POST",
@@ -106,45 +105,73 @@ export function MainSettingsScreen({ navigation }) {
         });
     }
 
-
-
     return (
-        <Menu>
-            <MenuItem
-                title="Toggle Theme"
-                onPress={themeContext.toggleTheme}
-                accessoryLeft={ThemeIcon}
-                accessoryRight={ForwardIcon}
-            />
-            <MenuItem
-                title="Logout"
-                onPress={logout}
-                accessoryLeft={LogOutIcon}
-                accessoryRight={ForwardIcon}
-            />
-            <MenuItem
-                title="Edit Profile"
-                onPress={() => navigation.navigate("EditProfileScreen")}
-                accessoryLeft={ProfileIcon}
-                accessoryRight={ForwardIcon}
-            />
-            <MenuItem
-                title="Change Password"
-                onPress={() => navigation.navigate("ChangePasswordScreen")}
-                accessoryLeft={PasswordIcon}
-                accessoryRight={ForwardIcon}
-            />
-        </Menu>
+        <Layout style={styles.wrapper}>
+            <Layout style={styles.container}>
+                {/*
+                <Layout style={styles.row}>
+                    <Text category='h1'>Hello, </Text>
+                    <Text category='h1'>{userContext.user.first}!</Text>
+                </Layout>
+                */}
+                <Button
+                    onPress={themeContext.toggleTheme}
+                    accessoryLeft={ThemeIcon}
+                    style={styles.button}
+                    appearance='ghost'
+                >
+                    Toggle Theme
+                </Button>
+                <Button
+                    onPress={() => navigation.navigate("EditProfileScreen")}
+                    accessoryLeft={ProfileIcon}
+                    accessoryRight={ForwardIcon}
+                    style={styles.button}
+                    appearance='ghost'
+                >
+                    Edit Profile
+                </Button>
+                <Button
+                    onPress={() => navigation.navigate("ChangePasswordScreen")}
+                    accessoryLeft={PasswordIcon}
+                    accessoryRight={ForwardIcon}
+                    style={styles.button}
+                    appearance='ghost'
+                >
+                    Change Password
+                </Button>
+                <Button
+                    onPress={logout}
+                    accessoryLeft={LogOutIcon}
+                    style={styles.button}
+                    appearance='ghost'
+                >
+                    Logout
+                </Button>
+            </Layout>
+        </Layout>
     );
 }
 
 const styles = StyleSheet.create({
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: '35%',
+        marginTop: 20 
+    },
     container: {
         flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
+        width: '95%',
+        justifyContent: 'center',
     },
-    buttons : {
-        margin: 2
+    wrapper: {
+        width: '100%',
+        height: '100%',
+        alignItems: 'center',
+    },
+    button: {
+        marginBottom: 10 
     }
 });

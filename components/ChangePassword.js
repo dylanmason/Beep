@@ -79,14 +79,14 @@ export class ChangePasswordScreen extends Component {
                             secureTextEntry={true}
                             label="New Password"
                             textContentType="password"
-                            placeholder="password"
+                            placeholder="New Password"
                             onChangeText={(text) => this.setState({password: text})}
                             onSubmitEditing={()=>this.secondTextInput.focus()} />
                         <Input
                             secureTextEntry={true}
                             label="Repeat New Password"
                             textContentType="password"
-                            placeholder="password"
+                            placeholder="New Password"
                             returnKeyType="go"
                             onChangeText={(text) => this.setState({password2: text})}
                             ref={(input)=>this.secondTextInput = input}
