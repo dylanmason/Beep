@@ -442,7 +442,7 @@ export class StartBeepingScreen extends Component {
                             null
                         }
 
-                        {(state == 3) ?
+                        {(state >= 3) ?
                             <Button
                                 size='small'
                                 onPress={()=> this.AcceptDeny(id, riderid, "complete")}

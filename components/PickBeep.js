@@ -1,10 +1,6 @@
 import React, { Component } from 'react';
 import { Layout, Text, Divider, List, ListItem, Icon, TopNavigation, TopNavigationAction, Spinner } from '@ui-kitten/components';
-import { YellowBox, StyleSheet } from 'react-native';
-
-YellowBox.ignoreWarnings([
-  'Non-serializable values were found in the navigation state',
-]);
+import { StyleSheet } from 'react-native';
 
 export class PickBeepScreen extends Component {
 
@@ -18,23 +14,20 @@ export class PickBeepScreen extends Component {
 
     getBeeperList = () => {
         fetch("https://beep.nussman.us/api/rider/list", {
-           method: "GET",
-           headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-           }
+            method: "GET",
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            }
         })
         .then(
-            function(response)
-            {
-                if (response.status !== 200)
-                {
+            function(response) {
+                if (response.status !== 200) {
                     console.log('Looks like our API is not responding correctly. Status Code: ' + response.status);
                     return;
                 }
                 response.json().then(
-                    function(data)
-                    {
+                    function(data) {
                         console.log("[PickBeep.js] Rider API Responce: ", data);
 
                         if (data.status === "success") {
@@ -80,21 +73,34 @@ export class PickBeepScreen extends Component {
         );
         
         if (!this.state.isLoading) {
-            return (
-                <>
-                    <TopNavigation title='Beeper List' alignment='center' accessoryLeft={BackAction}/>
-                    <List
-                        data={this.state.beeperList}
-                        ItemSeparatorComponent={Divider}
-                        renderItem={renderItem}
-                    />
-                </>
-            );
+            if (this.state.beeperList && this.state.beeperList.length != 0) {
+                return (
+                    <>
+                        <TopNavigation title='Beeper List' alignment='center' accessoryLeft={BackAction}/>
+                        <List
+                            data={this.state.beeperList}
+                            ItemSeparatorComponent={Divider}
+                            renderItem={renderItem}
+                        />
+                    </>
+                );
+            }
+            else {
+                return (
+                    <>
+                        <TopNavigation title='Beeper List' alignment='center' accessoryLeft={BackAction}/>
+                        <Layout style={styles.container}>
+                            <Text category='h5'>Nobody is beeping!</Text>
+                            <Text appearance='hint'>Nobody is giving rides right now. Check back later!</Text>
+                        </Layout>
+                    </>
+                );
+            }
         }
         else {
             return (
                 <>
-                <TopNavigation title='Beeper List' alignment='center' leftControl={BackAction()}/>
+                <TopNavigation title='Beeper List' alignment='center' accessoryLeft={BackAction}/>
                 <Layout style={styles.container}>
                     <Spinner size='large' />
                 </Layout>

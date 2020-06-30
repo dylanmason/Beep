@@ -1,16 +1,11 @@
 import React, { Component } from 'react';
-import { StyleSheet, AsyncStorage, Linking, TouchableWithoutFeedback } from 'react-native';
+import { StyleSheet, AsyncStorage, Linking, TouchableWithoutFeedback, AppState } from 'react-native';
 import { Icon, Layout, Text, Button, Input, CheckBox, Modal, Card } from '@ui-kitten/components';
 import * as Location from 'expo-location';
 import { Ionicons } from '@expo/vector-icons';
 import socket from '../utils/Socket'
 import * as SplashScreen from 'expo-splash-screen';
-import { YellowBox } from 'react-native';
 import { UserContext } from '../utils/UserContext.js';
-
-YellowBox.ignoreWarnings([
-  'Non-serializable values were found in the navigation state',
-]);
 
 const PhoneIcon = (props) => (
   <Icon {...props} name='phone-call-outline'/>
@@ -585,7 +580,7 @@ export class MainFindBeepScreen extends Component {
                                     :
                                     null
                                 }
-                                {this.state.state == 3 ?
+                                {this.state.state >= 3 ?
                                     <Text appearance='hint'>
                                         You are currenly in the car with your beeper.
                                     </Text>
