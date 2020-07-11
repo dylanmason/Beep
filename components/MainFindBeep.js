@@ -48,7 +48,8 @@ export class MainFindBeepScreen extends Component {
             groupSize: '1',
             startLocation: '',
             destination: '',
-            pickBeeper: true
+            pickBeeper: true,
+            appState: AppState.currentState
         }
     }
 
@@ -59,14 +60,36 @@ export class MainFindBeepScreen extends Component {
     componentDidMount () {
         this.getInitialRiderStatus();
 
+        AppState.addEventListener("change", this._handleAppStateChange);
+
         socket.on('updateRiderStatus', data => {
             console.log("[FindBeep.js] [Socket.io] Socket.io told us to update rider status.");
             this.getRiderStatus();
         });
     }
 
+    componentWillUnmount() {
+        AppState.removeEventListener("change", this._handleAppStateChange);
+    }
+
+    _handleAppStateChange = nextAppState => {
+        if (
+            this.state.appState.match(/inactive|background/) &&
+            nextAppState === "active"
+        ) {
+            console.log("App has come to the foreground!");
+            if(!socket.connected && this.state.beepersID) {
+                console.log("Socket.io is not conntected! We need to reconnect to continue to get updates");
+                //TODO test this solution
+                //TODO apply this same logic to the beeper
+                this.getInitialRiderStatus();
+            }
+        }
+        this.setState({ appState: nextAppState });
+    };
+
+
     getInitialRiderStatus() {
-        console.log(this.context);
         //We will need to use user's token to update their status
         let token = this.context.user.token;
 

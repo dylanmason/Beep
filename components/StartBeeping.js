@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import * as Location from 'expo-location';
-import { StyleSheet, AsyncStorage, Linking, Platform } from 'react-native';
+import { StyleSheet, AsyncStorage, Linking, Platform, AppState } from 'react-native';
 import { Card, Icon, Layout, Text, Button, Input, Toggle, List, ListItem, Modal } from '@ui-kitten/components';
 import socket from '../utils/Socket'
 import { UserContext } from '../utils/UserContext.js';
@@ -42,59 +42,83 @@ export class StartBeepingScreen extends Component {
         queue: [],
         capacity: "" + this.context.user.capacity,
         singlesRate: this.context.user.singlesRate,
-        groupRate: this.context.user.groupRate
+        groupRate: this.context.user.groupRate,
+        appState: AppState.currentState
     };
 
     /**
      * Get User's Data from AsyncStorage
      */
     retrieveData = async () => {
-            //Upon loading user data into states, get User's bepper status
-            //to make sure our toggle switch is accurate with our database
-            fetch('https://beep.nussman.us/api/beeper/status/' + this.context.user.id)
-            .then((response) => response.json())
-            .then(async (responseJson) =>
-            {
-                console.log("[StartBeeping.js] [API] Load Beeper's State Responce: ", responseJson);
-                if (this.state.isBeeping !== responseJson.isBeeping) {
-                    this.setState({isBeeping: responseJson.isBeeping});
-                }
+        //Upon loading user data into states, get User's bepper status
+        //to make sure our toggle switch is accurate with our database
+        fetch('https://beep.nussman.us/api/beeper/status/' + this.context.user.id)
+        .then((response) => response.json())
+        .then(async (responseJson) =>
+        {
+            console.log("[StartBeeping.js] [API] Load Beeper's State Responce: ", responseJson);
+            if (this.state.isBeeping !== responseJson.isBeeping) {
+                this.setState({isBeeping: responseJson.isBeeping});
+            }
 
-                if(responseJson.isBeeping) {
-                    //if user turns 'isBeeping' on (to true), subscribe to rethinkdb changes
-                    this.enableGetQueue();
-                    this.getQueue();
-                    let { status } = await Location.requestPermissionsAsync();
-                    if (status !== 'granted') {
-                        //if we have no location access, dont let the user beep
-                        //TODO: we only disable beeping client side, should we push false to server also?
-                        this.setState({isBeeping: false});
-                        this.disableGetQueue();
-                        alert("ERROR: You must allow location to beep!");
-                    }
-                }
-                else {
-                    //if user turns 'isBeeping' off (to false), unsubscribe to rethinkdb changes
-                    //this.setState({isBeeping: false});
+            if(responseJson.isBeeping) {
+                //if user turns 'isBeeping' on (to true), subscribe to rethinkdb changes
+                this.enableGetQueue();
+                this.getQueue();
+                let { status } = await Location.requestPermissionsAsync();
+                if (status !== 'granted') {
+                    //if we have no location access, dont let the user beep
+                    //TODO: we only disable beeping client side, should we push false to server also?
+                    this.setState({isBeeping: false});
                     this.disableGetQueue();
+                    alert("ERROR: You must allow location to beep!");
                 }
-            })
-            .catch((error) =>
-            {
-                console.error("[StartBeeping.js] [API] ", error);
-            });
+            }
+            else {
+                //if user turns 'isBeeping' off (to false), unsubscribe to rethinkdb changes
+                //this.setState({isBeeping: false});
+                this.disableGetQueue();
+            }
+        })
+        .catch((error) =>
+        {
+            console.error("[StartBeeping.js] [API] ", error);
+        });
     }
 
     componentDidMount () {
         console.log("mounded StartBeeping");
+
         //get user information and set toggle switch to correct status on mount
         this.retrieveData();
+
+        AppState.addEventListener("change", this._handleAppStateChange);
 
         socket.on("updateQueue", queue => {
             console.log("[StartBeeping.js] [Socket.io] Socktio.io told us to update queue!");
             this.getQueue();
         });
     }
+
+    componentWillUnmount() {
+        AppState.removeEventListener("change", this._handleAppStateChange);
+    }
+
+    _handleAppStateChange = nextAppState => {
+        if (
+            this.state.appState.match(/inactive|background/) &&
+            nextAppState === "active"
+        ) {
+            console.log("App has come to the foreground!");
+
+            if(!socket.connected && this.state.isBeeping) {
+                console.log("socket is not connected but user is beeping! We need to resubscribe and get our queue.");
+                this.enableGetQueue();
+                this.getQueue();
+            }
+        }
+        this.setState({ appState: nextAppState });
+    };
 
     getQueue() {
         //We will need to use user's token to update their status
@@ -238,6 +262,7 @@ export class StartBeepingScreen extends Component {
     }
 
     enableGetQueue = () => {
+        console.log("getQueueEnabled");
         //tell the socket server we want to get updates of our queue
         socket.emit('getQueue', this.context.user.id);
     }
