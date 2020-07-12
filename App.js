@@ -74,12 +74,6 @@ async function startSplash() {
     }
 }
 
-function getInitialUser() {
-    AsyncStorage.getItem("@user").then( (result) => {
-        return result;
-    });
-}
-
 export default function App() {
     startSplash();
 
@@ -110,7 +104,6 @@ export default function App() {
                 //Because user is logged in, send them to Main initially
                 initialScreen = "Main";
                 //Log this to console
-                console.log("[App.js] [Auth] Token found in storage: ", result[0][1]);
                 if(result[1][1]) {
                     //re-render may happen, if a re-render happens, this code will not run agian because
                     //initialScreen has been defined. 
