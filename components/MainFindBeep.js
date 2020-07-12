@@ -132,7 +132,8 @@ export class MainFindBeepScreen extends Component {
                                     beepersPhone: data.beepersPhone,
                                     beepersVenmo: data.beepersVenmo,
                                     ridersQueuePosition: data.ridersQueuePosition,
-                                    isLoading: false
+                                    isLoading: false,
+                                    state: data.state
                                 });
                             }
                             else {
