@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React, { Component } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Platform, StyleSheet, StatusBar, AsyncStorage, Vibration } from 'react-native';
@@ -94,6 +94,7 @@ export default function App() {
     if (initialScreen == null) {
         //When App loads initially, get token from AsyncStorage
         AsyncStorage.multiGet(['@user', '@theme']).then((result) => {
+            //if a user is defined
             if(result[0][1]) {
                 //Register for Expo Push Notifications
                 registerForPushNotificationsAsync();
@@ -104,33 +105,22 @@ export default function App() {
                 //Because user is logged in, send them to Main initially
                 initialScreen = "Main";
                 //Log this to console
-                if(result[1][1]) {
-                    //re-render may happen, if a re-render happens, this code will not run agian because
-                    //initialScreen has been defined. 
-                    setTheme(result[1][1]);
-                    setUser(JSON.parse(result[0][1]));
-                    setIsLoading(false);
-                }
-                else {
-                    setUser(JSON.parse(result[0][1]));
-                    setIsLoading(false);
-                }
-                console.log("Setting user to:", JSON.parse(result[0][1]));
+                setUser(JSON.parse(result[0][1]));
             }
             else {
-                //No Token found in AsyncStorage
                 //This mean no one is logged in, send them to login page initally
                 initialScreen = "Login";
                 //Log this to console
                 console.log("[App.js] [Auth] No token found, send user to Login");
-                if(result[1][1]) {
-                    //re-render may happen, if a re-render happens, this code will not run agian because
-                    //initialScreen has been defined. 
-                    setTheme(result[1][1]);
-                }
-                //we didn't have a theme to set, so just use this state to tigger a re-render to get into the app
-                setIsLoading(false);
             }
+
+            if(result[1][1]) {
+                //re-render may happen, if a re-render happens, this code will not run agian because
+                //initialScreen has been defined. 
+                setTheme(result[1][1]);
+            }
+
+            setIsLoading(false);
           }, (error) => {
             //AsyncStorage could not get data from storage
             console.log("[App.js] [AsyncStorage] ", error);
@@ -139,7 +129,7 @@ export default function App() {
         //We are checking if a token exists in AsyncStorage
         console.log("[App.js] Rendering Loading Screen");
         //this render is needed below, not sure why
-        return(null);
+        //return(null);
     }
 
     if (isLoading) {
