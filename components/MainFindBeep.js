@@ -6,34 +6,15 @@ import { Ionicons } from '@expo/vector-icons';
 import socket from '../utils/Socket'
 import * as SplashScreen from 'expo-splash-screen';
 import { UserContext } from '../utils/UserContext.js';
-
-const PhoneIcon = (props) => (
-  <Icon {...props} name='phone-call-outline'/>
-);
-
-const TextIcon = (props) => (
-  <Icon {...props} name='message-square-outline'/>
-);
-
-const VenmoIcon = (props) => (
-  <Icon {...props} name='credit-card-outline'/>
-);
-
-const LeaveIcon = (props) => (
-  <Icon {...props} name='person-remove-outline'/>
-);
-
-const BackIcon = (props) => (
-  <Icon {...props} name='arrow-back-outline'/>
-);
-
-const GetIcon = (props) => (
-  <Icon {...props} name='person-done-outline'/>
-);
-
-const FindIcon = (props) => (
-  <Icon {...props} name='search'/>
-);
+import {
+    PhoneIcon, 
+    TextIcon, 
+    VenmoIcon,
+    LeaveIcon,
+    BackIcon,
+    GetIcon,
+    FindIcon
+} from '../utils/Icons.js';
 
 export class MainFindBeepScreen extends Component {
     static contextType = UserContext;

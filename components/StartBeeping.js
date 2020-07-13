@@ -1,37 +1,18 @@
 import React, { Component } from 'react';
 import * as Location from 'expo-location';
 import { StyleSheet, AsyncStorage, Linking, Platform, AppState } from 'react-native';
-import { Card, Icon, Layout, Text, Button, Input, Toggle, List, ListItem, Modal } from '@ui-kitten/components';
+import { Card, Layout, Text, Button, Input, Toggle, List, ListItem, Modal } from '@ui-kitten/components';
 import socket from '../utils/Socket'
 import { UserContext } from '../utils/UserContext.js';
-
-const AcceptIcon = (props) => (
-  <Icon {...props} name='checkmark-circle-outline'/>
-);
-
-const DenyIcon = (props) => (
-  <Icon {...props} name='close-circle-outline'/>
-);
-
-const PhoneIcon = (props) => (
-  <Icon {...props} name='phone-call-outline'/>
-);
-
-const TextIcon = (props) => (
-  <Icon {...props} name='message-square-outline'/>
-);
-
-const VenmoIcon = (props) => (
-  <Icon {...props} name='credit-card-outline'/>
-);
-
-const MapsIcon = (props) => (
-  <Icon {...props} name='map-outline'/>
-);
-
-const DollarIcon = (props) => (
-  <Text>$</Text>
-);
+import {
+    PhoneIcon,
+    TextIcon,
+    VenmoIcon,
+    AcceptIcon,
+    DenyIcon,
+    MapsIcon,
+    DollarIcon
+} from '../utils/Icons.js';
 
 export class StartBeepingScreen extends Component {
     static contextType = UserContext;
@@ -109,8 +90,6 @@ export class StartBeepingScreen extends Component {
             this.state.appState.match(/inactive|background/) &&
             nextAppState === "active"
         ) {
-            console.log("App has come to the foreground!");
-
             if(!socket.connected && this.state.isBeeping) {
                 console.log("socket is not connected but user is beeping! We need to resubscribe and get our queue.");
                 this.enableGetQueue();
@@ -138,18 +117,14 @@ export class StartBeepingScreen extends Component {
                body:  JSON.stringify(data)
             })
             .then(
-                function(response)
-                {
-                    if (response.status !== 200)
-                    {
+                function(response) {
+                    if (response.status !== 200) {
                         console.log('[StartBeeping.js] [API]  Looks like our API is not responding correctly. Status Code: ' + response.status);
                         return;
                     }
                     response.json().then(
-                        function(data)
-                        {
-                            if (data.status === "success")
-                            {
+                        function(data) {
+                            if (data.status === "success") {
                                 //We sucessfuly updated beeper status in database
                                 let currentIndex;
                                 for(let i = 0;  i < data.queue.length; i++) {
@@ -160,8 +135,7 @@ export class StartBeepingScreen extends Component {
                                 }
                                 this.setState({queue: data.queue, currentIndex: currentIndex});
                             }
-                            else
-                            {
+                            else {
                                 console.warn(data.message, " Thread: ", this.state.username);
                             }
                         }.bind(this)
@@ -174,16 +148,13 @@ export class StartBeepingScreen extends Component {
     }
 
     toggleSwitch = async (value) => {
-
-        console.log("[StartBeeping.js] [Client] isBeeping: " + value);
-
         //Update the toggle switch's value into a isBeeping state
         this.setState({isBeeping: value});
 
-        if (value)
-        {
+        if (value) {
             let { status } = await Location.requestPermissionsAsync();
             if (status !== 'granted') {
+                //TODO: should I ensure the db agrees 
                 this.setState({isBeeping: !this.state.isBeeping});
                 alert("ERROR: You must allow location to beep!");
                 return;
@@ -191,71 +162,61 @@ export class StartBeepingScreen extends Component {
             //if user turns 'isBeeping' on (to true), subscribe to rethinkdb changes
             this.enableGetQueue();
         }
-        else
-        {
+        else {
             //if user turns 'isBeeping' off (to false), unsubscribe to rethinkdb changes
             this.disableGetQueue();
         }
 
-
-        //Data we will POST to beeper status enpoint API
-        var data = {
-            "token": this.context.user.token,
-            "isBeeping": value,
-            "singlesRate": this.state.singlesRate,
-            "groupRate": this.state.groupRate,
-            "capacity": this.state.capacity
-        }
-
         fetch("https://beep.nussman.us/api/beeper/status", {
-               method: "POST",
-               headers: {
+            method: "POST",
+            headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-               },
-               body:  JSON.stringify(data)
+            },
+            body:  JSON.stringify({
+                "token": this.context.user.token,
+                "isBeeping": value,
+                "singlesRate": this.state.singlesRate,
+                "groupRate": this.state.groupRate,
+                "capacity": this.state.capacity
             })
-            .then(
-                function(response)
-                {
-                    if (response.status !== 200)
-                    {
-                        console.log('[StartBeeping.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
-                        return;
-                    }
-                    response.json().then(
-                        function(data)
-                        {
-                            if (data.status === "success")
-                            {
-                                //We sucessfuly updated beeper status in database
-                                console.log("[StartBeeping.js] [API] Successfully updated beeper's status!");
-                                if (value) {
-                                    this.getQueue();
-                                }
+        })
+        .then(
+            function(response) {
+                if (response.status !== 200) {
+                    console.log('[StartBeeping.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
+                    return;
+                }
+                response.json().then(
+                    function(data) {
+                        if (data.status === "success") {
+                            //We sucessfuly updated beeper status in database
+                            console.log("[StartBeeping.js] [API] Successfully updated beeper's status!");
+                            if (value) {
+                                this.getQueue();
+                            }
 
-                                let tempUser = JSON.parse(JSON.stringify(this.context.user));
-                                tempUser.isBeeping = value;
-                                AsyncStorage.setItem('@user', JSON.stringify(tempUser));
+                            let tempUser = JSON.parse(JSON.stringify(this.context.user));
+                            tempUser.isBeeping = value;
+                            AsyncStorage.setItem('@user', JSON.stringify(tempUser));
+                        }
+                        else {
+                            //Use native popup to tell user why they could not change their status
+                            //Unupdate the toggle switch because something failed
+                            //We redo our actions so the client does not have to wait on server to update the switch
+                            this.setState({startBeepingError: data.message, showStartBeepingError: true, isBeeping: !this.state.isBeeping});
+                            //we also need to resubscribe to the socket
+                            if (this.state.isBeeping) {
+                                this.enableGetQueue();
                             }
-                            else
-                            {
-                                //Use native popup to tell user why they could not change their status
-                                //Unupdate the toggle switch because something failed
-                                //We redo our actions so the client does not have to wait on server to update the switch
-                                this.setState({startBeepingError: data.message, showStartBeepingError: true, isBeeping: !this.state.isBeeping});
-                                //we also need to resubscribe to the socket
-                                if (this.state.isBeeping) {
-                                    this.enableGetQueue();
-                                }
-                                else {
-                                    this.disableGetQueue();
-                                }
+                            else {
+                                this.disableGetQueue();
                             }
-                        }.bind(this)
-                    );
-                }.bind(this)
-            )
+                        }
+                    }.bind(this)
+                );
+            }.bind(this)
+        )
         .catch((error) => {
              console.log("[StartBeeping.js] [API] Error fetching from the Beep API: ", error);
         });
@@ -274,43 +235,36 @@ export class StartBeepingScreen extends Component {
 
     AcceptDeny = (queueID, riderID, value) => {
 
-        let token = this.context.user.token;
-
-        var data = {
-            "token": token,
-            "value": value,
-            "queueID": queueID,
-            "riderID": riderID
-        }
-
         fetch("https://beep.nussman.us/api/beeper/queue/status", {
-               method: "POST",
-               headers: {
+            method: "POST",
+            headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-               },
-               body:  JSON.stringify(data)
+            },
+            body:  JSON.stringify({
+                "token": this.context.user.token,
+                "value": value,
+                "queueID": queueID,
+                "riderID": riderID
             })
-            .then(
-                function(response)
-                {
-                    if (response.status !== 200)
-                    {
-                        console.log('[StartBeeping.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
-                        return;
-                    }
-                    response.json().then(
-                        function(data)
-                        {
-                            console.log("[StartBeeping.js] [API] Accept or Deny API Responce: ", data);
+        })
+        .then(
+            function(response) {
+                if (response.status !== 200) {
+                    console.log('[StartBeeping.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
+                    return;
+                }
+                response.json().then(
+                    function(data) {
+                        console.log("[StartBeeping.js] [API] Accept or Deny API Responce: ", data);
 
-                            if (data.status === "error") {
-                                this.setState({startBeepingError: data.message, showStartBeepingError: true});
-                            }
-                        }.bind(this)
-                    );
-                }.bind(this)
-            )
+                        if (data.status === "error") {
+                            this.setState({startBeepingError: data.message, showStartBeepingError: true});
+                        }
+                    }.bind(this)
+                );
+            }.bind(this)
+        )
         .catch((error) => {
              console.log("[StartBeeping.js] [API] Error fetching from the Beep API: ", error);
         });
@@ -560,7 +514,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         alignItems: "center",
-        paddingTop: 30
+        paddingTop: 15 
     },
     title: {
         fontSize: 40,

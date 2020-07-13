@@ -1,29 +1,10 @@
 import React, { Component } from 'react';
 import { StyleSheet, TouchableOpacity, AsyncStorage } from 'react-native';
-import { Icon, Toggle, Layout, Text, Button, Input, Menu, MenuItem } from '@ui-kitten/components';
+import { Layout, Text, Button } from '@ui-kitten/components';
 import { ThemeContext } from '../utils/theme-context';
-import socket from '../utils/Socket';
 import { UserContext } from '../utils/UserContext.js';
-
-const ThemeIcon = (props) => (
-  <Icon {...props} name='color-palette'/>
-);
-
-const LogOutIcon = (props) => (
-  <Icon {...props} name='log-out'/>
-);
-
-const ProfileIcon = (props) => (
-  <Icon {...props} name='person'/>
-);
-
-const PasswordIcon = (props) => (
-  <Icon {...props} name='lock'/>
-);
-
-const ForwardIcon = (props) => (
-  <Icon {...props} name='arrow-ios-forward'/>
-);
+import socket from '../utils/Socket';
+import { ThemeIcon, LogoutIcon, ProfileIcon, PasswordIcon, ForwardIcon } from '../utils/Icons.js';
 
 export function MainSettingsScreen({ navigation }) {
     const themeContext = React.useContext(ThemeContext);
@@ -142,7 +123,7 @@ export function MainSettingsScreen({ navigation }) {
                 </Button>
                 <Button
                     onPress={logout}
-                    accessoryLeft={LogOutIcon}
+                    accessoryLeft={LogoutIcon}
                     style={styles.button}
                     appearance='ghost'
                 >
