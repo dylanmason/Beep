@@ -49,7 +49,8 @@ export class MainFindBeepScreen extends Component {
             startLocation: '',
             destination: '',
             pickBeeper: true,
-            appState: AppState.currentState
+            appState: AppState.currentState,
+            beeper: {}
         }
     }
 
@@ -77,11 +78,8 @@ export class MainFindBeepScreen extends Component {
             this.state.appState.match(/inactive|background/) &&
             nextAppState === "active"
         ) {
-            console.log("App has come to the foreground!");
-            if(!socket.connected && this.state.beepersID) {
+            if(!socket.connected && this.state.beeper.id) {
                 console.log("Socket.io is not conntected! We need to reconnect to continue to get updates");
-                //TODO test this solution
-                //TODO apply this same logic to the beeper
                 this.getInitialRiderStatus();
             }
         }
@@ -120,33 +118,19 @@ export class MainFindBeepScreen extends Component {
                             //if the rider is accepted, we can have more personal info about the beeper
                             if (data.isAccepted) {
                                 this.setState({
-                                    isAccepted: data.isAccepted,
-                                    beepersFirstName: data.beepersFirstName,
-                                    beepersLastName: data.beepersLastName,
-                                    queueID: data.queueID,
-                                    beepersID: data.beepersID,
                                     foundBeep: true,
-                                    beepersQueueSize: data.beepersQueueSize,
-                                    beepersSinglesRate: data.beepersSinglesRate,
-                                    beepersGroupRate: data.beepersGroupRate,
-                                    beepersPhone: data.beepersPhone,
-                                    beepersVenmo: data.beepersVenmo,
+                                    isAccepted: data.isAccepted,
                                     ridersQueuePosition: data.ridersQueuePosition,
-                                    isLoading: false,
-                                    state: data.state
+                                    state: data.state,
+                                    beeper: data.beeper,
+                                    isLoading: false
                                 });
                             }
                             else {
                                 this.setState({
-                                    isAccepted: data.isAccepted,
-                                    beepersFirstName: data.beepersFirstName,
-                                    beepersLastName: data.beepersLastName,
-                                    queueID: data.queueID,
-                                    beepersID: data.beepersID,
                                     foundBeep: true,
-                                    beepersQueueSize: data.beepersQueueSize,
-                                    beepersSinglesRate: data.beepersSinglesRate,
-                                    beepersGroupRate: data.beepersGroupRate,
+                                    isAccepted: data.isAccepted,
+                                    beeper: data.beeper,
                                     isLoading: false
                                 });
                             }
@@ -155,7 +139,6 @@ export class MainFindBeepScreen extends Component {
                         }
                         else {
                             console.log("[FindBeep.js] [API] " , data.message);
-                            //this.setState({isLoading: false, foundBeep: false, isAccepted: false});
                         }
                     }.bind(this)
                 );
@@ -195,38 +178,24 @@ export class MainFindBeepScreen extends Component {
                         if (data.status === "success") {
                             if (data.isAccepted) {
                                 this.setState({
-                                    isAccepted: data.isAccepted,
-                                    beepersFirstName: data.beepersFirstName,
-                                    beepersLastName: data.beepersLastName,
-                                    queueID: data.queueID,
-                                    beepersID: data.beepersID,
                                     foundBeep: true,
-                                    beepersQueueSize: data.beepersQueueSize,
-                                    beepersSinglesRate: data.beepersSinglesRate,
-                                    beepersGroupRate: data.beepersGroupRate,
-                                    beepersPhone: data.beepersPhone,
-                                    beepersVenmo: data.beepersVenmo,
+                                    isAccepted: data.isAccepted,
                                     ridersQueuePosition: data.ridersQueuePosition,
-                                    state: data.state
+                                    state: data.state,
+                                    beeper: data.beeper
                                 });
                             }
                             else {
                                 this.setState({
-                                    isAccepted: data.isAccepted,
-                                    beepersFirstName: data.beepersFirstName,
-                                    beepersLastName: data.beepersLastName,
-                                    queueID: data.queueID,
-                                    beepersID: data.beepersID,
                                     foundBeep: true,
-                                    beepersQueueSize: data.beepersQueueSize,
-                                    beepersSinglesRate: data.beepersSinglesRate,
-                                    beepersGroupRate: data.beepersGroupRate
+                                    isAccepted: data.isAccepted,
+                                    beeper: data.beeper
                                 });
                             }
                         }
                         else {
                             console.log("[FindBeep.js] [API] " , data.message);
-                            this.setState({isLoading: false, foundBeep: false, isAccepted: false, beepersID: ''});
+                            this.setState({isLoading: false, foundBeep: false, isAccepted: false, beeper: {}});
                             this.disableGetRiderStatus();
                         }
                     }.bind(this)
@@ -240,6 +209,7 @@ export class MainFindBeepScreen extends Component {
 
     chooseBeep = (id) => {
         this.setState({isLoading: true});
+
         var data = {
             "token": this.context.user.token,
             "origin": this.state.startLocation,
@@ -268,13 +238,7 @@ export class MainFindBeepScreen extends Component {
 
                         if (data.status === "success") {
                             this.setState({
-                                beepersID: data.beepersID,
-                                beepersFirstName: data.beepersFirstName,
-                                beepersLastName: data.beepersLastName,
-                                beepersQueueSize: data.beepersQueueSize + 1,
-                                beepersSinglesRate: data.beepersSinglesRate,
-                                beepersGroupRate: data.beepersGroupRate,
-                                queueID: data.queueID,
+                                beeper: data.beeper,
                                 foundBeep: true,
                                 isLoading: false
                             });
@@ -330,19 +294,14 @@ export class MainFindBeepScreen extends Component {
 
                         if (data.status === "success") {
                             this.setState({
-                                beepersID: data.beepersID,
-                                beepersFirstName: data.beepersFirstName,
-                                beepersLastName: data.beepersLastName,
-                                beepersQueueSize: data.beepersQueueSize,
-                                beepersSinglesRate: data.beepersSinglesRate,
-                                beepersGroupRate: data.beepersGroupRate,
-                                beepersCapacity: data.beepersCapacity,
+                                beeper: data.beeper,
                                 isLoading: false
                             });
                         }
                         else {
                             this.setState({isLoading: false, findBeepError: data.message, showFindBeepError: true});
                         }
+                        console.log(this.state);
                     }.bind(this)
                 );
             }.bind(this)
@@ -355,7 +314,8 @@ export class MainFindBeepScreen extends Component {
     useCurrentLocation = async () => {
         //TODO: find amore elegent solution to tell user we are loading location data
         this.setState({ startLocation: "Loading Current Location..." });
-        
+       
+        //yeah this is probably bad to have here, but i dont care enough to move it
         Location.setApiKey("AIzaSyBgabJrpu7-ELWiUIKJlpBz2mL6GYjwCVI");
 
         let { status } = await Location.requestPermissionsAsync();
@@ -387,11 +347,12 @@ export class MainFindBeepScreen extends Component {
 
     leaveQueue = () => {
         this.setState({isLoading: true});
+
         let token = this.context.user.token;
 
         var data = {
             "token": token,
-            "beepersID": this.state.beepersID
+            "beepersID": this.state.beeper.id
         }
 
         fetch("https://beep.nussman.us/api/rider/leave", {
@@ -425,7 +386,7 @@ export class MainFindBeepScreen extends Component {
 
     enableGetRiderStatus = () => {
         //Tell our socket to push updates to user
-        socket.emit('getRiderStatus', this.state.beepersID);
+        socket.emit('getRiderStatus', this.state.beeper.id);
     }
 
     disableGetRiderStatus = () => {
@@ -443,42 +404,42 @@ export class MainFindBeepScreen extends Component {
         console.log("[MainFindBeep.js] Rendering Main Find Beep");
 
         if (!this.state.foundBeep) {
-            if (this.state.beepersID) {
+            if (this.state.beeper.id) {
                 return(
                     <Layout style={styles.container}>
                         <Layout style={styles.group}>
-                            <Text category='h6'>{this.state.beepersFirstName} {this.state.beepersLastName}</Text>
+                            <Text category='h6'>{this.state.beeper.first} {this.state.beeper.last}</Text>
                             <Text appearance='hint'>is avalible to beep you!</Text>
                         </Layout>
 
                         <Layout style={styles.group}>
-                            <Text category='h6'>{this.state.beepersFirstName}'s Rates</Text>
+                            <Text category='h6'>{this.state.beeper.first}'s Rates</Text>
                             <Layout style={styles.rateGroup}>
                                 <Layout style={styles.rateLayout}>
                                     <Text appearance='hint'>Single</Text>
-                                    <Text>${this.state.beepersSinglesRate}</Text>
+                                    <Text>${this.state.beeper.singlesRate}</Text>
                                 </Layout>
                                 <Layout style={styles.rateLayout} >
                                     <Text appearance='hint'>Group</Text>
-                                    <Text>${this.state.beepersGroupRate}</Text>
+                                    <Text>${this.state.beeper.groupRate}</Text>
                                 </Layout>
                             </Layout>
                         </Layout>
 
                         <Layout style={styles.group}>
-                            <Text appearance='hint'>{this.state.beepersFirstName}'s rider capacity is</Text>
-                            <Text category='h6'>{this.state.beepersCapacity}</Text>
+                            <Text appearance='hint'>{this.state.beeper.first}'s rider capacity is</Text>
+                            <Text category='h6'>{this.state.beeper.capacity}</Text>
                         </Layout>
 
                         <Layout style={styles.group}>
-                            <Text appearance='hint'>{this.state.beepersFirstName}'s total queue size is</Text>
-                            <Text category='h6'>{this.state.beepersQueueSize}</Text>
+                            <Text appearance='hint'>{this.state.beeper.first}'s total queue size is</Text>
+                            <Text category='h6'>{this.state.beeper.queueSize}</Text>
                         </Layout>
                         {!this.state.isLoading ?
                             <Button
                                 style={styles.buttons}
                                 accessoryRight={GetIcon}
-                                onPress={() => this.chooseBeep(this.state.beepersID)}
+                                onPress={() => this.chooseBeep(this.state.beeper.id)}
                             >
                             Get Beep
                             </Button>
@@ -491,7 +452,7 @@ export class MainFindBeepScreen extends Component {
                             status='basic'
                             style={styles.buttons}
                             accessoryRight={BackIcon}
-                            onPress={() => this.setState({'beepersID': ''})}
+                            onPress={() => this.setState({'beeper': {}})}
                         >
                         Go Back
                         </Button>
@@ -576,7 +537,7 @@ export class MainFindBeepScreen extends Component {
                 return (
                     <Layout style={styles.container}>
                         <Layout style={styles.group}>
-                            <Text category='h6'>{this.state.beepersFirstName} {this.state.beepersLastName}</Text>
+                            <Text category='h6'>{this.state.beeper.first} {this.state.beeper.last}</Text>
                             <Text appearance='hint'>is your beeper!</Text>
                         </Layout>
 
@@ -619,8 +580,8 @@ export class MainFindBeepScreen extends Component {
                         <Layout style={styles.group}>
                             {(this.state.ridersQueuePosition == 0) ?
                                 <>
-                                <Text>You are at the top of {this.state.beepersFirstName}'s queue.</Text>
-                                <Text appearance='hint'>{this.state.beepersFirstName} is currently serving you.</Text>
+                                <Text>You are at the top of {this.state.beeper.first}'s queue.</Text>
+                                <Text appearance='hint'>{this.state.beeper.first} is currently serving you.</Text>
 
 
                                 </>
@@ -628,7 +589,7 @@ export class MainFindBeepScreen extends Component {
                                 :
                                 <>
                                 <Text category='h6'>{this.state.ridersQueuePosition}</Text>
-                                <Text appearance='hint'>is your potition in {this.state.beepersFirstName}'s queue.</Text>
+                                <Text appearance='hint'>is your potition in {this.state.beeper.first}'s queue.</Text>
                                 </>
                             }
                         </Layout>
@@ -655,7 +616,7 @@ export class MainFindBeepScreen extends Component {
                             status='info'
                             accessoryRight={VenmoIcon}
                             style={styles.buttons}
-                            onPress={() =>{ Linking.openURL('venmo://paycharge?txn=pay&recipients='+ this.state.beepersVenmo + '&amount= + this.state.beepersGroupRate + &note=Beep'); } }
+                            onPress={() =>{ Linking.openURL('venmo://paycharge?txn=pay&recipients='+ this.state.beepersVenmo + '&amount= + this.state.beeper.groupRate + &note=Beep'); } }
                         >
                         Pay Beeper with Venmo
                         </Button>
@@ -668,27 +629,27 @@ export class MainFindBeepScreen extends Component {
 
                         <Layout style={styles.group}>
                         <Text appearance='hint'>Waiting on</Text>
-                        <Text category='h6'>{this.state.beepersFirstName} {this.state.beepersLastName}</Text>
+                        <Text category='h6'>{this.state.beeper.first} {this.state.beeper.last}</Text>
                         <Text appearance='hint'>to accept your request.</Text>
                         </Layout>
 
                         <Layout style={styles.group}>
-                            <Text category='h6'>{this.state.beepersFirstName}'s Rates</Text>
+                            <Text category='h6'>{this.state.beeper.first}'s Rates</Text>
                             <Layout style={styles.rateGroup}>
                                 <Layout style={styles.rateLayout}>
                                     <Text appearance='hint'>Single</Text>
-                                    <Text>${this.state.beepersSinglesRate}</Text>
+                                    <Text>${this.state.beeper.singlesRate}</Text>
                                 </Layout>
                                 <Layout style={styles.rateLayout} >
                                     <Text appearance='hint'>Group</Text>
-                                    <Text>${this.state.beepersGroupRate}</Text>
+                                    <Text>${this.state.beeper.groupRate}</Text>
                                 </Layout>
                             </Layout>
                         </Layout>
 
                         <Layout style={styles.group}>
-                        <Text appearance='hint'>{this.state.beepersFirstName}'s total queue size is</Text>
-                        <Text category='h6'>{this.state.beepersQueueSize}</Text>
+                        <Text appearance='hint'>{this.state.beeper.first}'s total queue size is</Text>
+                        <Text category='h6'>{this.state.beeper.queueSize}</Text>
                         </Layout>
 
                         {!this.state.isLoading ?
