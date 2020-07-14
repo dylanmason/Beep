@@ -51,8 +51,7 @@ export class ChangePasswordScreen extends Component {
                             navigationStuff.goBack();
                         }
                         else {
-                            //TODO: modal popup or something better
-                            alert("Error updating new password.");
+                            alert(data.message);
                         }
                     }.bind(this)
                 );

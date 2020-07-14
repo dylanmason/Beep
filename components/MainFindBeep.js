@@ -580,7 +580,7 @@ export class MainFindBeepScreen extends Component {
                             accessoryRight={PhoneIcon}
                             style={styles.buttons}
                             title="Text Beeper"
-                            onPress={() =>{ Linking.openURL('tel:' + this.state.beepersPhone); } }
+                            onPress={() =>{ Linking.openURL('tel:' + this.state.beeper.phone); } }
                         >
                         Call Beeper
                         </Button>
@@ -589,7 +589,7 @@ export class MainFindBeepScreen extends Component {
                             status='basic'
                             accessoryRight={TextIcon}
                             style={styles.buttons}
-                            onPress={() =>{ Linking.openURL('sms:' + this.state.beepersPhone); } }
+                            onPress={() =>{ Linking.openURL('sms:' + this.state.beeper.phone); } }
                         >
                         Text Beeper
                         </Button>
@@ -597,7 +597,7 @@ export class MainFindBeepScreen extends Component {
                             status='info'
                             accessoryRight={VenmoIcon}
                             style={styles.buttons}
-                            onPress={() =>{ Linking.openURL('venmo://paycharge?txn=pay&recipients='+ this.state.beepersVenmo + '&amount= + this.state.beeper.groupRate + &note=Beep'); } }
+                            onPress={() =>{ Linking.openURL('venmo://paycharge?txn=pay&recipients='+ this.state.beeper.venmo + '&amount= + this.state.beeper.groupRate + &note=Beep'); } }
                         >
                         Pay Beeper with Venmo
                         </Button>

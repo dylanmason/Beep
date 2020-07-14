@@ -3,12 +3,12 @@ import { AsyncStorage } from 'react-native';
 export async function removeOldToken () {
     try {
         let tokenid = await AsyncStorage.getItem('@tokenid');
-        console.log("Removing", tokenid);
 
         if (tokenid !== null) {
             //Token is NOT null, this means a previous user on this device logged out while offline.
             //We must safely revoke their token.
             console.log("There was a tokenid stored in memory, this means user logged out while offline. We need to deactivate their token by tokenid.");
+            console.log("Removing", tokenid);
 
             //POST to our token API
             fetch("https://beep.nussman.us/api/auth/token", {
