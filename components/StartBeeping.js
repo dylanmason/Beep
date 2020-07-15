@@ -79,6 +79,10 @@ export class StartBeepingScreen extends Component {
             console.log("[StartBeeping.js] [Socket.io] Socktio.io told us to update queue!");
             this.getQueue();
         });
+
+        socket.on('disconnect', () => {
+            console.log("SOCKET HAS DISSCONNECTED :(");
+        });
     }
 
     componentWillUnmount() {

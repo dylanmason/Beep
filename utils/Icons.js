@@ -65,6 +65,10 @@ const DollarIcon = (props) => (
   <Text>$</Text>
 );
 
+const ShareIcon = (props) => (
+  <Icon {...props} name='share-outline'/>
+);
+
 export {
     ThemeIcon,
     LogoutIcon,
@@ -81,5 +85,6 @@ export {
     AcceptIcon,
     DenyIcon,
     MapsIcon,
-    DollarIcon
+    DollarIcon,
+    ShareIcon
 };

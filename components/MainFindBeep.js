@@ -13,7 +13,8 @@ import {
     LeaveIcon,
     BackIcon,
     GetIcon,
-    FindIcon
+    FindIcon,
+    ShareIcon
 } from '../utils/Icons.js';
 
 export class MainFindBeepScreen extends Component {
@@ -40,7 +41,7 @@ export class MainFindBeepScreen extends Component {
     }
 
     componentDidMount () {
-        this.getInitialRiderStatus();
+        this.getInitialRiderStatus(false);
 
         AppState.addEventListener("change", this._handleAppStateChange);
 
@@ -61,14 +62,14 @@ export class MainFindBeepScreen extends Component {
         ) {
             if(!socket.connected && this.state.beeper.id) {
                 console.log("Socket.io is not conntected! We need to reconnect to continue to get updates");
-                this.getInitialRiderStatus();
+                this.getInitialRiderStatus(true);
             }
         }
         this.setState({ appState: nextAppState });
     };
 
 
-    getInitialRiderStatus() {
+    getInitialRiderStatus(isSocketCall) {
         //We will need to use user's token to update their status
         let token = this.context.user.token;
 
@@ -119,6 +120,11 @@ export class MainFindBeepScreen extends Component {
                             this.enableGetRiderStatus();
                         }
                         else {
+                            //TODO this really should only happen on the socket reconnection, not initialy when the page
+                            //is mounted... this setState might cause an unnessisary render ONLY for page mount
+                            if (isSocketCall) {
+                                this.setState({isLoading: false, foundBeep: false, isAccepted: false, beeper: {}});
+                            }
                             console.log("[FindBeep.js] [API] " , data.message);
                         }
                     }.bind(this)
@@ -375,6 +381,15 @@ export class MainFindBeepScreen extends Component {
         socket.emit('stopGetRiderStatus');
     }
 
+    handleVenmo = () => {
+        if (this.state.groupSize > 1) {
+            Linking.openURL('venmo://paycharge?txn=pay&recipients='+ this.state.beeper.venmo + '&amount=' + this.state.beeper.groupRate + '&note=Beep');
+        }
+        else {
+            Linking.openURL('venmo://paycharge?txn=pay&recipients='+ this.state.beeper.venmo + '&amount=' + this.state.beeper.singlesRate + '&note=Beep');
+        }
+    }
+
     render () {
         const CurrentLocationIcon = (props) => (
             <TouchableWithoutFeedback onPress={this.useCurrentLocation}>
@@ -597,10 +612,22 @@ export class MainFindBeepScreen extends Component {
                             status='info'
                             accessoryRight={VenmoIcon}
                             style={styles.buttons}
-                            onPress={() =>{ Linking.openURL('venmo://paycharge?txn=pay&recipients='+ this.state.beeper.venmo + '&amount= + this.state.beeper.groupRate + &note=Beep'); } }
+                            onPress={this.handleVenmo}
                         >
                         Pay Beeper with Venmo
+                        </Button> 
+                        {(this.state.groupSize > 1) ?
+
+                        <Button
+                            status='basic'
+                            accessoryRight={ShareIcon}
+                            style={styles.buttons}
+                            onPress={() =>{ Linking.openURL('sms:' + this.state.beeper.phone); } }
+                        >
+                        Share Venmo Info with Your Group
                         </Button>
+                        
+                        : null}
                     </Layout>
                 );
             }
