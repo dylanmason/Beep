@@ -13,7 +13,6 @@ export default function LoginScreen({ navigation }) {
     const [password, setPassword] = useState("");
     const inputEl = useRef(null);
     const onButtonClick = () => {
-        // `current` points to the mounted text input element
         inputEl.current.focus();
     };
 
@@ -25,6 +24,8 @@ export default function LoginScreen({ navigation }) {
         removeOldToken();
 
         let expoPushToken = await AsyncStorage.getItem('@expoPushToken');
+
+        console.log("Logging in... Sending this as the pushToken", expoPushToken);
 
         fetch("https://beep.nussman.us/api/auth/login", {
             method: "POST",

@@ -38,7 +38,7 @@ export function MainSettingsScreen({ navigation }) {
                             //Logout was successfull
                             console.log("[Settings.js] [Logout] We have internet connection.");
                             //Define the keys we want to unset
-                            let keys = ['@user'];
+                            let keys = ['@user', '@tokenid'];
                             //Using AsyncStorage, remove keys on logout.
                             //IMPORTANT: we do NOT remove the expo push token beause we need that for any other user that may login
                             //We can't remove it because it is only set on App.js when we initialize notifications, we may not re-run that code

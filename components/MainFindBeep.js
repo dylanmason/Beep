@@ -288,7 +288,6 @@ export class MainFindBeepScreen extends Component {
                         else {
                             this.setState({isLoading: false, findBeepError: data.message, showFindBeepError: true});
                         }
-                        console.log(this.state);
                     }.bind(this)
                 );
             }.bind(this)

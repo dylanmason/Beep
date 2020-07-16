@@ -6,9 +6,6 @@ import { Platform, StyleSheet, StatusBar, AsyncStorage, Vibration } from 'react-
 import { RegisterScreen } from './components/Register'
 import LoginScreen from './components/Login'
 import { MainScreen } from './components/MainScreen'
-import { Notifications } from 'expo';
-import * as Permissions from 'expo-permissions';
-import Constants from 'expo-constants';
 import * as eva from '@eva-design/eva';
 import { ApplicationProvider, IconRegistry, Layout } from '@ui-kitten/components';
 import { default as beepTheme } from './utils/theme.json';
@@ -16,54 +13,11 @@ import { EvaIconsPack } from '@ui-kitten/eva-icons';
 import { ThemeContext } from './utils/theme-context';
 import { UserContext } from './utils/UserContext.js';
 import * as SplashScreen from 'expo-splash-screen';
+import { registerForPushNotificationsAsync } from './utils/Notifications.js';
+import { getStatusBarHeight } from 'react-native-status-bar-height';
 
 const Stack = createStackNavigator();
 var initialScreen;
-
-async function registerForPushNotificationsAsync() {
-    if (Constants.isDevice) {
-        const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
-
-        let finalStatus = existingStatus;
-
-        if (existingStatus !== 'granted') {
-            const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
-            finalStatus = status;
-        }
-
-        if (finalStatus !== 'granted') {
-            console.log('[App.js] [Push Notifications] Failed to get push token for push notification!');
-            return;
-        }
-
-        //Get Token from Expo Push Notifications
-        pushToken = await Notifications.getExpoPushTokenAsync();
-        //Put Expo Notification Token in a state
-        //setExpoPushToken(pushToken);
-        //Store our push token in AsyncStorage
-        AsyncStorage.setItem('@expoPushToken', pushToken);
-        //Log that we saved a notification token in storage
-        console.log("[Notifications] Wrote Expo Push Token to AsyncStorage: ", pushToken);
-    }
-
-    if (Platform.OS === 'android') {
-        Notifications.createChannelAndroidAsync('default', {
-            name: 'default',
-            sound: true,
-            priority: 'max',
-            vibrate: [0, 250, 250, 250],
-        });
-    }
-}
-
-function _handleNotification(notification) {
-    //Vibrate when we recieve a notification
-    Vibration.vibrate();
-    //Log the entire notification to the console
-    console.log("[App.js] [Notifications] Notification Recieved: ", notification);
-    //Store the most recent notification in a state
-    //setNotification(notification);
-}
 
 async function startSplash() {
     // Prevent native splash screen from autohiding
@@ -98,20 +52,14 @@ export default function App() {
             if(result[0][1]) {
                 //Register for Expo Push Notifications
                 registerForPushNotificationsAsync();
-                //Add Listiner for Push Notifications
-                Notifications.addListener(_handleNotification);
-                //Token found in AsyncStorage!
-                //This means a user is logged in on this device!
                 //Because user is logged in, send them to Main initially
                 initialScreen = "Main";
-                //Log this to console
+                //Take user from AsyncStorage and put it in our context
                 setUser(JSON.parse(result[0][1]));
             }
             else {
                 //This mean no one is logged in, send them to login page initally
                 initialScreen = "Login";
-                //Log this to console
-                console.log("[App.js] [Auth] No token found, send user to Login");
             }
 
             if(result[1][1]) {
@@ -125,14 +73,11 @@ export default function App() {
             //AsyncStorage could not get data from storage
             console.log("[App.js] [AsyncStorage] ", error);
         });
-
-        //We are checking if a token exists in AsyncStorage
-        console.log("[App.js] Rendering Loading Screen");
-        //this render is needed below, not sure why
-        //return(null);
     }
 
     if (isLoading) {
+        //TODO: this renders 3 times >:(
+        //console.log("LOADING..........");
         return null;
     }
 
@@ -163,8 +108,7 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-    //TODO: handle notch on iPhone X or newer
     statusbar: {
-        paddingTop: Platform.OS === 'ios' ? 20 : 0
+        paddingTop: getStatusBarHeight(true)
     }
 });
