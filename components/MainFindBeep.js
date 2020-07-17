@@ -31,7 +31,6 @@ export class MainFindBeepScreen extends Component {
             startLocation: '',
             destination: '',
             pickBeeper: true,
-            appState: AppState.currentState,
             beeper: {}
         }
     }
@@ -43,7 +42,7 @@ export class MainFindBeepScreen extends Component {
     componentDidMount () {
         this.getInitialRiderStatus(false);
 
-        AppState.addEventListener("change", this._handleAppStateChange);
+        AppState.addEventListener("change", this.handleAppStateChange);
 
         socket.on('updateRiderStatus', data => {
             console.log("[FindBeep.js] [Socket.io] Socket.io told us to update rider status.");
@@ -52,22 +51,15 @@ export class MainFindBeepScreen extends Component {
     }
 
     componentWillUnmount() {
-        AppState.removeEventListener("change", this._handleAppStateChange);
+        AppState.removeEventListener("change", this.handleAppStateChange);
     }
 
-    _handleAppStateChange = nextAppState => {
-        if (
-            this.state.appState.match(/inactive|background/) &&
-            nextAppState === "active"
-        ) {
-            if(!socket.connected && this.state.beeper.id) {
-                console.log("Socket.io is not conntected! We need to reconnect to continue to get updates");
-                this.getInitialRiderStatus(true);
-            }
+    handleAppStateChange = nextAppState => {
+        if(nextAppState === "active" && !socket.connected && this.state.beeper.id) {
+            this.getInitialRiderStatus(true);
+            console.log("Socket.io is not conntected! We need to reconnect to continue to get updates");
         }
-        this.setState({ appState: nextAppState });
-    };
-
+    }
 
     getInitialRiderStatus(isSocketCall) {
         //We will need to use user's token to update their status
@@ -126,6 +118,7 @@ export class MainFindBeepScreen extends Component {
                             //is mounted... this setState might cause an unnessisary render ONLY for page mount
                             if (isSocketCall) {
                                 this.setState({isLoading: false, foundBeep: false, isAccepted: false, beeper: {}});
+                                this.disableGetRiderStatus();
                             }
                             console.log("[FindBeep.js] [API] " , data.message);
                         }
@@ -373,11 +366,13 @@ export class MainFindBeepScreen extends Component {
     }
 
     enableGetRiderStatus = () => {
+        console.log("Subscribing to Socket.io for Rider Status");
         //Tell our socket to push updates to user
         socket.emit('getRiderStatus', this.state.beeper.id);
     }
 
     disableGetRiderStatus = () => {
+        console.log("Unsubscribing to Socket.io for Rider Status");
         //Tell our socket to push updates to user
         socket.emit('stopGetRiderStatus');
     }

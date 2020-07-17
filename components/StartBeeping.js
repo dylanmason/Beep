@@ -23,8 +23,7 @@ export class StartBeepingScreen extends Component {
         queue: [],
         capacity: "" + this.context.user.capacity,
         singlesRate: this.context.user.singlesRate,
-        groupRate: this.context.user.groupRate,
-        appState: AppState.currentState
+        groupRate: this.context.user.groupRate
     };
 
     /**
@@ -35,32 +34,33 @@ export class StartBeepingScreen extends Component {
         //to make sure our toggle switch is accurate with our database
         fetch('https://beep.nussman.us/api/beeper/status/' + this.context.user.id)
         .then((response) => response.json())
-        .then(async (responseJson) =>
-        {
-            console.log("[StartBeeping.js] [API] Load Beeper's State Responce: ", responseJson);
-            if (this.state.isBeeping !== responseJson.isBeeping) {
-                this.setState({isBeeping: responseJson.isBeeping});
-            }
+        .then(
+            async (responseJson) => {
+                console.log("[StartBeeping.js] [API] Load Beeper's State Responce: ", responseJson);
+                if (this.state.isBeeping !== responseJson.isBeeping) {
+                    this.setState({isBeeping: responseJson.isBeeping});
+                }
 
-            if(responseJson.isBeeping) {
-                //if user turns 'isBeeping' on (to true), subscribe to rethinkdb changes
-                this.enableGetQueue();
-                this.getQueue();
-                let { status } = await Location.requestPermissionsAsync();
-                if (status !== 'granted') {
-                    //if we have no location access, dont let the user beep
-                    //TODO: we only disable beeping client side, should we push false to server also?
-                    this.setState({isBeeping: false});
+                if(responseJson.isBeeping) {
+                    //if user turns 'isBeeping' on (to true), subscribe to rethinkdb changes
+                    this.enableGetQueue();
+                    this.getQueue();
+                    let { status } = await Location.requestPermissionsAsync();
+                    if (status !== 'granted') {
+                        //if we have no location access, dont let the user beep
+                        //TODO: we only disable beeping client side, should we push false to server also?
+                        this.setState({isBeeping: false});
+                        this.disableGetQueue();
+                        alert("ERROR: You must allow location to beep!");
+                    }
+                }
+                else {
+                    //if user turns 'isBeeping' off (to false), unsubscribe to rethinkdb changes
+                    //this.setState({isBeeping: false});
                     this.disableGetQueue();
-                    alert("ERROR: You must allow location to beep!");
                 }
             }
-            else {
-                //if user turns 'isBeeping' off (to false), unsubscribe to rethinkdb changes
-                //this.setState({isBeeping: false});
-                this.disableGetQueue();
-            }
-        })
+        )
         .catch((error) =>
         {
             console.error("[StartBeeping.js] [API] ", error);
@@ -68,40 +68,28 @@ export class StartBeepingScreen extends Component {
     }
 
     componentDidMount () {
-        console.log("mounded StartBeeping");
-
         //get user information and set toggle switch to correct status on mount
         this.retrieveData();
 
-        AppState.addEventListener("change", this._handleAppStateChange);
+        AppState.addEventListener("change", this.handleAppStateChange);
 
         socket.on("updateQueue", queue => {
             console.log("[StartBeeping.js] [Socket.io] Socktio.io told us to update queue!");
             this.getQueue();
         });
-
-        socket.on('disconnect', () => {
-            console.log("SOCKET HAS DISSCONNECTED :(");
-        });
     }
 
     componentWillUnmount() {
-        AppState.removeEventListener("change", this._handleAppStateChange);
+        AppState.removeEventListener("change", this.handleAppStateChange);
     }
 
-    _handleAppStateChange = nextAppState => {
-        if (
-            this.state.appState.match(/inactive|background/) &&
-            nextAppState === "active"
-        ) {
-            if(!socket.connected && this.state.isBeeping) {
-                console.log("socket is not connected but user is beeping! We need to resubscribe and get our queue.");
-                this.enableGetQueue();
-                this.getQueue();
-            }
+    handleAppStateChange = nextAppState => {
+        if (nextAppState === "active" && !socket.connected && this.state.isBeeping) {
+            console.log("socket is not connected but user is beeping! We need to resubscribe and get our queue.");
+            this.enableGetQueue();
+            this.getQueue();
         }
-        this.setState({ appState: nextAppState });
-    };
+    }
 
     getQueue() {
         //We will need to use user's token to update their status
@@ -227,18 +215,18 @@ export class StartBeepingScreen extends Component {
     }
 
     enableGetQueue = () => {
-        console.log("getQueueEnabled");
+        console.log("Subscribing to Socket.io for Beeper's Queue");
         //tell the socket server we want to get updates of our queue
         socket.emit('getQueue', this.context.user.id);
     }
 
     disableGetQueue = () => {
+        console.log("Unsubscribing to Socket.io for Beeper's Queue");
         //tell socket.io to close cursor
         socket.emit('stopGetQueue');
     }
 
     AcceptDeny = (queueID, riderID, value) => {
-
         fetch("https://beep.nussman.us/api/beeper/queue/status", {
             method: "POST",
             headers: {
