@@ -9,6 +9,7 @@ export default function LoginScreen({ navigation }) {
     const {user, setUser} = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
+    const [hasError, setHasError] = useState(false);
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const inputEl = useRef(null);
@@ -24,8 +25,6 @@ export default function LoginScreen({ navigation }) {
         removeOldToken();
 
         let expoPushToken = await AsyncStorage.getItem('@expoPushToken');
-
-        console.log("Logging in... Sending this as the pushToken", expoPushToken);
 
         fetch("https://beep.nussman.us/api/auth/login", {
             method: "POST",
@@ -65,6 +64,7 @@ export default function LoginScreen({ navigation }) {
                         else {
                             //Use Native Alert to tell user a login error.
                             //This is where we tell user "Incorrect Password" and such
+                            setHasError(true);
                             setError(data.message);
                             setIsLoading(false);
                         }
@@ -116,12 +116,12 @@ export default function LoginScreen({ navigation }) {
             >
             Sign Up
             </Button>
-            <Modal visible={error}>
+            <Modal visible={hasError}>
                 <Card disabled={true}>
                 <Text>
                     {error}
                 </Text>
-                    <Button onPress={() => setError(null)}>
+                    <Button onPress={() => setHasError(false)}>
                     Close
                     </Button>
                 </Card>
