@@ -105,6 +105,7 @@ export class MainFindBeepScreen extends Component {
                                     ridersQueuePosition: data.ridersQueuePosition,
                                     state: data.state,
                                     beeper: data.beeper,
+                                    groupSize: data.groupSize,
                                     isLoading: false
                                 });
                             }
@@ -112,6 +113,7 @@ export class MainFindBeepScreen extends Component {
                                 this.setState({
                                     foundBeep: true,
                                     isAccepted: data.isAccepted,
+                                    groupSize: data.groupSize,
                                     beeper: data.beeper,
                                     isLoading: false
                                 });
