@@ -45,14 +45,18 @@ export class StartBeepingScreen extends Component {
 
                 if(responseJson.isBeeping) {
                     //if user turns 'isBeeping' on (to true), subscribe to rethinkdb changes
-                    this.enableGetQueue();
                     this.getQueue();
+                    this.enableGetQueue();
+
+                    //ensure we have location permissions before we start beeping
                     let { status } = await Location.requestPermissionsAsync();
+
                     if (status !== 'granted') {
                         //if we have no location access, dont let the user beep
-                        //TODO: we only disable beeping client side, should we push false to server also?
+                        //TODO we only disable beeping client side, should we push false to server also?
                         this.setState({isBeeping: false});
                         this.disableGetQueue();
+                        //TODO better error handling
                         alert("ERROR: You must allow location to beep!");
                     }
                 }
@@ -63,8 +67,7 @@ export class StartBeepingScreen extends Component {
                 }
             }
         )
-        .catch((error) =>
-        {
+        .catch((error) => {
             console.error("[StartBeeping.js] [API] ", error);
         });
     }
@@ -128,7 +131,6 @@ export class StartBeepingScreen extends Component {
                                     }
                                 }
                                 this.setState({queue: data.queue, currentIndex: currentIndex});
-                                isBusy = false;
                             }
                             else {
                                 console.warn(data.message, " Thread: ", this.state.username);
@@ -140,6 +142,7 @@ export class StartBeepingScreen extends Component {
         .catch((error) => {
              console.log("[StartBeeping.js] [API] Error fetching from the Beep API: ", error);
         });
+        isBusy = false;
     }
 
     toggleSwitch = async (value) => {
@@ -147,11 +150,16 @@ export class StartBeepingScreen extends Component {
         this.setState({isBeeping: value});
 
         if (value) {
+            //if we are turning on isBeeping, ensure we have location permission
             let { status } = await Location.requestPermissionsAsync();
+
             if (status !== 'granted') {
                 //TODO: should I ensure the db agrees 
                 this.setState({isBeeping: !this.state.isBeeping});
+                //TODO better error handling
                 alert("ERROR: You must allow location to beep!");
+                //dont continue to process this request to turn on isBeeing,
+                //user did not grant us permission
                 return;
             }
             //if user turns 'isBeeping' on (to true), subscribe to rethinkdb changes

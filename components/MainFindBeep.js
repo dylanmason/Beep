@@ -62,27 +62,17 @@ export class MainFindBeepScreen extends Component {
     }
 
     getInitialRiderStatus(isSocketCall) {
-        //We will need to use user's token to update their status
-        let token = this.context.user.token;
-
-        //Data we will POST to beeper status enpoint API
-        var data = {
-            "token": token
-        }
-
         fetch("https://beep.nussman.us/api/rider/status", {
             method: "POST",
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
-            body:  JSON.stringify(data)
+            body: JSON.stringify({"token": this.context.user.token})
         })
         .then(
-            function(response)
-            {
-                if (response.status !== 200)
-                {
+            function(response) {
+                if (response.status !== 200) {
                     console.log('[FindBeep.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
                     return;
                 }
@@ -127,27 +117,21 @@ export class MainFindBeepScreen extends Component {
             }.bind(this)
         )
         .catch((error) => {
-             console.log("[FindBeep.js] [API] Error fetching from the Beep API: ", error);
+            console.log("[FindBeep.js] [API] Error fetching from the Beep API: ", error);
+            this.getInitialRiderStatus();
         });
+        //TODO: is this a good spot to dismiss the splash page?
         this.doneSplash();
     }
 
     getRiderStatus() {
-        //We will need to use user's token to update their status
-        let token = this.context.user.token;
-
-        //Data we will POST to beeper status enpoint API
-        var data = {
-            "token": token
-        }
-
         fetch("https://beep.nussman.us/api/rider/status", {
             method: "POST",
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
-            body:  JSON.stringify(data)
+            body:  JSON.stringify({ "token": this.context.user.token })
         })
         .then(
             function(response) {
@@ -206,7 +190,7 @@ export class MainFindBeepScreen extends Component {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
-            body:  JSON.stringify(data)
+            body: JSON.stringify(data)
         })
         .then(
             function(response) {
@@ -229,7 +213,6 @@ export class MainFindBeepScreen extends Component {
                             this.enableGetRiderStatus();
                         }
                         else {
-                            //alert(data.message);
                             this.setState({isLoading: false, findBeepError: data.message, showFindBeepError: true});
                         }
                     }.bind(this)
@@ -242,6 +225,7 @@ export class MainFindBeepScreen extends Component {
     }
 
     findBeep = () => {
+        //if the "pick beeper" checbox is checked, run this code
         if (this.state.pickBeeper) {
             const navigationStuff = this.props.navigation;
             console.log("[FindBeep.js] Rider wants to pick their own beeper.");
@@ -250,11 +234,8 @@ export class MainFindBeepScreen extends Component {
             });
             return;
         }
-        this.setState({isLoading: true});
 
-        var data = {
-            "token": this.context.user.token
-        }
+        this.setState({isLoading: true});
 
         fetch("https://beep.nussman.us/api/rider/find", {
             method: "POST",
@@ -262,7 +243,7 @@ export class MainFindBeepScreen extends Component {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
-            body:  JSON.stringify(data)
+            body:  JSON.stringify({"token": this.context.user.token})
         })
         .then(
             function(response) {
@@ -329,20 +310,16 @@ export class MainFindBeepScreen extends Component {
     leaveQueue = () => {
         this.setState({isLoading: true});
 
-        let token = this.context.user.token;
-
-        var data = {
-            "token": token,
-            "beepersID": this.state.beeper.id
-        }
-
         fetch("https://beep.nussman.us/api/rider/leave", {
             method: "POST",
             headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
             },
-            body:  JSON.stringify(data)
+            body: JSON.stringify({
+                "token": this.context.user.token,
+                "beepersID": this.state.beeper.id
+            })
         })
         .then(
             function(response) {
