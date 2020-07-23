@@ -1,7 +1,7 @@
 import { Notifications } from 'expo';
 import * as Permissions from 'expo-permissions';
 import Constants from 'expo-constants';
-import {AsyncStorage} from 'react-native';
+import { AsyncStorage, Vibration } from 'react-native';
 
 export async function registerForPushNotificationsAsync() {
     if (Constants.isDevice) {
