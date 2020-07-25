@@ -1,9 +1,10 @@
 import React, { useState, useContext, useRef } from 'react';
-import { StyleSheet, AsyncStorage, View } from 'react-native';
+import { StyleSheet, AsyncStorage } from 'react-native';
 import { Layout, Text, Button, Input, Modal, Card } from '@ui-kitten/components';
 import * as SplashScreen from 'expo-splash-screen';
 import { UserContext } from '../utils/UserContext.js';
 import { removeOldToken } from '../utils/OfflineToken.js';
+import { registerForPushNotificationsAsync } from '../utils/Notifications.js';
 
 export default function LoginScreen({ navigation }) {
     const {user, setUser} = useContext(UserContext);
@@ -24,7 +25,13 @@ export default function LoginScreen({ navigation }) {
 
         removeOldToken();
 
-        let expoPushToken = await AsyncStorage.getItem('@expoPushToken');
+        let expoPushToken;
+
+        if (Platform.OS == "ios" || Platform.OS == "android") {
+            expoPushToken = await registerForPushNotificationsAsync();
+        }
+
+        console.log("Logging in and posting this push token with it", expoPushToken);
 
         fetch("https://beep.nussman.us/api/auth/login", {
             method: "POST",
@@ -40,12 +47,10 @@ export default function LoginScreen({ navigation }) {
         })
         .then(
             function(response) {
-
                 if (response.status !== 200) {
                     console.log('[Login.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
                     return;
                 }
-
                 response.json().then(
                     function(data) {
                         //Log what our login API returns for debugging
@@ -54,6 +59,8 @@ export default function LoginScreen({ navigation }) {
                         if (data.status === "success") {
                             setUser(data);
                             AsyncStorage.setItem("@user", JSON.stringify(data));
+
+
                             navigation.reset({
                                 index: 0,
                                 routes: [

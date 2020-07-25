@@ -1,9 +1,11 @@
 import { Notifications } from 'expo';
 import * as Permissions from 'expo-permissions';
 import Constants from 'expo-constants';
-import { AsyncStorage, Vibration } from 'react-native';
+import { Vibration } from 'react-native';
 
 export async function registerForPushNotificationsAsync() {
+    let pushToken;
+
     if (Constants.isDevice) {
         const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
 
@@ -16,17 +18,12 @@ export async function registerForPushNotificationsAsync() {
 
         if (finalStatus !== 'granted') {
             console.log('[App.js] [Push Notifications] Failed to get push token for push notification!');
-            return;
+            return null;
         }
 
         //Get Token from Expo Push Notifications
         pushToken = await Notifications.getExpoPushTokenAsync();
-        //Put Expo Notification Token in a state
-        //setExpoPushToken(pushToken);
-        //Store our push token in AsyncStorage
-        AsyncStorage.setItem('@expoPushToken', pushToken);
-        //Log that we saved a notification token in storage
-        console.log("[Notifications] Wrote Expo Push Token to AsyncStorage: ", pushToken);
+
         //define a listener to handle notifications
         Notifications.addListener(_handleNotification);
     }
@@ -39,6 +36,8 @@ export async function registerForPushNotificationsAsync() {
             vibrate: [0, 250, 250, 250],
         });
     }
+
+    return pushToken;
 }
 
 export function _handleNotification(notification) {
