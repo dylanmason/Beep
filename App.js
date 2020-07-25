@@ -2,7 +2,7 @@ import 'react-native-gesture-handler';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { Platform, StyleSheet, StatusBar, AsyncStorage, Vibration } from 'react-native';
+import { StyleSheet, StatusBar, AsyncStorage } from 'react-native';
 import { RegisterScreen } from './components/Register'
 import LoginScreen from './components/Login'
 import { MainScreen } from './components/MainScreen'
@@ -32,8 +32,6 @@ export default function App() {
     startSplash();
 
     const [user, setUser] = React.useState();
-    const [notification, setNotification] = React.useState({});
-    const [token, setToken] = React.useState('');
     const [theme, setTheme] = React.useState('light');
     const [isLoading, setIsLoading] = React.useState(true);
 
@@ -77,7 +75,7 @@ export default function App() {
 
     if (isLoading) {
         //TODO: this renders 3 times >:(
-        //console.log("LOADING..........");
+        console.log("Loading...");
         return null;
     }
 

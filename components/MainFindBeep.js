@@ -118,7 +118,10 @@ export class MainFindBeepScreen extends Component {
         )
         .catch((error) => {
             console.log("[FindBeep.js] [API] Error fetching from the Beep API: ", error);
-            this.getInitialRiderStatus();
+            //this line below feels very very very very very very dangerous
+            //if an error is ever throw, we just recurse and run the funtion infinatly 
+            //TODO fix this
+            this.getInitialRiderStatus(true);
         });
         //TODO: is this a good spot to dismiss the splash page?
         this.doneSplash();
