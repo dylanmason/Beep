@@ -1,5 +1,5 @@
 import React, { useState, useContext, useRef } from 'react';
-import { StyleSheet, AsyncStorage } from 'react-native';
+import { Platform, StyleSheet, AsyncStorage } from 'react-native';
 import { Layout, Text, Button, Input, Modal, Card } from '@ui-kitten/components';
 import * as SplashScreen from 'expo-splash-screen';
 import { UserContext } from '../utils/UserContext.js';

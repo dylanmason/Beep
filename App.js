@@ -88,7 +88,7 @@ export default class App extends Component {
 
     render () {
         if (!initialScreen) {
-            console.log("[App.js] Rendering App with Intial Screen: ", initialScreen);
+            console.log("[App.js] Rendering Splash Screen");
             return null;
         }
 
@@ -100,10 +100,9 @@ export default class App extends Component {
         let toggleTheme = this.toggleTheme;
 
         return (
-            <>
-            <IconRegistry icons={EvaIconsPack} />
             <UserContext.Provider value={{user, setUser}}>
                 <ThemeContext.Provider value={{theme, toggleTheme}}>
+                    <IconRegistry icons={EvaIconsPack} />
                     <ApplicationProvider {...eva} theme={{ ...eva[this.state.theme], ...beepTheme }}>
                         <Layout style={styles.statusbar}>
                             <StatusBar barStyle={(this.state.theme === 'light' ? 'dark' : 'light') + "-content"} />
@@ -118,7 +117,6 @@ export default class App extends Component {
                     </ApplicationProvider>
                 </ThemeContext.Provider>
             </UserContext.Provider>
-            </>
         );
     }
 }

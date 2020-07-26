@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as Location from 'expo-location';
 import { StyleSheet, AsyncStorage, Linking, Platform, AppState } from 'react-native';
-import { Card, Layout, Text, Button, Input, Toggle, List, ListItem, Modal } from '@ui-kitten/components';
+import { Card, Layout, Text, Button, Input, Toggle, List, Modal } from '@ui-kitten/components';
 import socket from '../utils/Socket';
 import { UserContext } from '../utils/UserContext.js';
 import {
@@ -61,9 +61,11 @@ export class StartBeepingScreen extends Component {
                     }
                 }
                 else {
-                    //if user turns 'isBeeping' off (to false), unsubscribe to rethinkdb changes
-                    //this.setState({isBeeping: false});
-                    this.disableGetQueue();
+                    //if the socket was somehow connected, make sure we are not lisiting to socket.io
+                    //beacuse isBeeping is false
+                    if (socket.connected) {
+                        this.disableGetQueue();
+                    }
                 }
             }
         )
@@ -100,48 +102,46 @@ export class StartBeepingScreen extends Component {
         //We will need to use user's token to update their status
         let token = this.context.user.token;
 
-        //Data we will POST to beeper status enpoint API
-        var data = {
-            "token": token
-        }
-
         fetch("https://beep.nussman.us/api/beeper/queue", {
-               method: "POST",
-               headers: {
+            method: "POST",
+            headers: {
                 Accept: 'application/json',
                 'Content-Type': 'application/json',
-               },
-               body:  JSON.stringify(data)
+            },
+            body: JSON.stringify({
+                "token": token
             })
-            .then(
-                function(response) {
-                    if (response.status !== 200) {
-                        console.log('[StartBeeping.js] [API]  Looks like our API is not responding correctly. Status Code: ' + response.status);
-                        return;
-                    }
-                    response.json().then(
-                        function(data) {
-                            if (data.status === "success") {
-                                //We sucessfuly updated beeper status in database
-                                let currentIndex;
-                                for(let i = 0;  i < data.queue.length; i++) {
-                                    if (data.queue[i].isAccepted) {
-                                        currentIndex = i;
-                                        break;
-                                    }
+        })
+        .then(
+            function(response) {
+                if (response.status !== 200) {
+                    console.log('[StartBeeping.js] [API]  Looks like our API is not responding correctly. Status Code: ' + response.status);
+                    return;
+                }
+                response.json().then(
+                    function(data) {
+                        if (data.status === "success") {
+                            //We sucessfuly updated beeper status in database
+                            let currentIndex;
+                            for(let i = 0;  i < data.queue.length; i++) {
+                                if (data.queue[i].isAccepted) {
+                                    currentIndex = i;
+                                    break;
                                 }
-                                this.setState({queue: data.queue, currentIndex: currentIndex});
                             }
-                            else {
-                                console.warn(data.message, " Thread: ", this.state.username);
-                            }
-                        }.bind(this)
-                    );
-                }.bind(this)
-            )
+                            this.setState({queue: data.queue, currentIndex: currentIndex});
+                        }
+                        else {
+                            console.warn(data.message, " Thread: ", this.state.username);
+                        }
+                    }.bind(this)
+                );
+            }.bind(this)
+        )
         .catch((error) => {
              console.log("[StartBeeping.js] [API] Error fetching from the Beep API: ", error);
         });
+
         isBusy = false;
     }
 
@@ -243,7 +243,9 @@ export class StartBeepingScreen extends Component {
             console.log("update did not happen yet, cant perform another action");
             return;
         }
+
         isBusy = true;
+
         fetch("https://beep.nussman.us/api/beeper/queue/status", {
             method: "POST",
             headers: {
