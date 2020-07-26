@@ -44,5 +44,5 @@ export function _handleNotification(notification) {
     //Vibrate when we recieve a notification
     Vibration.vibrate();
     //Log the entire notification to the console
-    console.log("[App.js] [Notifications] Notification Recieved: ", notification);
+    console.log("[App.js] [Notifications] Notification Recieved: ", notification.data);
 }

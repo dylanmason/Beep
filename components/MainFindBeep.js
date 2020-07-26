@@ -104,10 +104,11 @@ export class MainFindBeepScreen extends Component {
                             this.enableGetRiderStatus();
                         }
                         else {
-                            //TODO this really should only happen on the socket reconnection, not initialy when the page
-                            //is mounted... this setState might cause an unnessisary render ONLY for page mount
+                            //if the socket re-runs getInitialRiderStatus, then isSocketCall will
+                            //allow us to ensure our states are cleared. We don't want this to run on
+                            //the mount's call because it would cause an unnessisary setState
                             if (isSocketCall) {
-                                this.setState({isLoading: false, foundBeep: false, isAccepted: false, beeper: {}});
+                                this.setState({isLoading: false, foundBeep: false, isAccepted: false, beeper: {}, state: 0});
                                 this.disableGetRiderStatus();
                             }
                             console.log("[FindBeep.js] [API] " , data.message);
@@ -123,7 +124,8 @@ export class MainFindBeepScreen extends Component {
             //TODO fix this
             this.getInitialRiderStatus(true);
         });
-        //TODO: is this a good spot to dismiss the splash page?
+
+        //now that we know inital rider status, unhide the splash screen
         this.doneSplash();
     }
 
@@ -145,6 +147,11 @@ export class MainFindBeepScreen extends Component {
                 response.json().then(
                     function(data) {
                         if (data.status === "success") {
+
+                            if (data.state !== this.state.state) {
+                                console.log("The state of this beep changed! Display a toast?");
+                            }
+
                             if (data.isAccepted) {
                                 this.setState({
                                     foundBeep: true,
@@ -161,10 +168,11 @@ export class MainFindBeepScreen extends Component {
                                     beeper: data.beeper
                                 });
                             }
+                            
                         }
                         else {
                             console.log("[FindBeep.js] [API] " , data.message);
-                            this.setState({isLoading: false, foundBeep: false, isAccepted: false, beeper: {}});
+                            this.setState({isLoading: false, foundBeep: false, isAccepted: false, beeper: {}, state: 0});
                             this.disableGetRiderStatus();
                         }
                     }.bind(this)
@@ -179,7 +187,7 @@ export class MainFindBeepScreen extends Component {
     chooseBeep = (id) => {
         this.setState({isLoading: true});
 
-        var data = {
+        const data = {
             "token": this.context.user.token,
             "origin": this.state.startLocation,
             "destination": this.state.destination,
