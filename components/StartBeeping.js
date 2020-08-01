@@ -24,8 +24,8 @@ export class StartBeepingScreen extends Component {
         isBeeping: this.context.user.isBeeping,
         queue: [],
         capacity: "" + this.context.user.capacity,
-        singlesRate: this.context.user.singlesRate,
-        groupRate: this.context.user.groupRate
+        singlesRate: "" + this.context.user.singlesRate,
+        groupRate: "" + this.context.user.groupRate
     };
 
     /**
@@ -142,7 +142,6 @@ export class StartBeepingScreen extends Component {
              console.log("[StartBeeping.js] [API] Error fetching from the Beep API: ", error);
         });
 
-        isBusy = false;
     }
 
     toggleSwitch = async (value) => {
@@ -268,11 +267,10 @@ export class StartBeepingScreen extends Component {
                 response.json().then(
                     function(data) {
                         console.log("[StartBeeping.js] [API] Accept or Deny API Responce: ", data);
-
                         if (data.status === "error") {
-                            isBusy = false;
                             this.setState({startBeepingError: data.message, showStartBeepingError: true});
                         }
+                        isBusy = false;
                     }.bind(this)
                 );
             }.bind(this)
