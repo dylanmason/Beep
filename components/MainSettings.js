@@ -93,10 +93,6 @@ export function MainSettingsScreen({ navigation }) {
     return (
         <Layout style={styles.wrapper}>
             <Layout style={styles.container}>
-                <Layout style={styles.row}>
-                    <Text category='h1'>Hello, </Text>
-                    <Text category='h1'>{userContext.user.first}!</Text>
-                </Layout>
                 <Button
                     onPress={themeContext.toggleTheme}
                     accessoryLeft={ThemeIcon}
