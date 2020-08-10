@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, AsyncStorage } from 'react-native';
 import { Icon, Layout, Text, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 import { UserContext } from '../utils/UserContext.js';
+import { config } from "../utils/config";
 
 export class ChangePasswordScreen extends Component {
     static contextType = UserContext;
@@ -23,11 +24,9 @@ export class ChangePasswordScreen extends Component {
 
         //Define our Main Navigation, use this so send user back a page
         const navigationStuff = this.props.navigation;
-        //get token to autheticate with api
-        const token = await AsyncStorage.getItem("@token");
 
         //POST to our edit profile API
-        fetch("https://beep.nussman.us/api/account/password", {
+        fetch(config.apiUrl + "/account/password", {
             method: "POST",
             headers: {
                 Accept: 'application/json',

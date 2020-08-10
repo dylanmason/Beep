@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
-import { StyleSheet, AsyncStorage, Linking, TouchableWithoutFeedback, AppState } from 'react-native';
+import { StyleSheet, Linking, TouchableWithoutFeedback, AppState } from 'react-native';
 import { Icon, Layout, Text, Button, Input, CheckBox, Modal, Card } from '@ui-kitten/components';
 import * as Location from 'expo-location';
-import { Ionicons } from '@expo/vector-icons';
 import socket from '../utils/Socket'
 import * as SplashScreen from 'expo-splash-screen';
 import { UserContext } from '../utils/UserContext.js';
+import { config } from '../utils/config';
 import {
     PhoneIcon, 
     TextIcon, 
@@ -62,7 +62,7 @@ export class MainFindBeepScreen extends Component {
     }
 
     getInitialRiderStatus(isSocketCall) {
-        fetch("https://beep.nussman.us/api/rider/status", {
+        fetch(config.apiUrl + "/rider/status", {
             method: "POST",
             headers: {
                 Accept: 'application/json',
@@ -130,7 +130,7 @@ export class MainFindBeepScreen extends Component {
     }
 
     getRiderStatus() {
-        fetch("https://beep.nussman.us/api/rider/status", {
+        fetch(config.apiUrl + "/rider/status", {
             method: "POST",
             headers: {
                 Accept: 'application/json',
@@ -195,7 +195,7 @@ export class MainFindBeepScreen extends Component {
             "beepersID": id
         }
 
-        fetch("https://beep.nussman.us/api/rider/choose", {
+        fetch(config.apiUrl + "/rider/choose", {
             method: "POST",
             headers: {
                 Accept: 'application/json',
@@ -248,7 +248,7 @@ export class MainFindBeepScreen extends Component {
 
         this.setState({isLoading: true});
 
-        fetch("https://beep.nussman.us/api/rider/find", {
+        fetch(config.apiUrl + "/rider/find", {
             method: "POST",
             headers: {
                 Accept: 'application/json',
@@ -321,7 +321,7 @@ export class MainFindBeepScreen extends Component {
     leaveQueue = () => {
         this.setState({isLoading: true});
 
-        fetch("https://beep.nussman.us/api/rider/leave", {
+        fetch(config.apiUrl + "/rider/leave", {
             method: "POST",
             headers: {
                 Accept: 'application/json',

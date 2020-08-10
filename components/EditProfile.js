@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, AsyncStorage } from 'react-native';
 import { Icon, Layout, Text, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 import { UserContext } from '../utils/UserContext.js';
+import { config } from "../utils/config";
 
 export class EditProfileScreen extends Component {
     static contextType = UserContext;
@@ -21,7 +22,7 @@ export class EditProfileScreen extends Component {
         const navigationStuff = this.props.navigation;
 
         //POST to our edit profile API
-        fetch("https://beep.nussman.us/api/account/edit", {
+        fetch(config.apiUrl + "/account/edit", {
             method: "POST",
             headers: {
                 Accept: 'application/json',

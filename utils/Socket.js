@@ -1,5 +1,6 @@
 import io from 'socket.io-client';
+import { config } from './config';
 
-const socket = io('https://beep.nussman.us/', { transports: ['websocket'] });
+const socket = io(config.apiUrl, { transports: ['websocket'] });
 
 export default socket

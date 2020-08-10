@@ -4,6 +4,7 @@ import { StyleSheet, AsyncStorage, Linking, Platform, AppState } from 'react-nat
 import { Card, Layout, Text, Button, Input, Toggle, List, Modal } from '@ui-kitten/components';
 import socket from '../utils/Socket';
 import { UserContext } from '../utils/UserContext.js';
+import { config } from "../utils/config";
 import {
     PhoneIcon,
     TextIcon,
@@ -34,7 +35,7 @@ export class StartBeepingScreen extends Component {
     retrieveData = async () => {
         //Upon loading user data into states, get User's bepper status
         //to make sure our toggle switch is accurate with our database
-        fetch('https://beep.nussman.us/api/beeper/status/' + this.context.user.id)
+        fetch(config.apiUrl + '/beeper/status/' + this.context.user.id)
         .then((response) => response.json())
         .then(
             async (responseJson) => {
@@ -102,7 +103,7 @@ export class StartBeepingScreen extends Component {
         //We will need to use user's token to update their status
         let token = this.context.user.token;
 
-        fetch("https://beep.nussman.us/api/beeper/queue", {
+        fetch(config.apiUrl + "/beeper/queue", {
             method: "POST",
             headers: {
                 Accept: 'application/json',
@@ -169,7 +170,7 @@ export class StartBeepingScreen extends Component {
             this.disableGetQueue();
         }
 
-        fetch("https://beep.nussman.us/api/beeper/status", {
+        fetch(config.apiUrl + "/beeper/status", {
             method: "POST",
             headers: {
                 Accept: 'application/json',
@@ -245,7 +246,7 @@ export class StartBeepingScreen extends Component {
 
         isBusy = true;
 
-        fetch("https://beep.nussman.us/api/beeper/queue/status", {
+        fetch(config.apiUrl + "/beeper/queue/status", {
             method: "POST",
             headers: {
                 Accept: 'application/json',

@@ -3,6 +3,7 @@ import { StyleSheet, AsyncStorage } from 'react-native';
 import { Icon, Layout, Text, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 import { UserContext } from '../utils/UserContext.js';
 import { removeOldToken } from '../utils/OfflineToken.js';
+import { config } from "../utils/config";
  
 export class RegisterScreen extends Component {
     static contextType = UserContext;
@@ -47,7 +48,7 @@ export class RegisterScreen extends Component {
         }
 
         //POST to our signup API
-        fetch("https://beep.nussman.us/api/auth/signup", {
+        fetch(config.apiUrl + "/auth/signup", {
             method: "POST",
             headers: {
                 Accept: 'application/json',

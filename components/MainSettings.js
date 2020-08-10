@@ -1,10 +1,11 @@
-import React, { Component } from 'react';
-import { StyleSheet, TouchableOpacity, AsyncStorage } from 'react-native';
-import { Layout, Text, Button } from '@ui-kitten/components';
+import React from 'react';
+import { StyleSheet, AsyncStorage } from 'react-native';
+import { Layout, Button, Text } from '@ui-kitten/components';
 import { ThemeContext } from '../utils/theme-context';
 import { UserContext } from '../utils/UserContext.js';
 import socket from '../utils/Socket';
 import { ThemeIcon, LogoutIcon, ProfileIcon, PasswordIcon, ForwardIcon } from '../utils/Icons.js';
+import { config } from "../utils/config";
 
 export function MainSettingsScreen({ navigation }) {
     const themeContext = React.useContext(ThemeContext);
@@ -12,7 +13,7 @@ export function MainSettingsScreen({ navigation }) {
 
     async function logout() {
         //POST to our Logout API
-        fetch("https://beep.nussman.us/api/auth/logout", {
+        fetch(config.apiUrl + "/auth/logout", {
             method: "POST",
             headers: {
                 Accept: 'application/json',
@@ -43,6 +44,9 @@ export function MainSettingsScreen({ navigation }) {
                             //IMPORTANT: we do NOT remove the expo push token beause we need that for any other user that may login
                             //We can't remove it because it is only set on App.js when we initialize notifications, we may not re-run that code
                             AsyncStorage.multiRemove(keys, (err) => {
+                                if (err) { 
+                                    console.error(err);
+                                }
                                 console.log("[Settings.js] [Logout] Removed all from storage except our push token.");
                             });
                             //these two emits tell our socket server that we no longer want the rethinkdb watcher open
@@ -89,12 +93,10 @@ export function MainSettingsScreen({ navigation }) {
     return (
         <Layout style={styles.wrapper}>
             <Layout style={styles.container}>
-                {/*
                 <Layout style={styles.row}>
                     <Text category='h1'>Hello, </Text>
                     <Text category='h1'>{userContext.user.first}!</Text>
                 </Layout>
-                */}
                 <Button
                     onPress={themeContext.toggleTheme}
                     accessoryLeft={ThemeIcon}

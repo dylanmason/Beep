@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Layout, Text, Divider, List, ListItem, Icon, TopNavigation, TopNavigationAction, Spinner } from '@ui-kitten/components';
 import { StyleSheet } from 'react-native';
+import { config } from "../utils/config";
 
 export class PickBeepScreen extends Component {
 
@@ -13,7 +14,7 @@ export class PickBeepScreen extends Component {
     }
 
     getBeeperList = () => {
-        fetch("https://beep.nussman.us/api/rider/list", {
+        fetch(config.apiUrl + "/rider/list", {
             method: "GET",
             headers: {
                 Accept: 'application/json',

@@ -1,4 +1,5 @@
 import { AsyncStorage } from 'react-native';
+import { config } from './config';
 
 export async function removeOldToken () {
     try {
@@ -11,7 +12,7 @@ export async function removeOldToken () {
             console.log("Removing", tokenid);
 
             //POST to our token API
-            fetch("https://beep.nussman.us/api/auth/token", {
+            fetch(config.apiUrl + "/auth/token", {
                 method: "POST",
                 headers: {
                     Accept: 'application/json',

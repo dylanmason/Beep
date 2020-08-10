@@ -5,9 +5,10 @@ import * as SplashScreen from 'expo-splash-screen';
 import { UserContext } from '../utils/UserContext.js';
 import { removeOldToken } from '../utils/OfflineToken.js';
 import { registerForPushNotificationsAsync } from '../utils/Notifications.js';
+import { config } from '../utils/config';
 
 export default function LoginScreen({ navigation }) {
-    const {user, setUser} = useContext(UserContext);
+    const { setUser } = useContext(UserContext);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
     const [hasError, setHasError] = useState(false);
@@ -33,7 +34,7 @@ export default function LoginScreen({ navigation }) {
 
         console.log("Logging in and posting this push token with it", expoPushToken);
 
-        fetch("https://beep.nussman.us/api/auth/login", {
+        fetch(config.apiUrl + "/auth/login", {
             method: "POST",
             headers: {
                 Accept: 'application/json',
