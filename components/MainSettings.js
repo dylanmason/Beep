@@ -35,7 +35,7 @@ export function MainSettingsScreen({ navigation }) {
                         //Log the result from the Logout API to debug
                         console.log("[Settings.js] [API] Logout API Responce: ", data);
 
-                        if (data.status == "success") {
+                        if (data.status == "success" || (data.status === "error" && data.message === "Your auth token is not valid.")) {
                             //Logout was successfull
                             console.log("[Settings.js] [Logout] We have internet connection.");
                             //Define the keys we want to unset
