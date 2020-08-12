@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Layout, Text, Divider, List, ListItem, Icon, TopNavigation, TopNavigationAction, Spinner } from '@ui-kitten/components';
 import { StyleSheet } from 'react-native';
 import { config } from "../utils/config";
+import { BackIcon, RefreshIcon } from '../utils/Icons';
 
 export class PickBeepScreen extends Component {
 
@@ -57,12 +58,12 @@ export class PickBeepScreen extends Component {
     }
 
     render() {
-        const BackIcon = (props) => (
-             <Icon {...props} name='arrow-back'/>
-        );
-
         const BackAction = () => (
             <TopNavigationAction icon={BackIcon} onPress={() =>this.props.navigation.goBack()}/>
+        );
+
+        const RefreshAction = () => (
+            <TopNavigationAction icon={RefreshIcon} onPress={() => this.getBeeperList()}/>
         );
 
         const renderItem = ({ item, index }) => (
@@ -77,7 +78,7 @@ export class PickBeepScreen extends Component {
             if (this.state.beeperList && this.state.beeperList.length != 0) {
                 return (
                     <>
-                        <TopNavigation title='Beeper List' alignment='center' accessoryLeft={BackAction}/>
+                        <TopNavigation title='Beeper List' alignment='center' accessoryLeft={BackAction} accessoryRight={RefreshAction}/>
                         <List
                             data={this.state.beeperList}
                             ItemSeparatorComponent={Divider}

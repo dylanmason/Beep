@@ -3,6 +3,7 @@ import { StyleSheet, AsyncStorage } from 'react-native';
 import { Icon, Layout, Text, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 import { UserContext } from '../utils/UserContext.js';
 import { config } from "../utils/config";
+import { EditIcon } from "../utils/Icons";
 
 export class ChangePasswordScreen extends Component {
     static contextType = UserContext;
@@ -92,8 +93,9 @@ export class ChangePasswordScreen extends Component {
                             ref={(input)=>this.secondTextInput = input}
                             onSubmitEditing={() => this.handleChangePassword()} />
                         <Button
-                          buttonStyle={styles.button}
+                            buttonStyle={styles.button}
                             onPress={() => this.handleChangePassword()}
+                            accessoryRight={EditIcon}
                         >
                             Change Password
                         </Button>

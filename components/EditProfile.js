@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { StyleSheet, AsyncStorage } from 'react-native';
-import { Icon, Layout, Text, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
+import { Icon, Layout, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 import { UserContext } from '../utils/UserContext.js';
 import { config } from "../utils/config";
+import { EditIcon } from "../utils/Icons";
 
 export class EditProfileScreen extends Component {
     static contextType = UserContext;
@@ -137,8 +138,9 @@ export class EditProfileScreen extends Component {
                             ref={(input)=>this.fifthTextInput = input}
                             onSubmitEditing={() => this.handleUpdate()} />
                         <Button
-                          buttonStyle={styles.button}
+                            buttonStyle={styles.button}
                             onPress={() => this.handleUpdate()}
+                            accessoryRight={EditIcon}
                         >
                         Update Profile
                         </Button>

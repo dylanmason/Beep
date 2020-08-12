@@ -69,6 +69,14 @@ const ShareIcon = (props) => (
   <Icon {...props} name='share-outline'/>
 );
 
+const EditIcon = (props) => (
+  <Icon {...props} name='edit-outline'/>
+);
+
+const RefreshIcon = (props) => (
+  <Icon {...props} name='refresh-outline'/>
+);
+
 export {
     ThemeIcon,
     LogoutIcon,
@@ -86,5 +94,7 @@ export {
     DenyIcon,
     MapsIcon,
     DollarIcon,
-    ShareIcon
+    ShareIcon,
+    EditIcon,
+    RefreshIcon
 };
