@@ -17,10 +17,9 @@ import { getStatusBarHeight } from 'react-native-status-bar-height';
 import { updatePushToken } from "./utils/Notifications";
 
 const Stack = createStackNavigator();
-var initialScreen;
+let initialScreen;
 
 async function startSplash() {
-    // Prevent native splash screen from autohiding
     try {
       await SplashScreen.preventAutoHideAsync();
     } catch (e) {
@@ -39,55 +38,55 @@ export default class App extends Component {
     }
 
     toggleTheme = () => {
-        const nextTheme = this.state.theme === 'light' ? 'dark' : 'light';
-        this.setState({theme: nextTheme});
-        AsyncStorage.setItem('@theme', nextTheme);
+        const nextempTheme = this.state.theme === 'light' ? 'dark' : 'light';
+        this.setState({theme: nextempTheme});
+        AsyncStorage.setItem('@theme', nextempTheme);
     };
 
     setUser = (user) => {
         this.setState({user: user});
     }
     
-    //If we haven't deturmined an initial screen, run this code
-    //We DONT want to run this code if we already know what screen to load
     componentDidMount() {
+        //Ensure native splash screen stays up
         startSplash();
 
-        if (initialScreen == null) {
-            //When App loads initially, get token from AsyncStorage
-            AsyncStorage.multiGet(['@user', '@theme']).then((result) => {
-                let sUser = null;
-                let sTheme = this.state.theme;
-                //if a user is defined
-                if(result[0][1]) {
-                    //Because user is logged in, send them to Main initially
-                    initialScreen = "Main";
-                    //Take user from AsyncStorage and put it in our context
-                    sUser = JSON.parse(result[0][1]);
-                    if ((Platform.OS == "ios" || Platform.OS == "android") && sUser.token) {
-                        updatePushToken(sUser.token);
-                    }
-                }
-                else {
-                    //This mean no one is logged in, send them to login page initally
-                    initialScreen = "Login";
-                }
+        //When App loads initially, get token from AsyncStorage
+        AsyncStorage.multiGet(['@user', '@theme']).then((result) => {
+            let tempUser = null;
+            let sTheme = this.state.theme;
 
-                if(result[1][1]) {
-                    //re-render may happen, if a re-render happens, this code will not run agian because
-                    //initialScreen has been defined. 
-                    sTheme = result[1][1];
+            //if a user is defined
+            if(result[0][1]) {
+                //Because user is logged in, send them to Main initially
+                initialScreen = "Main";
+                //Take user from AsyncStorage and put it in our context
+                tempUser = JSON.parse(result[0][1]);
+                //If user is on a mobile device and user object has a token, sub them to notifications
+                if ((Platform.OS == "ios" || Platform.OS == "android") && tempUser.token) {
+                    updatePushToken(tempUser.token);
                 }
-                
-                this.setState({
-                    user: sUser,
-                    theme: sTheme
-                });
-              }, (error) => {
-                //AsyncStorage could not get data from storage
-                console.log("[App.js] [AsyncStorage] ", error);
+            }
+            else {
+                //This mean no one is logged in, send them to login page initally
+                initialScreen = "Login";
+            }
+
+            if(result[1][1]) {
+                //re-render may happen, if a re-render happens, this code will not run agian because
+                //initialScreen has been defined. 
+                sTheme = result[1][1];
+            }
+            
+            //finaly setState once we know what data we have to minimize renders
+            this.setState({
+                user: tempUser,
+                theme: sTheme
             });
-        }
+          }, (error) => {
+            //AsyncStorage could not get data from storage
+            console.log("[App.js] [AsyncStorage] ", error);
+        });
     }
 
     render () {

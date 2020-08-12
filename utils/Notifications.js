@@ -4,8 +4,11 @@ import Constants from 'expo-constants';
 import { Vibration, Platform } from 'react-native';
 import { config } from '../utils/config';
 
+/**
+ * Checks for permssion for Notifications, asks expo for push token, sets up notification listeners, returns 
+ * push token to be used
+ */
 export async function getPushToken() {
-
     const hasPermission = await getNotificationPermission();
 
     if(!hasPermission) {
@@ -29,6 +32,10 @@ export async function getPushToken() {
     return token;
 }
 
+/**
+ * function to get existing or prompt for notification permission
+ * @returns boolean true if client has location permissions
+ */
 async function getNotificationPermission() {
     if (!Constants.isDevice) {
         return false;
@@ -50,14 +57,18 @@ async function getNotificationPermission() {
     return true;
 }
 
+/**
+ * Set listiner function(s)
+ */
 function setNotificationHandlers() {
-    console.log("Now listening for notifications");
-    //Handles forground
     Notifications.setNotificationHandler(handleNotification);
-
     //Notifications.addNotificationReceivedListener(handleNotification);
 }
 
+/**
+ * call getPushToken and send to backend
+ * @param token a user's auth token
+ */
 export async function updatePushToken(token) {
     fetch(config.apiUrl + "/account/pushtoken", {
         method: "POST",
