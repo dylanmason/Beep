@@ -2,7 +2,7 @@ import 'react-native-gesture-handler';
 import React, { Component } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { StyleSheet, StatusBar, AsyncStorage } from 'react-native';
+import { StyleSheet, StatusBar, AsyncStorage, Platform } from 'react-native';
 import { RegisterScreen } from './components/Register'
 import LoginScreen from './components/Login'
 import { MainScreen } from './components/MainScreen'
@@ -14,6 +14,7 @@ import { ThemeContext } from './utils/theme-context';
 import { UserContext } from './utils/UserContext.js';
 import * as SplashScreen from 'expo-splash-screen';
 import { getStatusBarHeight } from 'react-native-status-bar-height';
+import { updatePushToken } from "./utils/Notifications";
 
 const Stack = createStackNavigator();
 var initialScreen;
@@ -63,6 +64,9 @@ export default class App extends Component {
                     initialScreen = "Main";
                     //Take user from AsyncStorage and put it in our context
                     sUser = JSON.parse(result[0][1]);
+                    if ((Platform.OS == "ios" || Platform.OS == "android") && sUser.token) {
+                        updatePushToken(sUser.token);
+                    }
                 }
                 else {
                     //This mean no one is logged in, send them to login page initally

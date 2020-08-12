@@ -5,6 +5,8 @@ import { Card, Layout, Text, Button, Input, Toggle, List, Modal } from '@ui-kitt
 import socket from '../utils/Socket';
 import { UserContext } from '../utils/UserContext.js';
 import { config } from "../utils/config";
+import * as Notifications from 'expo-notifications';
+
 import {
     PhoneIcon,
     TextIcon,
@@ -122,6 +124,7 @@ export class StartBeepingScreen extends Component {
                 response.json().then(
                     function(data) {
                         if (data.status === "success") {
+                            Notifications.setBadgeCountAsync(data.queue.length);
                             //We sucessfuly updated beeper status in database
                             let currentIndex;
                             for(let i = 0;  i < data.queue.length; i++) {

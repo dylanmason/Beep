@@ -4,7 +4,7 @@ import { Layout, Text, Button, Input, Modal, Card } from '@ui-kitten/components'
 import * as SplashScreen from 'expo-splash-screen';
 import { UserContext } from '../utils/UserContext.js';
 import { removeOldToken } from '../utils/OfflineToken.js';
-import { registerForPushNotificationsAsync } from '../utils/Notifications.js';
+import { getPushToken } from '../utils/Notifications.js';
 import { config } from '../utils/config';
 
 export default function LoginScreen({ navigation }) {
@@ -29,7 +29,7 @@ export default function LoginScreen({ navigation }) {
         let expoPushToken;
 
         if (Platform.OS == "ios" || Platform.OS == "android") {
-            expoPushToken = await registerForPushNotificationsAsync();
+            expoPushToken = await getPushToken();
         }
 
         console.log("Logging in and posting this push token with it", expoPushToken);
