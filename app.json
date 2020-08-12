@@ -10,7 +10,9 @@
     "githubUrl": "https://github.com/bnussman/Beep",
     "primaryColor": "#ecc94b",
     "icon": "./assets/icon.png",
-    "iosDisplayInForeground": true,
+    "notification": {
+        "iosDisplayInForeground": true
+    },
     "platforms": [
         "ios",
         "android",
