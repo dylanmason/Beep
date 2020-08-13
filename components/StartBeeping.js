@@ -8,7 +8,6 @@ import { config } from "../utils/config";
 import * as Notifications from 'expo-notifications';
 import ActionButton from "./ActionButton";
 import AcceptDenyButton from "./AcceptDenyButton";
-
 import {
     PhoneIcon,
     TextIcon,
@@ -273,6 +272,15 @@ export class StartBeepingScreen extends Component {
         }
     }
 
+    handleVenmo = (groupSize, venmo) => {
+        if (groupSize > 1) {
+            Linking.openURL('venmo://paycharge?txn=pay&recipients='+ venmo + '&amount=' + this.state.groupRate + '&note=Beep');
+        }
+        else {
+            Linking.openURL('venmo://paycharge?txn=pay&recipients='+ venmo + '&amount=' + this.state.singlesRate + '&note=Beep');
+        }
+    }
+
     render () {
         console.log("[StartBeeping.js] Rendering Start Beeping Screen");
         if(!this.state.isBeeping) {
@@ -390,7 +398,7 @@ export class StartBeepingScreen extends Component {
                                         style={styles.paddingUnder}
                                         status='info'
                                         accessoryLeft={VenmoIcon}
-                                        onPress={() =>{ Linking.openURL('venmo://paycharge?txn=pay&recipients='+ item.personalInfo.venmo + '&amount= + this.state.beepersGroupRate + &note=Beep'); } }
+                                        onPress={() => this.handleVenmo(item.groupSize, item.personalInfo.venmo)}
                                     >
                                     Request Money from Rider with Venmo
                                     </Button>
