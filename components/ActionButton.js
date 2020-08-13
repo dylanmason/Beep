@@ -20,8 +20,7 @@ export default class ActionButton extends Component {
         };
     }
 
-    componentWillReceiveProps() {
-        console.log("updated!!!!");
+    UNSAFE_componentWillReceiveProps() {
         this.setState({isLoading: false});
     }
 

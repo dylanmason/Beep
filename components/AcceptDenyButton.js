@@ -27,8 +27,7 @@ export default class AcceptDenyButton extends Component {
         };
     }
 
-    componentWillReceiveProps() {
-        console.log("updated!!!!");
+    UNSAFE_componentWillReceiveProps() {
         this.setState({isLoading: false});
     }
 
