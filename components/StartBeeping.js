@@ -1,4 +1,4 @@
-import React, { Component, createRef } from 'react';
+import React, { Component } from 'react';
 import * as Location from 'expo-location';
 import { StyleSheet, AsyncStorage, Linking, Platform, AppState } from 'react-native';
 import { Card, Layout, Text, Button, Input, Toggle, List, Modal } from '@ui-kitten/components';
@@ -20,7 +20,6 @@ import {
 
 export class StartBeepingScreen extends Component {
     static contextType = UserContext;
-
 
     state = {
         showStartBeepingError: false,
@@ -78,7 +77,6 @@ export class StartBeepingScreen extends Component {
     }
 
     componentDidMount () {
-        this.actionButtonElement = React.createRef();
         //get user information and set toggle switch to correct status on mount
         this.retrieveData();
 
@@ -170,9 +168,6 @@ export class StartBeepingScreen extends Component {
                                 }
                             }
                             this.setState({queue: data.queue, currentIndex: currentIndex});
-                            if (this.actionButtonElement.current) {
-                                this.actionButtonElement.current.stopLoading();
-                            }
                         }
                         else {
                             console.warn(data.message, " Thread: ", this.state.username);

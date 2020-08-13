@@ -20,7 +20,8 @@ export default class ActionButton extends Component {
         };
     }
 
-    stopLoading() {
+    componentWillReceiveProps() {
+        console.log("updated!!!!");
         this.setState({isLoading: false});
     }
 
@@ -51,8 +52,8 @@ export default class ActionButton extends Component {
                         console.log("[StartBeeping.js] [API] Accept or Deny API Responce: ", data);
                         if (data.status === "error") {
                             alert(data.message);
+                            this.setState({isLoading: false});
                         }
-                        //this.setState({isLoading: false});
                     }.bind(this)
                 );
             }.bind(this)

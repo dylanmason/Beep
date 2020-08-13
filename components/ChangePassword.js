@@ -17,9 +17,13 @@ export class ChangePasswordScreen extends Component {
     }
 
     async handleChangePassword () {
-
         if (this.state.password !== this.state.password2) {
             alert("Your passwords do not match!");
+            return;
+        }
+
+        if (!this.state.password || !this.state.password2) {
+            alert("Please enter a longer password.");
             return;
         }
 

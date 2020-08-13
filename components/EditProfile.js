@@ -62,7 +62,7 @@ export class EditProfileScreen extends Component {
                         }
                         else {
                             //TODO: modal popup or something better
-                            alert("Error updating acount info");
+                            alert(data.message);
                         }
                     }.bind(this)
                 );
