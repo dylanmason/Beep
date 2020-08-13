@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, createRef } from 'react';
 import * as Location from 'expo-location';
 import { StyleSheet, AsyncStorage, Linking, Platform, AppState } from 'react-native';
 import { Card, Layout, Text, Button, Input, Toggle, List, Modal } from '@ui-kitten/components';
@@ -6,6 +6,7 @@ import socket from '../utils/Socket';
 import { UserContext } from '../utils/UserContext.js';
 import { config } from "../utils/config";
 import * as Notifications from 'expo-notifications';
+import ActionButton from "./ActionButton";
 
 import {
     PhoneIcon,
@@ -17,10 +18,9 @@ import {
     DollarIcon
 } from '../utils/Icons.js';
 
-let isBusy = false;
-
 export class StartBeepingScreen extends Component {
     static contextType = UserContext;
+
 
     state = {
         showStartBeepingError: false,
@@ -78,6 +78,7 @@ export class StartBeepingScreen extends Component {
     }
 
     componentDidMount () {
+        this.actionButtonElement = React.createRef();
         //get user information and set toggle switch to correct status on mount
         this.retrieveData();
 
@@ -91,6 +92,41 @@ export class StartBeepingScreen extends Component {
 
     componentWillUnmount() {
         AppState.removeEventListener("change", this.handleAppStateChange);
+    }
+
+    AcceptDeny = (queueID, riderID, value) => {
+        fetch(config.apiUrl + "/beeper/queue/status", {
+            method: "POST",
+            headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+            },
+            body:  JSON.stringify({
+                "token": this.context.user.token,
+                "value": value,
+                "queueID": queueID,
+                "riderID": riderID
+            })
+        })
+        .then(
+            function(response) {
+                if (response.status !== 200) {
+                    console.log('[StartBeeping.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
+                    return;
+                }
+                response.json().then(
+                    function(data) {
+                        console.log("[StartBeeping.js] [API] Accept or Deny API Responce: ", data);
+                        if (data.status === "error") {
+                            this.setState({startBeepingError: data.message, showStartBeepingError: true});
+                        }
+                    }.bind(this)
+                );
+            }.bind(this)
+        )
+        .catch((error) => {
+             console.log("[StartBeeping.js] [API] Error fetching from the Beep API: ", error);
+        });
     }
 
     handleAppStateChange = nextAppState => {
@@ -134,6 +170,9 @@ export class StartBeepingScreen extends Component {
                                 }
                             }
                             this.setState({queue: data.queue, currentIndex: currentIndex});
+                            if (this.actionButtonElement.current) {
+                                this.actionButtonElement.current.stopLoading();
+                            }
                         }
                         else {
                             console.warn(data.message, " Thread: ", this.state.username);
@@ -240,49 +279,6 @@ export class StartBeepingScreen extends Component {
         socket.emit('stopGetQueue');
     }
 
-    AcceptDeny = (queueID, riderID, value) => {
-        if (isBusy) {
-            console.log("WARNING");
-            console.log("update did not happen yet, cant perform another action");
-            return;
-        }
-
-        isBusy = true;
-
-        fetch(config.apiUrl + "/beeper/queue/status", {
-            method: "POST",
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body:  JSON.stringify({
-                "token": this.context.user.token,
-                "value": value,
-                "queueID": queueID,
-                "riderID": riderID
-            })
-        })
-        .then(
-            function(response) {
-                if (response.status !== 200) {
-                    console.log('[StartBeeping.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
-                    return;
-                }
-                response.json().then(
-                    function(data) {
-                        console.log("[StartBeeping.js] [API] Accept or Deny API Responce: ", data);
-                        if (data.status === "error") {
-                            this.setState({startBeepingError: data.message, showStartBeepingError: true});
-                        }
-                        isBusy = false;
-                    }.bind(this)
-                );
-            }.bind(this)
-        )
-        .catch((error) => {
-             console.log("[StartBeeping.js] [API] Error fetching from the Beep API: ", error);
-        });
-    }
 
     updateSingles = (value) => {
         this.setState({singlesRate: value});
@@ -444,53 +440,7 @@ export class StartBeepingScreen extends Component {
                                     >
                                     Get Directions for Beep
                                     </Button>
-                                        {(item.state == 0) ?
-                                            <Button
-                                                onPress={()=> this.AcceptDeny(item.id, item.riderid, "next")}
-                                            >
-                                                i'm on the way
-                                            </Button>
-
-                                            :
-
-                                            null
-                                        }
-
-                                        {(item.state == 1) ?
-                                            <Button
-                                                onPress={()=> this.AcceptDeny(item.id, item.riderid, "next")}
-                                            >
-                                                i'm here
-                                            </Button>
-
-                                            :
-
-                                            null
-                                        }
-
-                                        {(item.state == 2) ?
-                                            <Button
-                                                onPress={()=> this.AcceptDeny(item.id, item.riderid, "next")}
-                                            >
-                                                i'm now beeping this rider
-                                            </Button>
-
-                                            :
-
-                                            null
-                                        }
-
-                                        {(item.state >= 3) ?
-                                            <Button
-                                                onPress={()=> this.AcceptDeny(item.id, item.riderid, "complete")}
-                                            >
-                                                i'm done beeping rider
-                                            </Button>
-
-                                            :
-
-                                            null
-                                        }
+                                    <ActionButton ref={this.actionButtonElement} item={item}/>
                                 </Card>
 
                                 :
