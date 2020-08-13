@@ -7,13 +7,12 @@ import { UserContext } from '../utils/UserContext.js';
 import { config } from "../utils/config";
 import * as Notifications from 'expo-notifications';
 import ActionButton from "./ActionButton";
+import AcceptDenyButton from "./AcceptDenyButton";
 
 import {
     PhoneIcon,
     TextIcon,
     VenmoIcon,
-    AcceptIcon,
-    DenyIcon,
     MapsIcon,
     DollarIcon
 } from '../utils/Icons.js';
@@ -90,41 +89,6 @@ export class StartBeepingScreen extends Component {
 
     componentWillUnmount() {
         AppState.removeEventListener("change", this.handleAppStateChange);
-    }
-
-    AcceptDeny = (queueID, riderID, value) => {
-        fetch(config.apiUrl + "/beeper/queue/status", {
-            method: "POST",
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body:  JSON.stringify({
-                "token": this.context.user.token,
-                "value": value,
-                "queueID": queueID,
-                "riderID": riderID
-            })
-        })
-        .then(
-            function(response) {
-                if (response.status !== 200) {
-                    console.log('[StartBeeping.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
-                    return;
-                }
-                response.json().then(
-                    function(data) {
-                        console.log("[StartBeeping.js] [API] Accept or Deny API Responce: ", data);
-                        if (data.status === "error") {
-                            this.setState({startBeepingError: data.message, showStartBeepingError: true});
-                        }
-                    }.bind(this)
-                );
-            }.bind(this)
-        )
-        .catch((error) => {
-             console.log("[StartBeeping.js] [API] Error fetching from the Beep API: ", error);
-        });
     }
 
     handleAppStateChange = nextAppState => {
@@ -400,17 +364,19 @@ export class StartBeepingScreen extends Component {
                                     </Layout>
                                     <Layout style={styles.row}>
                                         <Layout style={styles.layout}>
-                                        <Button
-                                            style={styles.rowButton}
-                                            status='basic'
-                                            accessoryLeft={PhoneIcon}
-                                            onPress={() =>{ Linking.openURL('tel:' + item.personalInfo.phone); } }
-                                        >
-                                        Call Rider
-                                        </Button>
+                                            <Button
+                                                size="small"
+                                                style={styles.rowButton}
+                                                status='basic'
+                                                accessoryLeft={PhoneIcon}
+                                                onPress={() =>{ Linking.openURL('tel:' + item.personalInfo.phone); } }
+                                            >
+                                            Call Rider
+                                            </Button>
                                         </Layout>
                                         <Layout style={styles.layout}>
                                             <Button
+                                                size="small"
                                                 status='basic'
                                                 accessoryLeft={TextIcon}
                                                 onPress={() =>{ Linking.openURL('sms:' + item.personalInfo.phone); } }
@@ -420,6 +386,7 @@ export class StartBeepingScreen extends Component {
                                     </Layout>
                                     </Layout>
                                     <Button
+                                        size="small"
                                         style={styles.paddingUnder}
                                         status='info'
                                         accessoryLeft={VenmoIcon}
@@ -428,6 +395,7 @@ export class StartBeepingScreen extends Component {
                                     Request Money from Rider with Venmo
                                     </Button>
                                     <Button
+                                        size="small"
                                         style={styles.paddingUnder}
                                         status='success'
                                         accessoryLeft={MapsIcon}
@@ -455,14 +423,10 @@ export class StartBeepingScreen extends Component {
                                     </Layout>
                                     <Layout style={styles.row}>
                                         <Layout style={styles.layout}>
-                                        <Button title="Accept" status='success' style={styles.rowButton} accessoryLeft={AcceptIcon} onPress={()=> this.AcceptDeny(item.id, item.riderid, "accept")} >
-                                            Accept
-                                        </Button>
+                                            <AcceptDenyButton type="accept" item={item}/>
                                         </Layout>
                                         <Layout style={styles.layout}>
-                                        <Button title="Deny" status='danger' accessoryLeft={DenyIcon} onPress={()=> this.AcceptDeny(item.id, item.riderid, "deny")}  >
-                                            Deny
-                                        </Button>
+                                            <AcceptDenyButton type="deny" item={item}/>
                                         </Layout>
                                     </Layout>
                                 </Card>
