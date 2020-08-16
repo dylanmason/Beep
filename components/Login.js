@@ -72,9 +72,9 @@ export default function LoginScreen({ navigation }) {
                         else {
                             //Use Native Alert to tell user a login error.
                             //This is where we tell user "Incorrect Password" and such
-                            setHasError(true);
                             setError(data.message);
                             setIsLoading(false);
+                            setHasError(true);
                         }
                     }
                 );
