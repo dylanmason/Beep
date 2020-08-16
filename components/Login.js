@@ -153,7 +153,4 @@ const styles = StyleSheet.create({
         fontSize: 40,
         padding: 15,
     },
-    indicator: {
-        marginTop: 10
-    },
 });
