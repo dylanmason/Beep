@@ -109,7 +109,11 @@ export default class App extends Component {
                     <IconRegistry icons={EvaIconsPack} />
                     <ApplicationProvider {...eva} theme={{ ...eva[this.state.theme], ...beepTheme }}>
                         <Layout style={styles.statusbar}>
-                            <StatusBar barStyle={(this.state.theme === 'light' ? 'dark' : 'light') + "-content"} />
+                            {Platform.OS == "ios" ?
+                                <StatusBar barStyle={(this.state.theme === 'light' ? 'dark' : 'light') + "-content"} />
+                                :
+                                <StatusBar translucent barStyle={(this.state.theme === 'light' ? 'dark' : 'light') + "-content"} backgroundColor={(this.state.theme === "dark") ? "#222b45" : "#ffffff"} />
+                            }
                         </Layout>
                         <NavigationContainer>
                             <Stack.Navigator initialRouteName={initialScreen} screenOptions={{ headerShown: false }} >
