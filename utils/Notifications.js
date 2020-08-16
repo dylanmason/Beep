@@ -17,7 +17,7 @@ export async function getPushToken() {
 
     const pushToken = await Notifications.getExpoPushTokenAsync();
     const token = pushToken.data;
-
+    /*
     if (Platform.OS === 'android') {
         Notifications.createChannelAndroidAsync('default', {
             name: 'default',
@@ -26,6 +26,7 @@ export async function getPushToken() {
             vibrate: [0, 250, 250, 250],
         });
     }
+    */
 
     setNotificationHandlers();
 
