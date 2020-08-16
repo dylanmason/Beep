@@ -76,6 +76,21 @@ const EditIcon = (props) => (
 const RefreshIcon = (props) => (
   <Icon {...props} name='refresh-outline'/>
 );
+const LoginIcon = (props) => (
+  <Icon {...props} name='log-in-outline'/>
+);
+
+const SignUpIcon = (props) => (
+  <Icon {...props} name='person-add-outline'/>
+);
+
+const QuestionIcon = (props) => (
+  <Icon {...props} name='question-mark-outline'/>
+);
+
+const EmailIcon = (props) => (
+  <Icon {...props} name='email-outline'/>
+);
 
 export {
     ThemeIcon,
@@ -96,5 +111,9 @@ export {
     DollarIcon,
     ShareIcon,
     EditIcon,
-    RefreshIcon
+    RefreshIcon,
+    LoginIcon,
+    SignUpIcon,
+    QuestionIcon,
+    EmailIcon
 };

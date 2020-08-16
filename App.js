@@ -6,6 +6,7 @@ import { StyleSheet, StatusBar, AsyncStorage, Platform } from 'react-native';
 import { RegisterScreen } from './components/Register'
 import LoginScreen from './components/Login'
 import { MainScreen } from './components/MainScreen'
+import { ForgotPassword } from './components/ForgotPassword'
 import * as eva from '@eva-design/eva';
 import { ApplicationProvider, IconRegistry, Layout } from '@ui-kitten/components';
 import { default as beepTheme } from './utils/theme.json';
@@ -114,6 +115,7 @@ export default class App extends Component {
                             <Stack.Navigator initialRouteName={initialScreen} screenOptions={{ headerShown: false }} >
                                 <Stack.Screen name="Login" component={LoginScreen} />
                                 <Stack.Screen name="Register" component={RegisterScreen} />
+                                <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
                                 <Stack.Screen name="Main" component={MainScreen} />
                             </Stack.Navigator>
                         </NavigationContainer>

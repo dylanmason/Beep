@@ -4,6 +4,7 @@ import { Icon, Layout, Text, Button, Input, TopNavigation, TopNavigationAction }
 import { UserContext } from '../utils/UserContext.js';
 import { removeOldToken } from '../utils/OfflineToken.js';
 import { config } from "../utils/config";
+import { BackIcon, SignUpIcon } from "../utils/Icons";
  
 export class RegisterScreen extends Component {
     static contextType = UserContext;
@@ -95,19 +96,14 @@ export class RegisterScreen extends Component {
     }
 
     render () {
-        const BackIcon = (props) => (
-             <Icon {...props} name='arrow-back'/>
-        );
-
         const BackAction = () => (
             <TopNavigationAction icon={BackIcon} onPress={() =>this.props.navigation.goBack()}/>
         );
 
         return (
             <>
-                <TopNavigation title='' alignment='center' accessoryLeft={BackAction}/>
+                <TopNavigation title='Sign Up' alignment='center' accessoryLeft={BackAction}/>
                 <Layout style={styles.container}>
-                    <Text style={styles.title} category='h6'>Sign Up</Text>
                     <Layout style={styles.form}>
                         <Input
                             textContentType="givenName"
@@ -162,8 +158,8 @@ export class RegisterScreen extends Component {
                             onSubmitEditing={() => this.handleRegister()} />
                     {!this.state.isLoading ? 
                         <Button
-                          buttonStyle={styles.button}
-                          onPress={() => this.handleRegister()}
+                            onPress={() => this.handleRegister()}
+                            accessoryRight={SignUpIcon}
                         >
                         Sign Up
                         </Button>
@@ -188,8 +184,5 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         width: "83%",
         marginTop: 20,
-    },
-    title: {
-        fontSize: 40,
     }
 });

@@ -6,6 +6,7 @@ import { UserContext } from '../utils/UserContext.js';
 import { removeOldToken } from '../utils/OfflineToken.js';
 import { getPushToken } from '../utils/Notifications.js';
 import { config } from '../utils/config';
+import { LoginIcon, SignUpIcon, QuestionIcon } from '../utils/Icons';
 
 export default function LoginScreen({ navigation }) {
     const { setUser } = useContext(UserContext);
@@ -108,7 +109,8 @@ export default function LoginScreen({ navigation }) {
                 />
                 {!isLoading ?
                     <Button
-                      onPress={handleLogin}
+                        accessoryRight={LoginIcon}
+                        onPress={handleLogin}
                     >
                     Login
                     </Button>
@@ -118,11 +120,23 @@ export default function LoginScreen({ navigation }) {
                     </Button>
                 }
             </Layout>
-            <Text style={{marginTop: 50, marginBottom: 20}}> Don't have an account? </Text>
+            <Text style={{marginTop: 30, marginBottom: 10 }}> Don't have an account? </Text>
             <Button
+                size="small"
                 onPress={() => navigation.navigate('Register')}
+                appearance="outline"
+                accessoryRight={SignUpIcon}
             >
             Sign Up
+            </Button>
+            <Text style={{marginTop: 20, marginBottom: 10}}> Forgot your password? </Text>
+            <Button
+                size="small"
+                onPress={() => navigation.navigate('ForgotPassword')}
+                appearance="outline"
+                accessoryRight={QuestionIcon}
+            >
+            Forgot Password
             </Button>
             <Modal visible={hasError}>
                 <Card disabled={true}>
