@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { Layout, Text, Divider, List, ListItem, Icon, TopNavigation, TopNavigationAction, Spinner } from '@ui-kitten/components';
+import { Layout, Text, Divider, List, ListItem, Button, TopNavigation, TopNavigationAction, Spinner } from '@ui-kitten/components';
 import { StyleSheet } from 'react-native';
 import { config } from "../utils/config";
-import { BackIcon, RefreshIcon } from '../utils/Icons';
+import { BackIcon, RefreshIcon, GetIcon } from '../utils/Icons';
 
 export class PickBeepScreen extends Component {
 
@@ -68,9 +68,17 @@ export class PickBeepScreen extends Component {
 
         const renderItem = ({ item, index }) => (
             <ListItem
-            onPress={() => this.goBack(item.id)}
-            title={`${item.first} ${item.last}`}
-            description={`${item.queueSize} in ${item.first}'s queue\nRider Capacity: ${item.capacity}\nSingles: $${item.singlesRate}\nGroups: $${item.groupRate}`}
+                onPress={() => this.goBack(item.id)}
+                title={`${item.first} ${item.last}`}
+                description={`${item.queueSize} in ${item.first}'s queue\nRider Capacity: ${item.capacity}\nSingles: $${item.singlesRate}\nGroups: $${item.groupRate}`}
+                accessoryRight={() => {
+                    if (item.isStudent) {
+                        return (
+                            <Button appearance="outline" size='tiny' accessoryRight={GetIcon}>Student</Button>
+                        );
+                    }
+                    return null;
+                }}
             />
         );
         

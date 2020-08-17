@@ -388,10 +388,13 @@ export class MainFindBeepScreen extends Component {
                 return(
                     <Layout style={styles.container}>
                         <Layout style={styles.group}>
-                            <Text category='h6'>{this.state.beeper.first} {this.state.beeper.last}</Text>
+                            <Text category='h5'>{this.state.beeper.first} {this.state.beeper.last}</Text>
                             <Text appearance='hint'>is avalible to beep you!</Text>
                         </Layout>
 
+                        <Layout style={styles.group}>
+                            <Button accessoryLeft={GetIcon} appearance="ghost" size="small">{this.state.beeper.first} is a student! </Button>
+                        </Layout>
                         <Layout style={styles.group}>
                             <Text category='h6'>{this.state.beeper.first}'s Rates</Text>
                             <Layout style={styles.rateGroup}>
@@ -405,7 +408,6 @@ export class MainFindBeepScreen extends Component {
                                 </Layout>
                             </Layout>
                         </Layout>
-
                         <Layout style={styles.group}>
                             <Text appearance='hint'>{this.state.beeper.first}'s rider capacity is</Text>
                             <Text category='h6'>{this.state.beeper.capacity}</Text>
