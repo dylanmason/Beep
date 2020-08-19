@@ -1,6 +1,6 @@
-import React, { useState, useContext, useRef } from 'react';
+import React, { Component } from 'react';
 import { Platform, StyleSheet, AsyncStorage } from 'react-native';
-import { Layout, Text, Button, Input, Modal, Card } from '@ui-kitten/components';
+import { Layout, Text, Button, Input } from '@ui-kitten/components';
 import * as SplashScreen from 'expo-splash-screen';
 import { UserContext } from '../utils/UserContext.js';
 import { removeOldToken } from '../utils/OfflineToken.js';
@@ -8,34 +8,34 @@ import { getPushToken } from '../utils/Notifications.js';
 import { config } from '../utils/config';
 import { LoginIcon, SignUpIcon, QuestionIcon } from '../utils/Icons';
 
-export default function LoginScreen({ navigation }) {
-    const { setUser } = useContext(UserContext);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState();
-    const [hasError, setHasError] = useState(false);
-    const [username, setUsername] = useState("");
-    const [password, setPassword] = useState("");
-    const inputEl = useRef(null);
-    const onButtonClick = () => {
-        inputEl.current.focus();
-    };
+export default class LoginScreen extends Component {
+    static contextType = UserContext;
 
-    SplashScreen.hideAsync();
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLoading: false,
+            username: "",
+            password: ""
+        };
+    }
 
-    async function handleLogin() {
-        setIsLoading(true);
+    componentDidMount() {
+        SplashScreen.hideAsync();
+    }
+
+    async handleLogin() {
+        this.setState({ isLoading: true });
 
         removeOldToken();
 
-        /*
         let expoPushToken;
 
         if (Platform.OS == "ios" || Platform.OS == "android") {
             expoPushToken = await getPushToken();
         }
-        */
 
-        console.log("Logging in and posting this push token with it", expoPushToken);
+        console.log("[Login.js] Logging in and posting this push token with it", expoPushToken);
 
         fetch(config.apiUrl + "/auth/login", {
             method: "POST",
@@ -44,8 +44,8 @@ export default function LoginScreen({ navigation }) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                "username": username,
-                "password": password,
+                "username": this.state.username,
+                "password": this.state.password,
                 "expoPushToken": expoPushToken
             })
         })
@@ -62,11 +62,10 @@ export default function LoginScreen({ navigation }) {
                         console.log("[Login.js] [API] Login API Responce: ", data);
 
                         if (data.status === "success") {
-                            setUser(data);
+                            this.context.setUser(data);
                             AsyncStorage.setItem("@user", JSON.stringify(data));
 
-
-                            navigation.reset({
+                            this.props.navigation.reset({
                                 index: 0,
                                 routes: [
                                     { name: 'Main' },
@@ -74,15 +73,12 @@ export default function LoginScreen({ navigation }) {
                             });
                         }
                         else {
-                            //Use Native Alert to tell user a login error.
-                            //This is where we tell user "Incorrect Password" and such
-                            setError(data.message);
-                            setIsLoading(false);
-                            setHasError(true);
+                            this.setState({ isLoading: false });
+                            alert(data.message);
                         }
-                    }
+                    }.bind(this)
                 );
-            }
+            }.bind(this)
         )
         .catch((error) => {
              console.log("[Login.js] [API] Error fetching from the Beep (Login) API: ", error);
@@ -90,70 +86,63 @@ export default function LoginScreen({ navigation }) {
         });
     }
 
-    return (
-        <Layout style={styles.container}>
-            <Text style={styles.title} category='h6'>Login</Text>
-            <Layout style={styles.form}>
-                <Input
-                    textContentType="username"
-                    placeholder="Username"
-                    returnKeyType="next"
-                    onChangeText={(text) => setUsername(text)}
-                    onSubmitEditing={onButtonClick}
-                    blurOnSubmit={false}
-                />
-                <Input
-                    textContentType="password"
-                    placeholder="Password"
-                    returnKeyType="go"
-                    secureTextEntry={true}
-                    onChangeText={(text) => setPassword(text)}
-                    onSubmitEditing={handleLogin}
-                    ref={inputEl}
-                />
-                {!isLoading ?
-                    <Button
-                        accessoryRight={LoginIcon}
-                        onPress={handleLogin}
-                    >
-                    Login
-                    </Button>
-                    :
-                    <Button appearance='outline'>
-                        Loading
-                    </Button>
-                }
+    render () {
+        return (
+            <Layout style={styles.container}>
+                <Text style={styles.title} category='h6'>Login</Text>
+                <Layout style={styles.form}>
+                    <Input
+                        textContentType="username"
+                        placeholder="Username"
+                        returnKeyType="next"
+                        onChangeText={(text) => this.setState({username: text})}
+                        onSubmitEditing={() => this.secondTextInput.focus()}
+                        blurOnSubmit={true}
+                    />
+                    <Input
+                        textContentType="password"
+                        placeholder="Password"
+                        returnKeyType="go"
+                        secureTextEntry={true}
+                        onChangeText={(text) => this.setState({password: text})}
+                        ref={(input)=>this.secondTextInput = input}
+                        onSubmitEditing={() => this.handleLogin()}
+                        blurOnSubmit={true}
+                    />
+                    {!this.state.isLoading ?
+                        <Button
+                            accessoryRight={LoginIcon}
+                            onPress={() => this.handleLogin()}
+                        >
+                        Login
+                        </Button>
+                        :
+                        <Button appearance='outline'>
+                            Loading
+                        </Button>
+                    }
+                </Layout>
+                <Text style={{marginTop: 30, marginBottom: 10 }}> Don't have an account? </Text>
+                <Button
+                    size="small"
+                    onPress={() => this.props.navigation.navigate('Register')}
+                    appearance="outline"
+                    accessoryRight={SignUpIcon}
+                >
+                Sign Up
+                </Button>
+                <Text style={{marginTop: 20, marginBottom: 10}}> Forgot your password? </Text>
+                <Button
+                    size="small"
+                    onPress={() => this.props.navigation.navigate('ForgotPassword')}
+                    appearance="outline"
+                    accessoryRight={QuestionIcon}
+                >
+                Forgot Password
+                </Button>
             </Layout>
-            <Text style={{marginTop: 30, marginBottom: 10 }}> Don't have an account? </Text>
-            <Button
-                size="small"
-                onPress={() => navigation.navigate('Register')}
-                appearance="outline"
-                accessoryRight={SignUpIcon}
-            >
-            Sign Up
-            </Button>
-            <Text style={{marginTop: 20, marginBottom: 10}}> Forgot your password? </Text>
-            <Button
-                size="small"
-                onPress={() => navigation.navigate('ForgotPassword')}
-                appearance="outline"
-                accessoryRight={QuestionIcon}
-            >
-            Forgot Password
-            </Button>
-            <Modal visible={hasError}>
-                <Card disabled={true}>
-                <Text>
-                    {error}
-                </Text>
-                    <Button onPress={() => setHasError(false)}>
-                    Close
-                    </Button>
-                </Card>
-            </Modal>
-        </Layout>
-    );
+        );
+    }
 }
 
 const styles = StyleSheet.create({

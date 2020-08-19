@@ -30,14 +30,14 @@ export class RegisterScreen extends Component {
         //It also gets the Expo push token and stores it in a state so we can use it here
         removeOldToken();
 
-        //Load expoPushToken
-        let expoPushToken = await AsyncStorage.getItem('@expoPushToken');
+        let expoPushToken;
 
-        //Define our Main Navigation, use this so send user to Main upon login
-        const navigationStuff = this.props.navigation;
+        if (Platform.OS == "ios" || Platform.OS == "android") {
+            expoPushToken = await getPushToken();
+        }
 
         //We will POST this data from our states
-        var data = {
+        const data = {
             "first": this.state.first,
             "last": this.state.last,
             "email": this.state.email,
@@ -74,7 +74,7 @@ export class RegisterScreen extends Component {
                             AsyncStorage.setItem("@user", JSON.stringify(data));
                             //Signup has been completed. We are ready to send user into main app.
                             //Use our Navigation we defined earlier to RESET the navigation stack where Main is the root
-                            navigationStuff.reset({
+                            this.props.navigation.reset({
                                 index: 0,
                                 routes: [
                                   { name: 'Main' },
@@ -82,7 +82,6 @@ export class RegisterScreen extends Component {
                             })
                         }
                         else {
-                            //TODO: Provide our user's with better sign up errors Ex. 'Password too short!' or 'You must enter a username!'
                             this.setState({isLoading: false});
                             alert("Error creating new account.");
                         }
