@@ -149,6 +149,7 @@ export class MainFindBeepScreen extends Component {
                         if (data.status === "success") {
 
                             if (data.state !== this.state.state) {
+                                //TODO work this in with notifications
                                 console.log("The state of this beep changed! Display a toast?");
                             }
 
