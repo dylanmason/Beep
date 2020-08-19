@@ -50,6 +50,7 @@ export default function LoginScreen({ navigation }) {
         .then(
             function(response) {
                 if (response.status !== 200) {
+                    alert("First error: " + response.status)
                     console.log('[Login.js] [API] Looks like our API is not responding correctly. Status Code: ' + response.status);
                     return;
                 }
@@ -83,6 +84,7 @@ export default function LoginScreen({ navigation }) {
         )
         .catch((error) => {
              console.log("[Login.js] [API] Error fetching from the Beep (Login) API: ", error);
+             alert("Second error: " + error)
         });
     }
 
