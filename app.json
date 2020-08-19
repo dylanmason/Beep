@@ -31,7 +31,7 @@
     },
     "android": {
         "package": "app.ridebeep.App",
-        "versionCode": 2,
+        "versionCode": 3,
         "permissions": ["INTERNET", "VIBRATE", "LOCATION", "NOTIFICATIONS"]
     },
     "splash": {
