@@ -27,11 +27,13 @@ export default function LoginScreen({ navigation }) {
 
         removeOldToken();
 
+        /*
         let expoPushToken;
 
         if (Platform.OS == "ios" || Platform.OS == "android") {
             expoPushToken = await getPushToken();
         }
+        */
 
         console.log("Logging in and posting this push token with it", expoPushToken);
 
