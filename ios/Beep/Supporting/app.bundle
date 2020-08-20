@@ -1815,5 +1815,5 @@ __d(function(g,r,i,a,m,e,d){"use strict";var t=r(d[0]),n=r(d[1]),l=r(d[2]),u=r(d
 __d(function(g,r,i,a,m,e,d){Object.defineProperty(e,"__esModule",{value:!0}),e.getStatusBarHeight=function(n){return o.Platform.select({ios:f?44:20,android:n?0:o.StatusBar.currentHeight,default:0})},e.isExpo=e.isIPhoneWithMonobrow=e.isIPhoneXMax=e.isIPhoneX=void 0;var o=r(d[0]),n=o.Dimensions.get('window'),t=n.height,s=n.width,u=!1,h=!1,f=!1;'ios'!==o.Platform.OS||o.Platform.isPad||o.Platform.isTVOS||(375===s&&812===t&&(f=!0,u=!0),414===s&&896===t&&(f=!0,h=!0));e.isIPhoneX=function(){return u};e.isIPhoneXMax=function(){return h};e.isIPhoneWithMonobrow=function(){return f};e.isExpo=function(){return void 0!==(g.Expo||g.__expo||g.__exponent)}},1809,[5]);
 __r(96);
 __r(0);
-//# sourceMappingURL=http://127.0.0.1:19002/index.map?dev=false&minify=true&hot=false&platform=ios
-//# sourceURL=http://127.0.0.1:19002/index.bundle?dev=false&minify=true&hot=false&platform=ios
+//# sourceMappingURL=http://127.0.0.1:19003/index.map?dev=false&minify=true&hot=false&platform=ios
+//# sourceURL=http://127.0.0.1:19003/index.bundle?dev=false&minify=true&hot=false&platform=ios
