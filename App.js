@@ -132,6 +132,6 @@ export default class App extends Component {
 
 const styles = StyleSheet.create({
     statusbar: {
-        paddingTop: getStatusBarHeight(true)
+        paddingTop: getStatusBarHeight()
     }
 });

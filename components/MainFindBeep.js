@@ -377,13 +377,22 @@ export class MainFindBeepScreen extends Component {
     }
 
     render () {
+        console.log("[MainFindBeep.js] Rendered");
+
         const CurrentLocationIcon = (props) => (
             <TouchableWithoutFeedback onPress={this.useCurrentLocation}>
                 <Icon {...props} name='pin'/>
             </TouchableWithoutFeedback>
         );
 
-        console.log("[MainFindBeep.js] Rendering Main Find Beep");
+        if (this.context.user.isBeeping) {
+            return(
+                <Layout style={styles.container}>
+                    <Text category="h5">You are beeping!</Text>
+                    <Text appearance="hint">You can't find a ride when you are beeping</Text>
+                </Layout>
+            );
+        }
 
         if (!this.state.foundBeep) {
             if (this.state.beeper.id) {
@@ -545,16 +554,13 @@ export class MainFindBeepScreen extends Component {
                         <Layout style={styles.group}>
                             {(this.state.ridersQueuePosition == 0) ?
                                 <>
-                                <Text>You are at the top of {this.state.beeper.first}'s queue.</Text>
-                                <Text appearance='hint'>{this.state.beeper.first} is currently serving you.</Text>
-
-
+                                    <Text>You are at the top of {this.state.beeper.first}'s queue.</Text>
+                                    <Text appearance='hint'>{this.state.beeper.first} is currently serving you.</Text>
                                 </>
-
                                 :
                                 <>
-                                <Text category='h6'>{this.state.ridersQueuePosition}</Text>
-                                <Text appearance='hint'>is your potition in {this.state.beeper.first}'s queue.</Text>
+                                    <Text category='h6'>{this.state.ridersQueuePosition}</Text>
+                                    <Text appearance='hint'>is your potition in {this.state.beeper.first}'s queue.</Text>
                                 </>
                             }
                         </Layout>
