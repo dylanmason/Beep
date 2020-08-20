@@ -7,6 +7,7 @@ import { removeOldToken } from '../utils/OfflineToken.js';
 import { getPushToken } from '../utils/Notifications.js';
 import { config } from '../utils/config';
 import { LoginIcon, SignUpIcon, QuestionIcon } from '../utils/Icons';
+import { parseError } from "../utils/errors";
 
 export default class LoginScreen extends Component {
     static contextType = UserContext;
@@ -74,7 +75,7 @@ export default class LoginScreen extends Component {
                         }
                         else {
                             this.setState({ isLoading: false });
-                            alert(data.message);
+                            alert(parseError(data.message));
                         }
                     }.bind(this)
                 );

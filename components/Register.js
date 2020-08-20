@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { StyleSheet, AsyncStorage } from 'react-native';
+import { StyleSheet, AsyncStorage, Platform } from 'react-native';
 import { Layout, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 import { UserContext } from '../utils/UserContext.js';
 import { removeOldToken } from '../utils/OfflineToken.js';
 import { config } from "../utils/config";
 import { BackIcon, SignUpIcon } from "../utils/Icons";
 import { getPushToken } from "../utils/Notifications";
+import { parseError } from "../utils/errors";
  
 export class RegisterScreen extends Component {
     static contextType = UserContext;
@@ -84,7 +85,7 @@ export class RegisterScreen extends Component {
                         }
                         else {
                             this.setState({isLoading: false});
-                            alert(data.message);
+                            alert(parseError(data.message));
                         }
                     }.bind(this)
                 )

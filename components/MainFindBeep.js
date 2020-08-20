@@ -17,6 +17,8 @@ import {
     ShareIcon
 } from '../utils/Icons.js';
 
+import { parseError } from "../utils/errors";
+
 export class MainFindBeepScreen extends Component {
     static contextType = UserContext;
 
@@ -225,7 +227,7 @@ export class MainFindBeepScreen extends Component {
                         }
                         else {
                             this.setState({isLoading: false});
-                            alert(data.message);
+                            alert(parseError(data.message));
                         }
                     }.bind(this)
                 );

@@ -15,6 +15,7 @@ import {
     MapsIcon,
     DollarIcon
 } from '../utils/Icons.js';
+import { parseError } from "../utils/errors";
 
 export class StartBeepingScreen extends Component {
     static contextType = UserContext;
@@ -212,7 +213,7 @@ export class StartBeepingScreen extends Component {
                             else {
                                 this.disableGetQueue();
                             }
-                            alert(data.message);
+                            alert(parseError(data.message));
                         }
                     }.bind(this)
                 );

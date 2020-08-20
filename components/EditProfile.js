@@ -4,6 +4,7 @@ import { Icon, Layout, Button, Input, TopNavigation, TopNavigationAction } from 
 import { UserContext } from '../utils/UserContext.js';
 import { config } from "../utils/config";
 import { EditIcon } from "../utils/Icons";
+import { parseError } from "../utils/errors";
 
 export class EditProfileScreen extends Component {
     static contextType = UserContext;
@@ -61,7 +62,7 @@ export class EditProfileScreen extends Component {
                             navigationStuff.goBack();
                         }
                         else {
-                            alert(data.message);
+                            alert(parseError(data.message));
                         }
                     }.bind(this)
                 );

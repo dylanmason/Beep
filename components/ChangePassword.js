@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { StyleSheet, AsyncStorage } from 'react-native';
-import { Icon, Layout, Text, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
+import { StyleSheet } from 'react-native';
+import { Icon, Layout, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 import { UserContext } from '../utils/UserContext.js';
 import { config } from "../utils/config";
 import { EditIcon } from "../utils/Icons";
+import { parseError } from "../utils/errors";
 
 export class ChangePasswordScreen extends Component {
     static contextType = UserContext;
@@ -55,7 +56,7 @@ export class ChangePasswordScreen extends Component {
                             navigationStuff.goBack();
                         }
                         else {
-                            alert(data.message);
+                            alert(parseError(data.message));
                         }
                     }.bind(this)
                 );

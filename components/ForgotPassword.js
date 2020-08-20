@@ -3,6 +3,7 @@ import { config } from "../utils/config";
 import { Layout, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 import { StyleSheet } from "react-native";
 import { BackIcon, EmailIcon } from "../utils/Icons";
+import { parseError } from "../utils/errors";
 
 export class ForgotPassword extends Component {
     constructor(props) {
@@ -37,7 +38,14 @@ export class ForgotPassword extends Component {
                         this.setState({
                             isLoading: false
                         });
-                        alert(data.message);
+
+                        if (data.status == "success") {
+                            alert(data.message);
+                        } 
+                        else {
+                            alert(parseError(data.message));
+                        }
+
                         if (data.status == "success") {
                             this.props.navigation.goBack();
                         }
