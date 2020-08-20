@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { StyleSheet, AsyncStorage } from 'react-native';
-import { Icon, Layout, Text, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
+import { Layout, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 import { UserContext } from '../utils/UserContext.js';
 import { removeOldToken } from '../utils/OfflineToken.js';
 import { config } from "../utils/config";
 import { BackIcon, SignUpIcon } from "../utils/Icons";
+import { getPushToken } from "../utils/Notifications";
  
 export class RegisterScreen extends Component {
     static contextType = UserContext;

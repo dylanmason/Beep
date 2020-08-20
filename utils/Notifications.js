@@ -42,6 +42,11 @@ async function getNotificationPermission() {
         return false;
     }
 
+    //TODO better fix
+    if(Platform.OS == "android") {
+        return true;
+    }
+
     const { status } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
 
     let finalStatus = status;
