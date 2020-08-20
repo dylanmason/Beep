@@ -198,6 +198,7 @@ export class StartBeepingScreen extends Component {
                             let tempUser = JSON.parse(JSON.stringify(this.context.user));
                             tempUser.isBeeping = value;
                             AsyncStorage.setItem('@user', JSON.stringify(tempUser));
+                            this.context.setUser(tempUser);
                         }
                         else {
                             //Use native popup to tell user why they could not change their status
