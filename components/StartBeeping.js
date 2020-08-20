@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import * as Location from 'expo-location';
 import { StyleSheet, AsyncStorage, Linking, Platform, AppState } from 'react-native';
-import { Card, Layout, Text, Button, Input, Toggle, List, Modal } from '@ui-kitten/components';
+import { Card, Layout, Text, Button, Input, Toggle, List } from '@ui-kitten/components';
 import socket from '../utils/Socket';
 import { UserContext } from '../utils/UserContext.js';
 import { config } from "../utils/config";
@@ -20,7 +20,6 @@ export class StartBeepingScreen extends Component {
     static contextType = UserContext;
 
     state = {
-        showStartBeepingError: false,
         isBeeping: this.context.user.isBeeping,
         queue: [],
         capacity: "" + this.context.user.capacity,
@@ -57,7 +56,7 @@ export class StartBeepingScreen extends Component {
                         this.setState({isBeeping: false});
                         this.disableGetQueue();
                         //TODO better error handling
-                        alert("ERROR: You must allow location to beep!");
+                        alert("You must allow location to beep!");
                     }
                 }
                 else {
@@ -132,9 +131,6 @@ export class StartBeepingScreen extends Component {
                             }
                             this.setState({queue: data.queue, currentIndex: currentIndex});
                         }
-                        else {
-                            console.warn(data.message, " Thread: ", this.state.username);
-                        }
                     }.bind(this)
                 );
             }.bind(this)
@@ -157,7 +153,7 @@ export class StartBeepingScreen extends Component {
                 //TODO: should I ensure the db agrees 
                 this.setState({isBeeping: !this.state.isBeeping});
                 //TODO better error handling
-                alert("ERROR: You must allow location to beep!");
+                alert("You must allow location to beep!");
                 //dont continue to process this request to turn on isBeeing,
                 //user did not grant us permission
                 return;
@@ -207,7 +203,7 @@ export class StartBeepingScreen extends Component {
                             //Use native popup to tell user why they could not change their status
                             //Unupdate the toggle switch because something failed
                             //We redo our actions so the client does not have to wait on server to update the switch
-                            this.setState({startBeepingError: data.message, showStartBeepingError: true, isBeeping: !this.state.isBeeping});
+                            this.setState({isBeeping: !this.state.isBeeping});
                             //we also need to resubscribe to the socket
                             if (this.state.isBeeping) {
                                 this.enableGetQueue();
@@ -215,6 +211,7 @@ export class StartBeepingScreen extends Component {
                             else {
                                 this.disableGetQueue();
                             }
+                            alert(data.message);
                         }
                     }.bind(this)
                 );
@@ -322,16 +319,6 @@ export class StartBeepingScreen extends Component {
                         accessoryLeft={DollarIcon}
                         onChangeText={(value) => this.updateGroup(value)}
                     />
-                    <Modal visible={this.state.showStartBeepingError}>
-                        <Card disabled={true}>
-                        <Text>
-                            {this.state.startBeepingError}
-                        </Text>
-                            <Button onPress={() => this.setState({showStartBeepingError: false})}>
-                            Close
-                            </Button>
-                        </Card>
-                    </Modal>
                 </Layout>
             );
         }
@@ -440,16 +427,6 @@ export class StartBeepingScreen extends Component {
                                 </Card>
                             }
                         />
-                        <Modal visible={this.state.showStartBeepingError}>
-                            <Card disabled={true}>
-                            <Text>
-                                {this.state.startBeepingError}
-                            </Text>
-                                <Button onPress={() => this.setState({showStartBeepingError: false})}>
-                                Close
-                                </Button>
-                            </Card>
-                        </Modal>
                     </Layout>
                 );
             }

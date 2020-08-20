@@ -61,7 +61,6 @@ export class EditProfileScreen extends Component {
                             navigationStuff.goBack();
                         }
                         else {
-                            //TODO: modal popup or something better
                             alert(data.message);
                         }
                     }.bind(this)

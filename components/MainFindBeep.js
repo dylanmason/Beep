@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, Linking, TouchableWithoutFeedback, AppState } from 'react-native';
-import { Icon, Layout, Text, Button, Input, CheckBox, Modal, Card } from '@ui-kitten/components';
+import { Icon, Layout, Text, Button, Input, CheckBox } from '@ui-kitten/components';
 import * as Location from 'expo-location';
 import socket from '../utils/Socket'
 import * as SplashScreen from 'expo-splash-screen';
@@ -24,7 +24,6 @@ export class MainFindBeepScreen extends Component {
         super(props);
         this.state = {
             isLoading: false,
-            showFindBeepError: false,
             foundBeep: false,
             isAccepted: false,
             groupSize: '1',
@@ -225,7 +224,8 @@ export class MainFindBeepScreen extends Component {
                             this.enableGetRiderStatus();
                         }
                         else {
-                            this.setState({isLoading: false, findBeepError: data.message, showFindBeepError: true});
+                            this.setState({isLoading: false});
+                            alert(data.message);
                         }
                     }.bind(this)
                 );
@@ -274,7 +274,8 @@ export class MainFindBeepScreen extends Component {
                             });
                         }
                         else {
-                            this.setState({isLoading: false, findBeepError: data.message, showFindBeepError: true});
+                            this.setState({isLoading: false});
+                            alert(data.message);
                         }
                     }.bind(this)
                 );
@@ -440,16 +441,6 @@ export class MainFindBeepScreen extends Component {
                         >
                         Go Back
                         </Button>
-                        <Modal visible={this.state.showFindBeepError}>
-                            <Card disabled={true}>
-                            <Text>
-                                {this.state.findBeepError}
-                            </Text>
-                                <Button onPress={() => this.setState({showFindBeepError: false})}>
-                                Close
-                                </Button>
-                            </Card>
-                        </Modal>
                     </Layout>
                 );
             }
@@ -502,16 +493,6 @@ export class MainFindBeepScreen extends Component {
                                 Loading
                             </Button>
                         }
-                        <Modal visible={this.state.showFindBeepError}>
-                            <Card disabled={true}>
-                            <Text>
-                                {this.state.findBeepError}
-                            </Text>
-                                <Button onPress={() => this.setState({showFindBeepError: false})}>
-                                Close
-                                </Button>
-                            </Card>
-                        </Modal>
                     </Layout>
                 );
             }

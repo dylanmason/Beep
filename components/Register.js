@@ -84,7 +84,7 @@ export class RegisterScreen extends Component {
                         }
                         else {
                             this.setState({isLoading: false});
-                            alert("Error creating new account.");
+                            alert(data.message);
                         }
                     }.bind(this)
                 )
