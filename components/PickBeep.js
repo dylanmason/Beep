@@ -86,7 +86,12 @@ export class PickBeepScreen extends Component {
             if (this.state.beeperList && this.state.beeperList.length != 0) {
                 return (
                     <>
-                        <TopNavigation title='Beeper List' alignment='center' accessoryLeft={BackAction} accessoryRight={RefreshAction}/>
+                        <TopNavigation title='Beeper List' 
+                        alignment='center' 
+                        subtitle= {(this.state.beeperList.length == 1) ? `${this.state.beeperList.length} person is beeping` : `${this.state.beeperList.length} people are beeping`}
+                        accessoryLeft={BackAction} 
+                        accessoryRight={RefreshAction}/>
+
                         <List
                             data={this.state.beeperList}
                             ItemSeparatorComponent={Divider}
