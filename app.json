@@ -31,7 +31,7 @@
     },
     "android": {
         "package": "app.ridebeep.App",
-        "versionCode": 9
+        "versionCode": 10
     },
     "splash": {
         "image": "./assets/splash.png",
