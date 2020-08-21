@@ -31,7 +31,8 @@
     },
     "android": {
         "package": "app.ridebeep.App",
-        "versionCode": 10
+        "versionCode": 11,
+        "googleServicesFile": "./google-services.json"
     },
     "splash": {
         "image": "./assets/splash.png",
