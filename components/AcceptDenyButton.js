@@ -1,21 +1,10 @@
 import React, { Component } from "react";
 import { StyleSheet, View } from "react-native";
-import { Button, Spinner } from "@ui-kitten/components";
+import { Button } from "@ui-kitten/components";
 import { UserContext } from '../utils/UserContext.js';
 import { config } from "../utils/config";
-import { AcceptIcon, DenyIcon } from "../utils/Icons";
+import { AcceptIcon, DenyIcon, AcceptIndicator, DenyIndicator } from "../utils/Icons";
 
-const AcceptIndicator = () => (
-  <View style={styles.indicator}>
-    <Spinner status="success" size='small'/>
-  </View>
-);
-
-const DenyIndicator = () => (
-  <View style={styles.indicator}>
-    <Spinner status="danger" size='small'/>
-  </View>
-);
 
 export default class AcceptDenyButton extends Component {
     static contextType = UserContext;
@@ -94,9 +83,5 @@ const styles = StyleSheet.create({
     },
     button: {
         margin: 2,
-    },
-    indicator: {
-        justifyContent: 'center',
-        alignItems: 'center',
     },
 });

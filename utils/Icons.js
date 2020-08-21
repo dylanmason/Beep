@@ -1,5 +1,6 @@
 import React from 'react';
-import { Icon, Text } from '@ui-kitten/components';
+import { StyleSheet, View } from 'react-native';
+import { Icon, Text, Spinner } from '@ui-kitten/components';
 
 const ThemeIcon = (props) => (
   <Icon {...props} name='color-palette'/>
@@ -61,7 +62,7 @@ const MapsIcon = (props) => (
   <Icon {...props} name='map-outline'/>
 );
 
-const DollarIcon = (props) => (
+const DollarIcon = () => (
   <Text>$</Text>
 );
 
@@ -92,6 +93,24 @@ const EmailIcon = (props) => (
   <Icon {...props} name='email-outline'/>
 );
 
+const AcceptIndicator = () => (
+  <View style={styles.indicator}>
+    <Spinner status="success" size='small'/>
+  </View>
+);
+
+const DenyIndicator = () => (
+  <View style={styles.indicator}>
+    <Spinner status="danger" size='small'/>
+  </View>
+);
+
+const LoadingIndicator = () => (
+  <View style={styles.indicator}>
+    <Spinner size='small'/>
+  </View>
+);
+
 export {
     ThemeIcon,
     LogoutIcon,
@@ -115,5 +134,16 @@ export {
     LoginIcon,
     SignUpIcon,
     QuestionIcon,
-    EmailIcon
+    EmailIcon,
+    AcceptIndicator,
+    DenyIndicator,
+    LoadingIndicator
 };
+
+
+const styles = StyleSheet.create({
+    indicator: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    }
+});

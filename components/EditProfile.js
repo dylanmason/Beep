@@ -3,13 +3,14 @@ import { StyleSheet, AsyncStorage } from 'react-native';
 import { Icon, Layout, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 import { UserContext } from '../utils/UserContext.js';
 import { config } from "../utils/config";
-import { EditIcon } from "../utils/Icons";
+import { EditIcon, LoadingIndicator } from "../utils/Icons";
 import { parseError } from "../utils/errors";
 
 export class EditProfileScreen extends Component {
     static contextType = UserContext;
 
     state = {
+        isLoading: false,
         token: this.context.user.token,
         username: this.context.user.username,
         first: this.context.user.first,
@@ -20,6 +21,8 @@ export class EditProfileScreen extends Component {
     };
 
     handleUpdate () {
+        this.setState({ isLoading: true });
+
         //Define our Main Navigation, use this so send user back a page
         const navigationStuff = this.props.navigation;
 
@@ -62,6 +65,7 @@ export class EditProfileScreen extends Component {
                             navigationStuff.goBack();
                         }
                         else {
+                            this.setState({ isLoading: false });
                             alert(parseError(data.message));
                         }
                     }.bind(this)
@@ -137,13 +141,21 @@ export class EditProfileScreen extends Component {
                             onChangeText={(text) => this.setState({venmo:text})}
                             ref={(input)=>this.fifthTextInput = input}
                             onSubmitEditing={() => this.handleUpdate()} />
-                        <Button
-                            buttonStyle={styles.button}
-                            onPress={() => this.handleUpdate()}
-                            accessoryRight={EditIcon}
-                        >
-                        Update Profile
-                        </Button>
+                        {!this.state.isLoading ?
+                            <Button
+                                onPress={() => this.handleUpdate()}
+                                accessoryRight={EditIcon}
+                            >
+                                Update Profile
+                            </Button>
+                            :
+                            <Button
+                                appearance="outline"
+                                accessoryRight={LoadingIndicator}
+                            >
+                                Loading
+                            </Button>
+                        }
                     </Layout>
                 </Layout>
             </>

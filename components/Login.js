@@ -6,7 +6,7 @@ import { UserContext } from '../utils/UserContext.js';
 import { removeOldToken } from '../utils/OfflineToken.js';
 import { getPushToken } from '../utils/Notifications.js';
 import { config } from '../utils/config';
-import { LoginIcon, SignUpIcon, QuestionIcon } from '../utils/Icons';
+import { LoginIcon, SignUpIcon, QuestionIcon, LoadingIndicator } from '../utils/Icons';
 import { parseError } from "../utils/errors";
 
 export default class LoginScreen extends Component {
@@ -118,7 +118,7 @@ export default class LoginScreen extends Component {
                         Login
                         </Button>
                         :
-                        <Button appearance='outline'>
+                        <Button appearance='outline' accessoryRight={LoadingIndicator}>
                             Loading
                         </Button>
                     }

@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 import { Icon, Layout, Button, Input, TopNavigation, TopNavigationAction } from '@ui-kitten/components';
 import { UserContext } from '../utils/UserContext.js';
 import { config } from "../utils/config";
-import { EditIcon } from "../utils/Icons";
+import { EditIcon, LoadingIndicator } from "../utils/Icons";
 import { parseError } from "../utils/errors";
 
 export class ChangePasswordScreen extends Component {
@@ -12,21 +12,14 @@ export class ChangePasswordScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
+            isLoading: false,
             password: '',
             password2: ''
         }
     }
 
     async handleChangePassword () {
-        if (this.state.password !== this.state.password2) {
-            alert("Your passwords do not match!");
-            return;
-        }
-
-        if (!this.state.password || !this.state.password2) {
-            alert("Please enter a longer password.");
-            return;
-        }
+        this.setState({ isLoading: true });
 
         //Define our Main Navigation, use this so send user back a page
         const navigationStuff = this.props.navigation;
@@ -56,6 +49,7 @@ export class ChangePasswordScreen extends Component {
                             navigationStuff.goBack();
                         }
                         else {
+                            this.setState({ isLoading: false });
                             alert(parseError(data.message));
                         }
                     }.bind(this)
@@ -97,13 +91,21 @@ export class ChangePasswordScreen extends Component {
                             onChangeText={(text) => this.setState({password2: text})}
                             ref={(input)=>this.secondTextInput = input}
                             onSubmitEditing={() => this.handleChangePassword()} />
-                        <Button
-                            buttonStyle={styles.button}
-                            onPress={() => this.handleChangePassword()}
-                            accessoryRight={EditIcon}
-                        >
-                            Change Password
-                        </Button>
+                        {!this.state.isLoading ? 
+                            <Button
+                                onPress={() => this.handleChangePassword()}
+                                accessoryRight={EditIcon}
+                            >
+                                Change Password
+                            </Button>
+                            :
+                            <Button
+                                appearance="outline"
+                                accessoryRight={LoadingIndicator}
+                            >
+                                Loading
+                            </Button>
+                        }
                     </Layout>
                 </Layout>
             </>

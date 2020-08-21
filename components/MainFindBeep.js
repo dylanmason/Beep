@@ -14,7 +14,8 @@ import {
     BackIcon,
     GetIcon,
     FindIcon,
-    ShareIcon
+    ShareIcon,
+    LoadingIndicator
 } from '../utils/Icons.js';
 
 import { parseError } from "../utils/errors";
@@ -440,7 +441,7 @@ export class MainFindBeepScreen extends Component {
                             Get Beep
                             </Button>
                             :
-                            <Button appearance='outline' style={styles.buttons}>
+                            <Button appearance='outline' style={styles.buttons} accessoryRight={LoadingIndicator}>
                                 Loading
                             </Button>
                         }
@@ -500,6 +501,7 @@ export class MainFindBeepScreen extends Component {
                                 size='large'
                                 style={{marginTop:15}}
                                 appearance='outline'
+                                accessoryRight={LoadingIndicator}
                             >
                                 Loading
                             </Button>
@@ -651,7 +653,7 @@ export class MainFindBeepScreen extends Component {
                             Leave Queue
                             </Button>
                             :
-                            <Button appearance='outline'>
+                            <Button appearance='outline' accessoryRight={LoadingIndicator}>
                                 Loading
                             </Button>
                         }
