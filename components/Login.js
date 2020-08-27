@@ -8,6 +8,12 @@ import { getPushToken } from '../utils/Notifications.js';
 import { config } from '../utils/config';
 import { LoginIcon, SignUpIcon, QuestionIcon, LoadingIndicator } from '../utils/Icons';
 import { parseError } from "../utils/errors";
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { Icon } from '@ui-kitten/components';
+
+const AlertIcon = (props) => (
+    <Icon {...props} name='alert-circle-outline'/>
+);
 
 export default class LoginScreen extends Component {
     static contextType = UserContext;
@@ -17,9 +23,21 @@ export default class LoginScreen extends Component {
         this.state = {
             isLoading: false,
             username: "",
-            password: ""
+            password: "",
+            secureTextEntry: true
         };
     }
+
+    toggleSecureEntry = () => {
+        this.setState({secureTextEntry:
+            !this.state.secureTextEntry});
+    }
+
+    renderIcon = (props) => (
+        <TouchableWithoutFeedback onPress={this.toggleSecureEntry}>
+            <Icon {...props} name={this.state.secureTextEntry ? 'eye-off' :'eye'}/>
+        </TouchableWithoutFeedback>
+    );
 
     componentDidMount() {
         SplashScreen.hideAsync();
@@ -104,7 +122,9 @@ export default class LoginScreen extends Component {
                         textContentType="password"
                         placeholder="Password"
                         returnKeyType="go"
-                        secureTextEntry={true}
+                        captionIcon={AlertIcon}
+                        accessoryRight={this.renderIcon}
+                        secureTextEntry={this.state.secureTextEntry}
                         onChangeText={(text) => this.setState({password: text})}
                         ref={(input)=>this.secondTextInput = input}
                         onSubmitEditing={() => this.handleLogin()}
